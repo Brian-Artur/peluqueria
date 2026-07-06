@@ -1,0 +1,13 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (nunca al repo)
+.env
+db.env
+
+# Build del frontend
+dist/
+
+# Logs y basura del SO
+*.log
+.DS_Store
