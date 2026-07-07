@@ -1,0 +1,21 @@
+-- Semilla v1: datos de demostración inventados
+
+INSERT INTO cliente (nombre, telefono) VALUES
+  ('María López',      '+34 600 111 222'),
+  ('Carlos Ruiz',      '+34 600 333 444'),
+  ('Lucía Fernández',  '+34 600 555 666'),
+  ('Javier Moreno',    NULL);
+
+INSERT INTO servicio (nombre, duracion_min, precio) VALUES
+  ('Corte de pelo', 30, 15.00),
+  ('Manicura',      45, 20.00);
+
+-- Citas repartidas en una semana. inicio + fin coherentes con la duración
+-- del servicio, pero congelados en la propia cita (patrón snapshot).
+INSERT INTO cita (cliente_id, servicio_id, inicio, fin, estado) VALUES
+  (1, 1, '2026-07-06 10:00:00', '2026-07-06 10:30:00', 'reservada'),
+  (2, 2, '2026-07-06 11:00:00', '2026-07-06 11:45:00', 'reservada'),
+  (3, 1, '2026-07-07 09:30:00', '2026-07-07 10:00:00', 'completada'),
+  (1, 2, '2026-07-08 16:00:00', '2026-07-08 16:45:00', 'reservada'),
+  (4, 1, '2026-07-09 12:00:00', '2026-07-09 12:30:00', 'cancelada'),
+  (2, 1, '2026-07-10 17:00:00', '2026-07-10 17:30:00', 'reservada');

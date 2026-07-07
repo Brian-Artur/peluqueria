@@ -9,6 +9,7 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - peluqueria_data:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
 
 volumes:
   peluqueria_data:
