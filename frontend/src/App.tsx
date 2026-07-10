@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Calendario from "./Calendario";
 
 type Cita = {
   id: number;
@@ -12,30 +13,11 @@ type Cita = {
 };
 
 function App() {
-  const [citas, setCitas] = useState<Cita[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/citas")
-      .then((res) => res.json())
-      .then((data) => setCitas(data))
-      .catch(() => setError("No se pudieron cargar las citas"));
-  }, []);
-
-  if (error) return <p>{error}</p>;
-
   return (
     <div>
-      <h1>Citas</h1>
-      <ul>
-        {citas.map((cita) => (
-          <li key={cita.id}>
-            {cita.inicio} — {cita.cliente_nombre} ({cita.servicio_nombre}) [{cita.estado}]
-          </li>
-        ))}
-      </ul>
+      <h1>Agenda</h1>
+      <Calendario />
     </div>
   );
 }
-
 export default App;
