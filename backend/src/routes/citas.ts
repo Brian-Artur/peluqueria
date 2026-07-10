@@ -6,7 +6,6 @@ import {
   moverCita,
   cancelarCita,
 } from "../services/citaService";
-import { ErrorNoEncontrado, ErrorConflicto } from "../errores";
 
 export const citasRouter = Router();
 
@@ -20,27 +19,13 @@ const moverCitaSchema = z.object({
   inicio: z.string().datetime(),
 });
 
-function traducirError(error: unknown, res: any) {
-  if (error instanceof ErrorNoEncontrado) {
-    return res.status(404).json({ error: error.message });
-  }
-  if (error instanceof ErrorConflicto) {
-    return res.status(409).json({ error: error.message });
-  }
-  return res.status(500).json({ error: "Error interno" });
-}
-
 function parsearId(valor: string): number | null {
   const id = Number(valor);
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 citasRouter.get("/citas", async (_req, res) => {
-  try {
-    res.json(await listarCitas());
-  } catch (error) {
-    traducirError(error, res);
-  }
+  res.json(await listarCitas());
 });
 
 citasRouter.post("/citas", async (req, res) => {
@@ -49,13 +34,9 @@ citasRouter.post("/citas", async (req, res) => {
     return res.status(400).json({ error: "Datos inválidos", detalles: parsed.error.issues });
   }
 
-  try {
-    const { cliente_id, servicio_id, inicio } = parsed.data;
-    const id = await crearCita(cliente_id, servicio_id, inicio);
-    res.status(201).json({ id });
-  } catch (error) {
-    traducirError(error, res);
-  }
+  const { cliente_id, servicio_id, inicio } = parsed.data;
+  const id = await crearCita(cliente_id, servicio_id, inicio);
+  res.status(201).json({ id });
 });
 
 citasRouter.patch("/citas/:id", async (req, res) => {
@@ -67,22 +48,14 @@ citasRouter.patch("/citas/:id", async (req, res) => {
     return res.status(400).json({ error: "Datos inválidos", detalles: parsed.error.issues });
   }
 
-  try {
-    await moverCita(id, parsed.data.inicio);
-    res.status(204).send();
-  } catch (error) {
-    traducirError(error, res);
-  }
+  await moverCita(id, parsed.data.inicio);
+  res.status(204).send();
 });
 
 citasRouter.post("/citas/:id/cancelar", async (req, res) => {
   const id = parsearId(req.params.id);
   if (!id) return res.status(400).json({ error: "Id inválido" });
 
-  try {
-    await cancelarCita(id);
-    res.status(204).send();
-  } catch (error) {
-    traducirError(error, res);
-  }
+  await cancelarCita(id);
+  res.status(204).send();
 });
