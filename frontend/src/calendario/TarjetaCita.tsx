@@ -12,6 +12,7 @@ function TarjetaCita({ cita }: Props) {
   return (
     <div
       className={`cita ${cita.estado}`}
+      // Posición in-line (cambia dinámicamente)
       style={{
         gridColumn: columnaDeDia(inicio),
         gridRow: `${filaDeHora(inicio)} / ${filaDeHora(fin)}`,
