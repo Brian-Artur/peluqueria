@@ -8,3 +8,7 @@ export type Cita = {
   servicio_id: number;
   servicio_nombre: string;
 };
+
+export type Seleccion =
+  | { tipo: "hueco"; inicio: Date }   // click en celda vacía → crear
+  | { tipo: "cita"; id: number };     // click en cita existente → ver/editar

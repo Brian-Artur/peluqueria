@@ -1,11 +1,15 @@
 import { HORAS } from "./constantes";
 import FilaHora from "./FilaHora";
 
-function Rejilla() {
+type Props = {
+  onSeleccionarHueco: (d: number, hora: number) => void;
+};
+
+function Rejilla({ onSeleccionarHueco }: Props) {
   return (
     <>
       {HORAS.map((hora) => (
-        <FilaHora key={hora} hora={hora} />
+        <FilaHora key={hora} hora={hora} onSeleccionarHueco={onSeleccionarHueco} />
       ))}
     </>
   );

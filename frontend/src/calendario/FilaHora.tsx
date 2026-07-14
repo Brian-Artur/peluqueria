@@ -2,9 +2,10 @@ import { DIAS, FRANJAS_POR_HORA, HORA_APERTURA } from "./constantes";
 
 type Props = {
   hora: number;
+  onSeleccionarHueco: (d: number, hora: number) => void;
 };
 
-function FilaHora({ hora }: Props) {
+function FilaHora({ hora, onSeleccionarHueco }: Props) {
   const filaInicio = (hora - HORA_APERTURA) * FRANJAS_POR_HORA + 2;
 
   return (
@@ -20,12 +21,8 @@ function FilaHora({ hora }: Props) {
         <div
           key={dia}
           className="celda"
-          style={{
-            // dia 0 -> col 2
-            gridColumn: d + 2,
-            gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}`,
-            // 60 / 5 = 12 franjas
-          }}
+          style={{ gridColumn: d + 2, gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}` }}
+          onClick={() => onSeleccionarHueco(d, hora)}
         />
       ))}
     </>
