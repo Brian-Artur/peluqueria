@@ -12,3 +12,16 @@ export type Cita = {
 export type Seleccion =
   | { tipo: "hueco"; inicio: Date }   // click en celda vacía → crear
   | { tipo: "cita"; id: number };     // click en cita existente → ver/editar
+
+export type Cliente = {
+  id: number;
+  nombre: string;
+  telefono: string | null;
+};
+
+export type Servicio = {
+  id: number;
+  nombre: string;
+  duracion_min: number;
+  precio: number;
+};

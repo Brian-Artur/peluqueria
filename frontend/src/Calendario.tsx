@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Cita, Seleccion } from "./tipos";
+import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
 import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
@@ -14,6 +14,8 @@ function Calendario() {
   const [lunesVisible, setLunesVisible] = useState(() =>
     lunesDeEstaSemana(new Date())
   );
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
 
   const [seleccion, setSeleccion] = useState<Seleccion | null>(null);
 
@@ -29,6 +31,21 @@ function Calendario() {
       .then(setCitas)
       .catch(() => setCitas([]));
   }, []);
+  useEffect(() => {
+    fetch("/api/clientes")
+      .then((res) => res.json())
+      .then(setClientes)
+      .catch(() => setClientes([]));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/servicios")
+      .then((res) => res.json())
+      .then(setServicios)
+      .catch(() => setServicios([]));
+  }, []);
+
+console.log("clientes", clientes, "servicios", servicios);
 
   const semanaAnterior = () => setLunesVisible(sumarDias(lunesVisible, -7));
   const semanaSiguiente = () => setLunesVisible(sumarDias(lunesVisible, 7));
