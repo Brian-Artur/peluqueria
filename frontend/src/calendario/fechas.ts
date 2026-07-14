@@ -6,3 +6,9 @@ export function lunesDeEstaSemana(fecha: Date): Date {
   lunes.setHours(0, 0, 0, 0);                // medianoche limpia
   return lunes;                     // Lunes esterilizado
 }
+
+export function sumarDias(fecha: Date, dias: number): Date {
+  const nueva = new Date(fecha);        // copiar: setDate muta
+  nueva.setDate(nueva.getDate() + dias);
+  return nueva;
+}
