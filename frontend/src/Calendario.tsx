@@ -45,7 +45,6 @@ function Calendario() {
       .catch(() => setServicios([]));
   }, []);
 
-console.log("clientes", clientes, "servicios", servicios);
 
   const semanaAnterior = () => setLunesVisible(sumarDias(lunesVisible, -7));
   const semanaSiguiente = () => setLunesVisible(sumarDias(lunesVisible, 7));
@@ -67,7 +66,12 @@ console.log("clientes", clientes, "servicios", servicios);
       </div>
 
       {seleccion && (
-        <Panel seleccion={seleccion} onCerrar={() => setSeleccion(null)} />
+        <Panel
+          seleccion={seleccion}
+          clientes={clientes}
+          servicios={servicios}
+          onCerrar={() => setSeleccion(null)}
+  />
       )}
     </>
   );
