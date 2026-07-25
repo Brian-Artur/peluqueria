@@ -7,10 +7,11 @@ type Props = {
   servicios: Servicio[];
   citaSeleccionada: Cita | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
+  onCancelar: (id: number) => void;
   onCerrar: () => void;
 };
 
-function Panel({ seleccion, clientes, servicios, onCrear, onCerrar }: Props) {
+function Panel({ seleccion, clientes, servicios, citaSeleccionada, onCrear, onCancelar, onCerrar }: Props) {
   const [clienteId, setClienteId] = useState<number | null>(null);
   const [servicioId, setServicioId] = useState<number | null>(null);
 
@@ -51,6 +52,21 @@ function Panel({ seleccion, clientes, servicios, onCrear, onCerrar }: Props) {
           >
             Crear cita
           </button>
+        </div>
+      )}
+
+       {seleccion.tipo === "cita" && citaSeleccionada && (
+        <div>
+          <p><strong>{citaSeleccionada.cliente_nombre}</strong></p>
+          <p>{citaSeleccionada.servicio_nombre}</p>
+          <p>{new Date(citaSeleccionada.inicio).toLocaleString("es-ES")}</p>
+          <p>Estado: {citaSeleccionada.estado}</p>
+
+          {citaSeleccionada.estado === "reservada" && (
+            <button onClick={() => onCancelar(citaSeleccionada.id)}>
+              Cancelar cita
+            </button>
+          )}
         </div>
       )}
     </div>
