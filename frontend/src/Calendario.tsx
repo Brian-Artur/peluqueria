@@ -25,6 +25,8 @@ function Calendario() {
     setSeleccion({ tipo: "hueco", inicio });
   };
 
+  const seleccionarCita = (id: number) => setSeleccion({ tipo: "cita", id });
+
   const crearCita = async (clienteId: number, servicioId: number, inicio: Date) => {
     await fetch("/api/citas", {
       method: "POST",
@@ -66,6 +68,11 @@ function Calendario() {
   const semanaAnterior = () => setLunesVisible(sumarDias(lunesVisible, -7));
   const semanaSiguiente = () => setLunesVisible(sumarDias(lunesVisible, 7));
 
+  const citaSeleccionada =
+    seleccion?.tipo === "cita"
+      ? citas.find((c) => c.id === seleccion.id) ?? null
+      : null;
+
   return (
     <>
       <ControlesSemana
@@ -78,7 +85,7 @@ function Calendario() {
         <CabeceraDias />
         <Rejilla onSeleccionarHueco={seleccionarHueco} />
         {citas.map((cita) => (
-          <TarjetaCita key={cita.id} cita={cita} />
+          <TarjetaCita key={cita.id} cita={cita} onSeleccionarCita={seleccionarCita} />
         ))}
       </div>
 
@@ -87,6 +94,7 @@ function Calendario() {
           seleccion={seleccion}
           clientes={clientes}
           servicios={servicios}
+          citaSeleccionada={citaSeleccionada}
           onCrear={crearCita}
           onCerrar={() => setSeleccion(null)}
         />

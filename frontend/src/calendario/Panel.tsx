@@ -1,10 +1,11 @@
 import { useState } from "react";
-import type { Seleccion, Cliente, Servicio } from "../tipos";
+import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
 
 type Props = {
   seleccion: Seleccion;
   clientes: Cliente[];
   servicios: Servicio[];
+  citaSeleccionada: Cita | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
   onCerrar: () => void;
 };
