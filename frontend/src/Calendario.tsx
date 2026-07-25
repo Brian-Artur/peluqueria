@@ -25,6 +25,23 @@ function Calendario() {
     setSeleccion({ tipo: "hueco", inicio });
   };
 
+  const crearCita = async (clienteId: number, servicioId: number, inicio: Date) => {
+    await fetch("/api/citas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cliente_id: clienteId,
+        servicio_id: servicioId,
+        inicio: inicio.toISOString(),
+      }),
+    });
+
+    const res = await fetch("/api/citas");   // refrescar desde el servidor
+    setCitas(await res.json());
+
+    setSeleccion(null);                       // cerrar el panel
+  };
+
   useEffect(() => {
     fetch("/api/citas")
       .then((res) => res.json())
@@ -70,8 +87,9 @@ function Calendario() {
           seleccion={seleccion}
           clientes={clientes}
           servicios={servicios}
+          onCrear={crearCita}
           onCerrar={() => setSeleccion(null)}
-  />
+        />
       )}
     </>
   );

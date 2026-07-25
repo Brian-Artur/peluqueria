@@ -5,10 +5,11 @@ type Props = {
   seleccion: Seleccion;
   clientes: Cliente[];
   servicios: Servicio[];
+  onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
   onCerrar: () => void;
 };
 
-function Panel({ seleccion, clientes, servicios, onCerrar }: Props) {
+function Panel({ seleccion, clientes, servicios, onCrear, onCerrar }: Props) {
   const [clienteId, setClienteId] = useState<number | null>(null);
   const [servicioId, setServicioId] = useState<number | null>(null);
 
@@ -39,6 +40,16 @@ function Panel({ seleccion, clientes, servicios, onCerrar }: Props) {
               <option key={s.id} value={s.id}>{s.nombre}</option>
             ))}
           </select>
+
+          <button
+            disabled={clienteId === null || servicioId === null}
+            onClick={() => {
+              if (clienteId === null || servicioId === null) return;
+              onCrear(clienteId, servicioId, seleccion.inicio);
+            }}
+          >
+            Crear cita
+          </button>
         </div>
       )}
     </div>
