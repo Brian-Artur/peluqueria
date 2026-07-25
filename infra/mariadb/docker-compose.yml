@@ -1,3 +1,5 @@
+name: peluqueria
+
 services:
   mariadb:
     image: mariadb:12
@@ -6,10 +8,12 @@ services:
     env_file:
       - db.env
     ports:
-      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:3305:3306"
     volumes:
       - peluqueria_data:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
 
 volumes:
   peluqueria_data:
+    name: mariadb_peluqueria_data
+    external: true
