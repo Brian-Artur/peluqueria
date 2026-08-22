@@ -10,12 +10,13 @@ const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
 
 app.use(express.json());
-app.use(healthRouter);
-app.use(serviciosRouter);
-app.use(clientesRouter);
-app.use(citasRouter);
 
-app.use(manejadorErrores); 
+app.use(healthRouter);                 // /health en raíz: lo llama el healthcheck de Docker
+app.use("/api", serviciosRouter);
+app.use("/api", clientesRouter);
+app.use("/api", citasRouter);
+
+app.use(manejadorErrores);
 
 app.listen(PORT, () => {
   console.log(`Backend escuchando en http://localhost:${PORT}`);

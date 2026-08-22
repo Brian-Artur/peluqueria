@@ -45,13 +45,13 @@ function Calendario() {
   };
 
   const cancelarCita = async (id: number) => {
-  await fetch(`/api/citas/${id}/cancelar`, { method: "POST" });
+    await fetch(`/api/citas/${id}/cancelar`, { method: "POST" });
 
-  const res = await fetch("/api/citas");   // refrescar desde el servidor
-  setCitas(await res.json());
+    const res = await fetch("/api/citas");   // refrescar desde el servidor
+    setCitas(await res.json());
 
-  setSeleccion(null);                       // cerrar el panel
-};
+    setSeleccion(null);                       // cerrar el panel
+  };
 
   useEffect(() => {
     fetch("/api/citas")
@@ -82,6 +82,18 @@ function Calendario() {
       ? citas.find((c) => c.id === seleccion.id) ?? null
       : null;
 
+  const moverCita = async (id: number, inicio: string) => {
+    await fetch(`/api/citas/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inicio }),
+    });
+
+    const res = await fetch("/api/citas");
+    setCitas(await res.json());
+    setSeleccion(null);
+  };
+
   return (
     <>
       <ControlesSemana
@@ -106,6 +118,7 @@ function Calendario() {
           citaSeleccionada={citaSeleccionada}
           onCrear={crearCita}
           onCancelar={cancelarCita}
+          onMover={moverCita}
           onCerrar={() => setSeleccion(null)}
         />
       )}

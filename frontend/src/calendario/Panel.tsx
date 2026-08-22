@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
+import { fechaParaInput } from "./fechas";
 
 type Props = {
   seleccion: Seleccion;
@@ -8,12 +9,24 @@ type Props = {
   citaSeleccionada: Cita | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
   onCancelar: (id: number) => void;
+  onMover: (id: number, inicio: string) => void;
   onCerrar: () => void;
 };
 
-function Panel({ seleccion, clientes, servicios, citaSeleccionada, onCrear, onCancelar, onCerrar }: Props) {
+function Panel({
+  seleccion,
+  clientes,
+  servicios,
+  citaSeleccionada,
+  onCrear,
+  onCancelar,
+  onMover,
+  onCerrar
+}: Props) {
+
   const [clienteId, setClienteId] = useState<number | null>(null);
   const [servicioId, setServicioId] = useState<number | null>(null);
+  const [nuevoInicio, setNuevoInicio] = useState("");
 
   return (
     <div className="panel">
@@ -55,7 +68,7 @@ function Panel({ seleccion, clientes, servicios, citaSeleccionada, onCrear, onCa
         </div>
       )}
 
-       {seleccion.tipo === "cita" && citaSeleccionada && (
+      {seleccion.tipo === "cita" && citaSeleccionada && (
         <div>
           <p><strong>{citaSeleccionada.cliente_nombre}</strong></p>
           <p>{citaSeleccionada.servicio_nombre}</p>
@@ -63,9 +76,28 @@ function Panel({ seleccion, clientes, servicios, citaSeleccionada, onCrear, onCa
           <p>Estado: {citaSeleccionada.estado}</p>
 
           {citaSeleccionada.estado === "reservada" && (
-            <button onClick={() => onCancelar(citaSeleccionada.id)}>
-              Cancelar cita
-            </button>
+            <>
+              <input
+                type="datetime-local"
+                value={nuevoInicio || fechaParaInput(citaSeleccionada.inicio)}
+                onChange={(e) => setNuevoInicio(e.target.value)}
+              />
+              <button
+                onClick={() =>
+                  onMover(
+                    citaSeleccionada.id,
+                    new Date(nuevoInicio || fechaParaInput(citaSeleccionada.inicio))
+                      .toISOString()
+                  )
+                }
+              >
+                Mover cita
+              </button>
+
+              <button onClick={() => onCancelar(citaSeleccionada.id)}>
+                Cancelar cita
+              </button>
+            </>
           )}
         </div>
       )}
