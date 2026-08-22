@@ -112,6 +112,11 @@ function Calendario() {
 
       {seleccion && (
         <Panel
+          key={
+            seleccion.tipo === "cita"
+              ? `cita-${seleccion.id}`
+              : `hueco-${seleccion.inicio.toISOString()}`
+          }
           seleccion={seleccion}
           clientes={clientes}
           servicios={servicios}
