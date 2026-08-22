@@ -53,6 +53,15 @@ function Calendario() {
     setSeleccion(null);                       // cerrar el panel
   };
 
+  const completarCita = async (id: number) => {
+    await fetch(`/api/citas/${id}/completar`, { method: "POST" });
+
+    const res = await fetch("/api/citas");   // refrescar desde el servidor
+    setCitas(await res.json());
+
+    setSeleccion(null);                       // cerrar el panel
+  };
+
   useEffect(() => {
     fetch("/api/citas")
       .then((res) => res.json())
@@ -130,6 +139,7 @@ function Calendario() {
           citaSeleccionada={citaSeleccionada}
           onCrear={crearCita}
           onCancelar={cancelarCita}
+          onCompletar={completarCita}
           onMover={moverCita}
           onCerrar={() => setSeleccion(null)}
         />

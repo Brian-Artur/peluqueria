@@ -9,6 +9,7 @@ type Props = {
   citaSeleccionada: Cita | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
   onCancelar: (id: number) => void;
+  onCompletar: (id: number) => void;
   onMover: (id: number, inicio: string) => void;
   onCerrar: () => void;
 };
@@ -20,6 +21,7 @@ function Panel({
   citaSeleccionada,
   onCrear,
   onCancelar,
+  onCompletar,
   onMover,
   onCerrar
 }: Props) {
@@ -82,6 +84,9 @@ function Panel({
                 value={nuevoInicio || fechaParaInput(citaSeleccionada.inicio)}
                 onChange={(e) => setNuevoInicio(e.target.value)}
               />
+              <button onClick={() => onCompletar(citaSeleccionada.id)}>
+                Completar cita
+              </button>
               <button
                 onClick={() =>
                   onMover(
