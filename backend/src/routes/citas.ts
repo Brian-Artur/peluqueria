@@ -5,6 +5,7 @@ import {
   crearCita,
   moverCita,
   cancelarCita,
+  completarCita,
 } from "../services/citaService";
 
 export const citasRouter = Router();
@@ -57,5 +58,13 @@ citasRouter.post("/citas/:id/cancelar", async (req, res) => {
   if (!id) return res.status(400).json({ error: "Id inválido" });
 
   await cancelarCita(id);
+  res.status(204).send();
+});
+
+citasRouter.post("/citas/:id/completar", async (req, res) => {
+  const id = parsearId(req.params.id);
+  if (!id) return res.status(400).json({ error: "Id inválido" });
+
+  await completarCita(id);
   res.status(204).send();
 });

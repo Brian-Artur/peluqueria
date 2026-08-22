@@ -58,6 +58,17 @@ export async function cancelarCita(id: number) {
   await updateEstado(id, "cancelada");
 }
 
+export async function completarCita(id: number) {
+  const cita = await findCitaById(id);
+  if (!cita) throw new ErrorNoEncontrado("Cita no encontrada");
+
+  if (cita.estado !== "reservada") {
+    throw new ErrorConflicto("Solo se pueden completar citas reservadas");
+  }
+
+  await updateEstado(id, "completada");
+}
+
 // El fin de una cita es su inicio más la duración del servicio (snapshot)
 function calcularFin(inicio: Date, duracionMin: number): Date {
   return new Date(inicio.getTime() + duracionMin * 60_000);
