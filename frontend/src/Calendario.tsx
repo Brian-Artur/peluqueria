@@ -94,6 +94,13 @@ function Calendario() {
     setSeleccion(null);
   };
 
+  const domingoSiguiente = sumarDias(lunesVisible, 7);
+
+  const citasDeLaSemana = citas.filter((cita) => {
+    const inicio = new Date(cita.inicio);
+    return inicio >= lunesVisible && inicio < domingoSiguiente;
+  });
+
   return (
     <>
       <ControlesSemana
@@ -105,7 +112,7 @@ function Calendario() {
       <div className="calendario">
         <CabeceraDias />
         <Rejilla onSeleccionarHueco={seleccionarHueco} />
-        {citas.map((cita) => (
+        {citasDeLaSemana.map((cita) => (
           <TarjetaCita key={cita.id} cita={cita} onSeleccionarCita={seleccionarCita} />
         ))}
       </div>
