@@ -34,7 +34,7 @@ function Panel({
   const [nuevoInicio, setNuevoInicio] = useState("");
 
   return (
-    <div className="panel">
+    <div>
       <button onClick={onCerrar}>Cerrar</button>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
 

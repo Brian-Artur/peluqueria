@@ -6,7 +6,7 @@ type Props = {
 
 function ControlesSemana({ lunesVisible, onAnterior, onSiguiente }: Props) {
   return (
-    <div className="controles-semana">
+    <div>
       <button onClick={onAnterior}>← Anterior</button>
       <span>{lunesVisible.toLocaleDateString("es-ES")}</span>
       <button onClick={onSiguiente}>Siguiente →</button>
