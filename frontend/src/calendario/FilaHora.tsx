@@ -1,4 +1,5 @@
 import { DIAS, FRANJAS_POR_HORA, HORA_APERTURA } from "./constantes";
+import styles from "./FilaHora.module.css";
 
 type Props = {
   hora: number;
@@ -11,7 +12,7 @@ function FilaHora({ hora, onSeleccionarHueco }: Props) {
   return (
     <>
       <div
-        className="etiqueta-hora"
+        className={styles.etiquetaHora}
         style={{ gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}` }}
       >
         {hora}:00
@@ -20,7 +21,7 @@ function FilaHora({ hora, onSeleccionarHueco }: Props) {
       {DIAS.map((dia, d) => (
         <div
           key={dia}
-          className="celda"
+          className={styles.celda}
           style={{ gridColumn: d + 2, gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}` }}
           onClick={() => onSeleccionarHueco(d, hora)}
         />

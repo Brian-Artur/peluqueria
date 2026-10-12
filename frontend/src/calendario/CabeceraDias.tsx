@@ -1,11 +1,12 @@
 import { DIAS } from "./constantes";
+import styles from "./CabeceraDias.module.css";
 
 function CabeceraDias() {
   return (
     <>
-      <div className="esquina" />
+      <div className={styles.esquina} />
       {DIAS.map((dia, i) => (
-        <div key={dia} className="cabecera-dia" style={{ gridColumn: i + 2 }}>
+        <div key={dia} className={styles.cabeceraDia} style={{ gridColumn: i + 2 }}>
           {dia}
         </div>
       ))}

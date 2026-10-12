@@ -4,7 +4,7 @@ import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
 import { lunesDeEstaSemana, sumarDias } from "./calendario/fechas";
-import "./Calendario.css";
+import styles from "./Calendario.module.css";
 import ControlesSemana from "./calendario/ControlesSemana";
 import Panel from "./calendario/Panel";
 
@@ -118,7 +118,7 @@ function Calendario() {
         onSiguiente={semanaSiguiente}
       />
 
-      <div className="calendario">
+      <div className={styles.calendario}>
         <CabeceraDias />
         <Rejilla onSeleccionarHueco={seleccionarHueco} />
         {citasDeLaSemana.map((cita) => (

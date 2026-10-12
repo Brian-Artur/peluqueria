@@ -1,0 +1,8 @@
+.calendario {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr); /* 8 colum = 1 cab + 7 dias */
+  grid-template-rows: 40px repeat(132, 5px);  /* 1 cab + 132 franjas de 5min */
+  border: 1px solid #ddd;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}

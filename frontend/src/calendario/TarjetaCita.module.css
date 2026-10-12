@@ -1,0 +1,33 @@
+.cita {
+  margin: 1px 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: white;
+  font-size: 11px;
+  line-height: 1.2;
+  overflow: hidden;
+  z-index: 1;
+  position: relative;
+}
+
+.cita.reservada {
+  background: #4a7ba7;
+}
+
+.cita.completada {
+  background: #5a8a5a;
+}
+
+.cita.cancelada {
+  background: #999;
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.citaCliente {
+  font-weight: 600;
+}
+
+.citaServicio {
+  opacity: 0.85;
+}

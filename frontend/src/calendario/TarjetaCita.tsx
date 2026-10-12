@@ -1,5 +1,6 @@
 import type { Cita } from "../tipos";
 import { columnaDeDia, filaDeHora } from "./posicion";
+import styles from "./TarjetaCita.module.css";
 
 type Props = {
   cita: Cita;
@@ -12,15 +13,15 @@ function TarjetaCita({ cita, onSeleccionarCita }: Props) {
 
   return (
     <div
-      className={`cita ${cita.estado}`}
+      className={`${styles.cita} ${styles[cita.estado]}`}
       style={{
         gridColumn: columnaDeDia(inicio),
         gridRow: `${filaDeHora(inicio)} / ${filaDeHora(fin)}`,
       }}
       onClick={() => onSeleccionarCita(cita.id)}
     >
-      <div className="cita-cliente">{cita.cliente_nombre}</div>
-      <div className="cita-servicio">{cita.servicio_nombre}</div>
+      <div className={styles.citaCliente}>{cita.cliente_nombre}</div>
+      <div className={styles.citaServicio}>{cita.servicio_nombre}</div>
     </div>
   );
 }
