@@ -31,7 +31,7 @@ En el Windows donde corre `bot_trading`, con Docker Compose y sin que los proyec
 |---|---|---|
 | **v2 — Cimientos** | Migraciones versionadas (una BD v1 con datos se actualiza sin perder nada), tests con Vitest, usuarios y roles comprobados en el backend, y una sola definición de los tipos para frontend y backend (hoy duplicados a mano, sin validar respuestas). Sin esto, tocar el esquema es peligroso. | — |
 | **v3 — Plantilla, tiempos y local** | Empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
-| **v4 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. Después, **arrastrar citas**. | §6–7 |
+| **v4 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. El panel de la cita gana una sección con el empleado o empleados asignados. Después, **arrastrar citas**. | §6–7 |
 | **v5 — Dinero y stock** | Tickets, cobros, caja, comisiones, reparto con externos; productos, movimientos de stock, proveedores. VERI\*FACTU antes de cobrar de verdad. | §8 |
 | **v6 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v4. | §10 |
 | **v7 — Plano del local** | Editor sobre rejilla y puesto de cada empleado por jornada. | §9 |
