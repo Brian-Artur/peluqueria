@@ -81,6 +81,7 @@ function Panel({
             <>
               <input
                 type="datetime-local"
+                step={300}
                 value={nuevoInicio || fechaParaInput(citaSeleccionada.inicio)}
                 onChange={(e) => setNuevoInicio(e.target.value)}
               />
