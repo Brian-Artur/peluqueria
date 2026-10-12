@@ -44,6 +44,8 @@ En el Windows donde corre `bot_trading`, con Docker Compose y sin que los proyec
 - Auto-avance de semana al llevar la cita al borde: temporizador que dispara `±7 días` mientras el puntero está en la franja lateral y se cancela al volver; `useEffect` con limpieza.
 - Casos borde: soltar fuera de celda válida, sobre otra cita, fuera de horario, durante el cambio de semana; eventos táctiles.
 - Va después del motor porque necesita saber si el hueco de destino es válido.
+- Que se vea la **animación** de la tarjeta viajando de un día a otro (en dnd-kit, `DragOverlay`).
+- Revisar entonces el panel: pasar de columna a la derecha a **una tarjeta que se amplía** (zoom sobre la propia cita) **o una ventana flotante**. Encaja mejor con arrastrar, porque la acción ocurre sobre la cita y no en una columna aparte.
 
 ### Ramas
 

@@ -11,6 +11,10 @@
 - Backend Express + TypeScript + Zod + mysql2. Frontend React + Vite + TypeScript. MariaDB 12 en Docker. Monorepo.
 - **`Date` nativo** (sin date-fns) y **calendario en CSS Grid a mano** (sin librería de calendario).
 - **CSS Modules** para estilos. Ni Tailwind ni Bootstrap.
+- **Todos los colores, espacios y radios son variables en `index.css`**; ningún hexadecimal en los módulos. Cambiar de paleta o añadir modo oscuro es tocar un solo archivo.
+- **Paleta "ciruela suave"** (12/10/2026): blanco, gris cálido, acento ciruela `#7A4E7E`, completada en verde azulado `#2F7A72`. Alternativa que sigue en pie: "salón cálido" (fondo `#FBF7F2`, superficie `#F3EBE1`, texto `#3A2E28`, suave `#85756A`, línea `#E9DED2`, acento terracota `#B5543C` / tinte `#F7E3DC`, ok `#6B7A3A` / tinte `#ECEFDD`). **Descartada**: neutro con azul petróleo, demasiado frío y serio.
+- **Tarjetas de cita con tinte + barra lateral** del color del estado; los estados no dependen solo del color (✓ en completada, borde discontinuo y tachado en cancelada). Las citas de 30 min o menos van en una línea con "…" y el texto completo en `title`.
+- **Panel a la derecha** del calendario, fijo al hacer scroll. Modo oscuro: más adelante, sobre las mismas variables.
 - Esquema y semilla versionados en `infra/mariadb/initdb/`, con prefijo numérico: mismo `docker compose up`, misma BD en cualquier máquina.
 - Credenciales fuera del repo (`db.env`, `.env`). Usuario de app (`peluqueria_app`) separado de root, con privilegio mínimo.
 - Puertos propios para convivir con otros proyectos en la misma máquina: BD **3305**, backend **3100**, Vite **5180** con `strictPort` (si está ocupado, falla en vez de saltar a otro).
