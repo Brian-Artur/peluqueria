@@ -1,0 +1,20 @@
+{
+  "verticalPosition": 50,
+  "maxHeadingsInCollapsed": 25,
+  "hoverColor": "var(--text-accent)",
+  "animationDuration": 250,
+  "sidebarPosition": "right",
+  "maxHeadingLevel": 2,
+  "panelWidth": 260,
+  "panelMaxHeight": 540,
+  "collapsedWidth": 30,
+  "lineThickness": 4,
+  "panelScrollPosition": "closest",
+  "parseHtmlElements": false,
+  "useCustomRegex": false,
+  "customRegexPatterns": [
+    ""
+  ],
+  "hidePanelOnNavigation": false,
+  "enableFilter": false
+}

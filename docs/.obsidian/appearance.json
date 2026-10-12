@@ -1,0 +1,12 @@
+{
+  "cssTheme": "",
+  "enabledCssSnippets": [
+    "mi-tema"
+  ],
+  "monospaceFontFamily": "jetbrainsmono Nerd Font",
+  "showViewHeader": false,
+  "showRibbon": false,
+  "baseFontSize": 15,
+  "textFontFamily": "Noto Sans,IBM Plex Sans",
+  "theme": "moonstone"
+}

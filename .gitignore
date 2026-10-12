@@ -11,3 +11,8 @@ dist/
 # Logs y basura del SO
 *.log
 .DS_Store
+
+# Obsidian (docs/ es una bóveda): estado de ventanas y papelera interna
+docs/.obsidian/workspace.json
+docs/.obsidian/workspace-mobile.json
+docs/.trash/

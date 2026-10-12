@@ -1,0 +1,220 @@
+body {
+  --code-size: 0.95em;
+  /* ajústalo: 1.1em, 14px, lo que prefieras */
+
+  --link-color: #b7873a;
+  --link-color-hover: #dcaf67;
+  --link-external-color: #b7873a;
+  --link-external-color-hover: #dcaf67;
+  --link-unresolved-color: #7a6645;
+
+  --h1-size: 1.55em !important;
+  --h2-size: 1.35em !important;
+  --h3-size: 1.25em !important;
+  --h4-size: 1.2em !important;
+  --h5-size: 1.15em !important;
+  --h6-size: 1.1em !important;
+
+  --file-line-width: 600px;
+
+  /* Grosores — valen para claro y oscuro */
+  --table-border-width: 2px;
+  --table-header-border-width: 2px;
+  --table-column-first-border-width: 2px;
+  --table-column-last-border-width: 2px;
+  --table-row-last-border-width: 2px;
+
+  --hr-thickness: 4px;
+}
+
+body.theme-light {
+  --table-border-color: #cdcac5;
+  --table-header-border-color: #cdcac5;
+  --hr-color: #cdcac5de;
+
+  --code-background: #f4f3f0;
+}
+
+.cm-s-obsidian .HyperMD-codeblock {
+  background-color: #7d6520bd !important;
+}
+
+/* Negrita — vista de lectura */
+.markdown-rendered strong,
+.markdown-preview-view strong {
+  font-weight: 700;
+  color: #30aebe !important;
+  /* azul claro; ajusta el tono */
+}
+
+/* Negrita — editor / Live Preview */
+.cm-s-obsidian .cm-strong {
+  font-weight: 700;
+  color: #30aebe !important;
+}
+
+
+/* h1–h6 en blanco (lectura y editor) */
+body .markdown-preview-view :is(h1, h2, h3, h4, h5, h6),
+body .markdown-rendered :is(h1, h2, h3, h4, h5, h6),
+.cm-s-obsidian .HyperMD-header.cm-line {
+  color: #3a3a3a;
+}
+
+/* H1 — azul */
+.markdown-preview-view h1,
+.markdown-rendered h1,
+.HyperMD-header.HyperMD-header-1.cm-line {
+
+  padding: 0px 4px;
+  border-bottom: solid 4px rgba(79, 125, 224, 0.5);
+  margin-bottom: 4px;
+}
+
+/* H2 — verde azulado */
+.markdown-preview-view h2,
+.markdown-rendered h2,
+.HyperMD-header.HyperMD-header-2.cm-line {
+  border-bottom: solid 4px rgba(97, 218, 199, 0.5);
+  padding: 0px 4px;
+  margin-bottom: 4px;
+}
+
+/* H3 — naranja */
+.markdown-preview-view h3,
+.markdown-rendered h3,
+.HyperMD-header.HyperMD-header-3.cm-line {
+  border-bottom: solid 4px rgba(236, 192, 110, 0.5);
+  padding: 0px 4px;
+  margin-bottom: 4px;
+}
+
+/* H4 — morado */
+.markdown-preview-view h4,
+.markdown-rendered h4,
+.HyperMD-header.HyperMD-header-4.cm-line {
+  border-bottom: solid 4px rgba(178, 99, 206, 0.5);
+  padding: 0px 4px;
+  margin-bottom: 4px;
+}
+
+/* H5 — amarillo */
+.markdown-preview-view h5,
+.markdown-rendered h5,
+.HyperMD-header.HyperMD-header-5.cm-line {
+  border-bottom: solid 4px rgba(192, 118, 78, 0.5);
+  padding: 0px 4px;
+  margin-bottom: 4px;
+}
+
+/* H6 — rosa */
+.markdown-preview-view h6,
+.markdown-rendered h6,
+.HyperMD-header.HyperMD-header-6.cm-line {
+  border-bottom: solid 4px rgba(82, 178, 212, 0.5);
+  padding: 0px 4px;
+  margin-bottom: 4px;
+}
+
+.markdown-preview-view :is(h1, h2, h3, h4, h5, h6),
+.markdown-rendered :is(h1, h2, h3, h4, h5, h6) {
+  width: fit-content;
+  padding: 4px 4px;
+  margin-bottom: 2px;
+}
+
+
+/* Bloques de código en vista de lectura */
+.markdown-rendered pre,
+.markdown-rendered pre code {
+  line-height: 1.2;
+  /* bájalo a tu gusto: 1.2, 1.25... */
+  border-radius: 12px !important;
+}
+
+/* Bloques de código en el editor (Live Preview / source) */
+.cm-s-obsidian .HyperMD-codeblock {
+  line-height: 1.2;
+  background-color: #f3f2ef9d !important;
+}
+
+
+/* (Opcional) mismo efecto en el editor */
+.cm-s-obsidian .HyperMD-header.cm-line {
+  width: fit-content;
+}
+
+/* Código en línea — vista de lectura y editor */
+.markdown-rendered code:not(pre code),
+.cm-inline-code {
+  color: #a54949 !important;
+  /* rojo vino; ajusta el tono */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background-color: #f3f2ef9d !important;
+}
+
+/* Texto de las citas en naranja */
+body {
+  --quote-color: #a949a9;
+  /* el naranja que ya trae el tema */
+}
+
+/* Fondo gris con transparencia */
+body .markdown-preview-view blockquote,
+body .markdown-source-view.mod-cm6.is-live-preview .HyperMD-quote {
+  background-color: #e9e9f2 !important;
+}
+
+body.theme-dark {
+  --color-base-00: #181818;
+  /* editor y vista previa */
+  --color-base-10: #222223;
+  /* barra de título, fondos alternos */
+  --color-base-20: #1d1d1d;
+  /* paneles laterales */
+  --color-base-25: #313134;
+  /* hover, campos */
+  --color-base-30: #36363d;
+  /* bordes y marcos */
+  --color-base-35: #39393c;
+
+  --text-normal: #e0e2e1;
+}
+
+
+/* Cursiva — vista de lectura */
+.markdown-rendered em,
+.markdown-preview-view em {
+  color: #639432 !important;
+  /* ajústalo a tu gusto */
+}
+
+/* Cursiva — editor / Live Preview */
+.cm-s-obsidian .cm-em {
+  color: #639432 !important;
+}
+
+
+/* Negrita+cursiva — vista de lectura */
+.markdown-rendered strong em,
+.markdown-rendered em strong,
+.markdown-preview-view strong em,
+.markdown-preview-view em strong {
+  color: #8b65cd !important;
+  /* morado; ajústalo */
+}
+
+/* Negrita+cursiva — editor / Live Preview */
+.cm-s-obsidian .cm-strong.cm-em {
+  color: #8b65cd !important;
+}
+
+/* Ancho de línea — lectura y editor */
+.markdown-preview-view .markdown-preview-sizer,
+.markdown-source-view.mod-cm6 .cm-sizer {
+  max-width: 800px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+}
