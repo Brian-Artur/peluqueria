@@ -33,16 +33,8 @@ function CabeceraDias({ dias, onAnterior, onSiguiente }: Props): ReactElement {
         {semana}
       </div>
       {dias.map((dia, indice) => {
-        let clase = styles.cabeceraDia;
-        if (indice === 0) {
-          clase += ` ${styles.primero}`;
-        }
-        if (indice === dias.length - 1) {
-          clase += ` ${styles.ultimo}`;
-        }
-
         return (
-          <div key={dia.getTime()} className={clase} style={{ gridColumn: indice + 2 }}>
+          <div key={dia.getTime()} className={styles.cabeceraDia} style={{ gridColumn: indice + 2 }}>
             {indice === 0 && (
               <button
                 type="button"
