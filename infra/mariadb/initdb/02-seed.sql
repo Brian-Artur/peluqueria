@@ -12,10 +12,11 @@ INSERT INTO servicio (nombre, duracion_min, precio) VALUES
 
 -- Citas repartidas en una semana. inicio + fin coherentes con la duración
 -- del servicio, pero congelados en la propia cita (patrón snapshot).
+-- Los DATETIME están en UTC; en julio, la hora de España peninsular es UTC +2 h.
 INSERT INTO cita (cliente_id, servicio_id, inicio, fin, estado) VALUES
-  (1, 1, '2026-07-06 10:00:00', '2026-07-06 10:30:00', 'reservada'),
-  (2, 2, '2026-07-06 11:00:00', '2026-07-06 11:45:00', 'reservada'),
-  (3, 1, '2026-07-07 09:30:00', '2026-07-07 10:00:00', 'completada'),
-  (1, 2, '2026-07-08 16:00:00', '2026-07-08 16:45:00', 'reservada'),
-  (4, 1, '2026-07-09 12:00:00', '2026-07-09 12:30:00', 'cancelada'),
-  (2, 1, '2026-07-10 17:00:00', '2026-07-10 17:30:00', 'reservada');
+  (1, 1, '2026-07-06 08:00:00', '2026-07-06 08:30:00', 'reservada'),
+  (2, 2, '2026-07-06 09:00:00', '2026-07-06 09:45:00', 'reservada'),
+  (3, 1, '2026-07-07 07:30:00', '2026-07-07 08:00:00', 'completada'),
+  (1, 2, '2026-07-08 14:00:00', '2026-07-08 14:45:00', 'reservada'),
+  (4, 1, '2026-07-09 10:00:00', '2026-07-09 10:30:00', 'cancelada'),
+  (2, 1, '2026-07-10 15:00:00', '2026-07-10 15:30:00', 'reservada');
