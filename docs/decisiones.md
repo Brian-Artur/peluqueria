@@ -13,6 +13,7 @@
 - **CSS Modules** para estilos. Ni Tailwind ni Bootstrap.
 - Esquema y semilla versionados en `infra/mariadb/initdb/`, con prefijo numérico: mismo `docker compose up`, misma BD en cualquier máquina.
 - Credenciales fuera del repo (`db.env`, `.env`). Usuario de app (`peluqueria_app`) separado de root, con privilegio mínimo.
+- Puertos propios para convivir con otros proyectos en la misma máquina: BD **3305**, backend **3100**, Vite **5180** con `strictPort` (si está ocupado, falla en vez de saltar a otro).
 - Puerto de MariaDB atado a loopback **en el compose**: así se esquiva que Docker se salte UFW, sin tocar el firewall.
 
 ## Backend

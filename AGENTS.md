@@ -22,8 +22,8 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 
 ## Stack
 
-- **Backend** (`backend/`): Node 24, Express 5, TypeScript, Zod 4, mysql2. CommonJS. Puerto 3000.
-- **Frontend** (`frontend/`): React 19, Vite, TypeScript, `Date` nativo. Puerto 5173, proxy `/api` → `127.0.0.1:3000`.
+- **Backend** (`backend/`): Node 24, Express 5, TypeScript, Zod 4, mysql2. CommonJS. Puerto **3100**.
+- **Frontend** (`frontend/`): React 19, Vite, TypeScript, `Date` nativo. Puerto **5180** (fijo, `strictPort`), proxy `/api` → `127.0.0.1:3100`.
 - **BD** (`infra/mariadb/`): MariaDB 12 en Docker, `127.0.0.1:3305`. Esquema y semilla en `initdb/` (solo se ejecutan con el volumen vacío).
 - Sin tests todavía. Sin sistema de migraciones todavía.
 
@@ -32,7 +32,7 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 ```bash
 # Base de datos (desde la raíz)
 docker compose -f infra/mariadb/docker-compose.yml up -d
-curl http://127.0.0.1:3000/health        # comprueba backend + BD
+curl http://127.0.0.1:3100/health        # comprueba backend + BD
 
 # Backend
 cd backend && npm run dev                # tsx watch
@@ -46,6 +46,7 @@ cd frontend && npm run build             # tsc -b && vite build
 
 - `tsx watch` no relee `.env`: tras editarlo, reiniciar el proceso.
 - Usar `127.0.0.1`, nunca `localhost` (Node 24 resuelve primero a IPv6).
+- Puertos elegidos para no chocar con otros proyectos de la máquina (bot_trading: 3000 y BD 3306; tramas: 4000 y BD 3307; Vite por defecto: 5173). No volver a 3000 ni 5173.
 - Credenciales en `backend/.env` y `infra/mariadb/db.env`, fuera del repo. No leerlas ni imprimirlas.
 
 ## Estructura
