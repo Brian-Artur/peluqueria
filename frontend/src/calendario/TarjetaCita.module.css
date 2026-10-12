@@ -1,16 +1,16 @@
 .cita {
   min-width: 0;
   margin: calc(var(--espacio-1) / 4) calc(var(--espacio-1) / 2);
-  padding: calc(var(--espacio-1) / 2) var(--espacio-1);
+  padding: var(--espacio-1) var(--espacio-2);
   border-left: 3px solid;
   border-radius: calc(var(--radio) / 2);
   color: var(--color-texto);
-  font-size: 11px;
   line-height: 1.2;
   overflow: hidden;
   z-index: 1;
   position: relative;
   cursor: pointer;
+  container-type: size;
 }
 
 .cita.reservada {
@@ -32,15 +32,32 @@
 }
 
 .citaCliente {
+  font-size: 13px;
   font-weight: 600;
 }
 
 .citaServicio {
+  font-size: 12px;
   color: var(--color-texto-suave);
 }
 
-.lineaCorta {
+.citaCliente,
+.citaServicio {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cita.seleccionada {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 1px;
+  z-index: 2;
+}
+
+/* Mide el alto sin padding: las dos líneas ocupan ~30px (13px y 12px con
+   interlineado 1.2). Por debajo, la segunda se oculta entera en vez de cortarse. */
+@container (max-height: 29px) {
+  .citaServicio {
+    display: none;
+  }
 }

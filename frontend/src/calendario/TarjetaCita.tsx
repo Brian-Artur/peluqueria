@@ -7,38 +7,22 @@ import styles from "./TarjetaCita.module.css";
 type Props = {
   cita: Cita;
   columna: number;
+  seleccionada: boolean;
   onSeleccionarCita: (id: number) => void;
 };
 
-function TarjetaCita({ cita, columna, onSeleccionarCita }: Props): ReactElement {
+function TarjetaCita({ cita, columna, seleccionada, onSeleccionarCita }: Props): ReactElement {
   const inicio = new Date(cita.inicio);
   const fin = new Date(cita.fin);
-  const duracionMinutos = (fin.getTime() - inicio.getTime()) / 60000;
-  const hora = horaCorta(inicio);
+  const horario = `${horaCorta(inicio)}–${horaCorta(fin)}`;
   const marcaEstado = cita.estado === "completada" ? "✓ " : "";
-  const textoCliente = `${marcaEstado}${hora} ${cita.cliente_nombre}`;
-  const textoCompleto = `${textoCliente} · ${cita.servicio_nombre} · ${cita.estado}`;
-
-  function contenido(): ReactElement {
-    if (duracionMinutos <= 30) {
-      return (
-        <div className={styles.lineaCorta}>
-          {textoCliente} · {cita.servicio_nombre}
-        </div>
-      );
-    }
-
-    return (
-      <>
-        <div className={styles.citaCliente}>{textoCliente}</div>
-        <div className={styles.citaServicio}>{cita.servicio_nombre}</div>
-      </>
-    );
-  }
+  const textoCliente = `${marcaEstado}${cita.cliente_nombre}`;
+  const textoServicio = `${cita.servicio_nombre} · ${horario}`;
+  const textoCompleto = `${textoCliente} · ${textoServicio} · ${cita.estado}`;
 
   return (
     <div
-      className={`${styles.cita} ${styles[cita.estado]}`}
+      className={`${styles.cita} ${styles[cita.estado]} ${seleccionada ? styles.seleccionada : ""}`}
       title={textoCompleto}
       style={{
         gridColumn: columna,
@@ -46,7 +30,8 @@ function TarjetaCita({ cita, columna, onSeleccionarCita }: Props): ReactElement 
       }}
       onClick={() => onSeleccionarCita(cita.id)}
     >
-      {contenido()}
+      <div className={styles.citaCliente}>{textoCliente}</div>
+      <div className={styles.citaServicio}>{textoServicio}</div>
     </div>
   );
 }

@@ -1,16 +1,20 @@
 .distribucion {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
   gap: var(--espacio-5);
-  align-items: start;
 }
 
 .agenda {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .columnaPanel {
   position: sticky;
+  align-self: start;
   top: var(--espacio-4);
   min-width: 0;
 }
@@ -22,8 +26,9 @@
 }
 
 .calendario {
+  flex: 1;
   display: grid;
-  grid-template-rows: 40px repeat(132, 5px);  /* 1 cab + 132 franjas de 5min */
+  grid-template-rows: 48px repeat(132, minmax(4px, 1fr));
   border: 1px solid var(--color-linea);
   font-size: 13px;
 }

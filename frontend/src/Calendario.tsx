@@ -158,7 +158,11 @@ function Calendario(): ReactElement {
           style={{ gridTemplateColumns: `60px repeat(${dias.length}, minmax(0, 1fr))` }}
         >
           <CabeceraDias dias={dias} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
-          <Rejilla dias={dias} onSeleccionarHueco={seleccionarHueco} />
+          <Rejilla
+            dias={dias}
+            huecoSeleccionado={seleccion?.tipo === "hueco" ? seleccion.inicio : null}
+            onSeleccionarHueco={seleccionarHueco}
+          />
           {citasDeLaSemana.map((cita) => {
             const columna = columnaDeFecha(new Date(cita.inicio), dias);
             if (columna === null) {
@@ -170,6 +174,7 @@ function Calendario(): ReactElement {
                 key={cita.id}
                 cita={cita}
                 columna={columna}
+                seleccionada={seleccion?.tipo === "cita" && seleccion.id === cita.id}
                 onSeleccionarCita={seleccionarCita}
               />
             );

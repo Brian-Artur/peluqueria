@@ -11,4 +11,15 @@
 .celda {
   border-left: 1px solid var(--color-linea);
   border-bottom: 1px solid var(--color-linea);
+  cursor: pointer;
+}
+
+.celda:hover {
+  background: var(--color-superficie);
+}
+
+.celda.seleccionada {
+  background: var(--color-acento-tinte);
+  outline: 2px solid var(--color-acento);
+  outline-offset: -2px;
 }

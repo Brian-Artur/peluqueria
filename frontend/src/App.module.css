@@ -1,5 +1,9 @@
 .pagina {
-  padding: var(--espacio-5);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: var(--espacio-5) var(--espacio-5) var(--espacio-4);
 }
 
 .titulo {

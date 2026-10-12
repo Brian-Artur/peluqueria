@@ -1,4 +1,5 @@
 .panel {
+  position: relative;
   background: var(--color-superficie);
   border-radius: var(--radio);
   padding: var(--espacio-4);
@@ -6,6 +7,34 @@
 
 .panel p {
   margin: var(--espacio-3) 0;
+}
+
+.panel .titulo,
+.panel .error {
+  padding-right: calc(28px + var(--espacio-2));
+}
+
+.cerrar {
+  position: absolute;
+  top: var(--espacio-4);
+  right: var(--espacio-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-error);
+  color: var(--color-sobre-error);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cerrar:hover {
+  filter: brightness(0.9);
 }
 
 .panel input,

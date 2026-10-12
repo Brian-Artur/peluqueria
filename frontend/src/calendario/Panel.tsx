@@ -35,12 +35,14 @@ function Panel({
 
   return (
     <div className={styles.panel}>
-      <button className={styles.secundario} onClick={onCerrar}>Cerrar</button>
+      <button className={styles.cerrar} aria-label="Cerrar" onClick={onCerrar}>×</button>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
 
       {seleccion.tipo === "hueco" && (
         <div>
-          <p>Nueva cita: {seleccion.inicio.toLocaleString("es-ES")}</p>
+          <p className={styles.titulo}>
+            Nueva cita: {seleccion.inicio.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
+          </p>
 
           <select
             value={clienteId ?? ""}
@@ -77,9 +79,9 @@ function Panel({
 
       {seleccion.tipo === "cita" && citaSeleccionada && (
         <div>
-          <p><strong>{citaSeleccionada.cliente_nombre}</strong></p>
+          <p className={styles.titulo}><strong>{citaSeleccionada.cliente_nombre}</strong></p>
           <p>{citaSeleccionada.servicio_nombre}</p>
-          <p>{new Date(citaSeleccionada.inicio).toLocaleString("es-ES")}</p>
+          <p>{new Date(citaSeleccionada.inicio).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}</p>
           <p>Estado: {citaSeleccionada.estado}</p>
 
           {citaSeleccionada.estado === "reservada" && (
