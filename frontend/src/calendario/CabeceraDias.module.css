@@ -1,17 +1,70 @@
 .cabeceraDia {
+  position: relative;
   grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-inline: var(--espacio-1);
+  white-space: nowrap;
   font-weight: 600;
   background: var(--color-superficie);
   border-bottom: 1px solid var(--color-linea);
   border-left: 1px solid var(--color-linea);
 }
 
+.primero {
+  padding-left: calc(var(--espacio-5) + var(--espacio-2));
+}
+
+.ultimo {
+  padding-right: calc(var(--espacio-5) + var(--espacio-2));
+}
+
+.textoDia {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .esquina {
   grid-column: 1;
   grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--color-superficie);
   border-bottom: 1px solid var(--color-linea);
+}
+
+.flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--espacio-5) + var(--espacio-1));
+  height: calc(var(--espacio-5) + var(--espacio-1));
+  padding: 0;
+  border: 1px solid var(--color-linea);
+  border-radius: 50%;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0.45;
+  cursor: pointer;
+}
+
+.flecha:hover,
+.flecha:focus-visible {
+  opacity: 1;
+}
+
+.anterior {
+  left: var(--espacio-1);
+}
+
+.siguiente {
+  right: var(--espacio-1);
 }

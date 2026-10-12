@@ -5,13 +5,15 @@ import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
 import { lunesDeEstaSemana, sumarDias } from "./calendario/fechas";
+import { diasVisibles } from "./calendario/diasVisibles";
+import { columnaDeFecha } from "./calendario/posicion";
 import styles from "./Calendario.module.css";
-import ControlesSemana from "./calendario/ControlesSemana";
 import Panel from "./calendario/Panel";
 
 
 function Calendario(): ReactElement {
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [mostrarCerrados, setMostrarCerrados] = useState(false);
   const [lunesVisible, setLunesVisible] = useState(() =>
     lunesDeEstaSemana(new Date())
   );
@@ -51,9 +53,9 @@ function Calendario(): ReactElement {
     setSeleccion(null);
   };
 
-  const seleccionarHueco = (d: number, hora: number) => {
-    const inicio = sumarDias(lunesVisible, d); // día correcto, a las 00:00
-    inicio.setHours(hora, 0, 0, 0);            // fija la hora, minutos 0
+  const seleccionarHueco = (dia: Date, hora: number): void => {
+    const inicio = new Date(dia);
+    inicio.setHours(hora, 0, 0, 0);
     setError(null);
     setSeleccion({ tipo: "hueco", inicio });
   };
@@ -132,26 +134,46 @@ function Calendario(): ReactElement {
     const inicio = new Date(cita.inicio);
     return inicio >= lunesVisible && inicio < domingoSiguiente;
   });
+  const dias = diasVisibles(lunesVisible, citasDeLaSemana, mostrarCerrados);
 
   return (
     <div className={styles.distribucion}>
       <div className={styles.agenda}>
-        <ControlesSemana
-          lunesVisible={lunesVisible}
-          onAnterior={semanaAnterior}
-          onSiguiente={semanaSiguiente}
-        />
+        <div className={styles.opciones}>
+          {seleccion === null && error !== null && (
+            <p role="alert" className={styles.error}>{error}</p>
+          )}
+          <label className={styles.mostrarCerrados}>
+            <input
+              type="checkbox"
+              checked={mostrarCerrados}
+              onChange={(evento) => setMostrarCerrados(evento.target.checked)}
+            />
+            Mostrar días cerrados
+          </label>
+        </div>
 
-        {seleccion === null && error !== null && (
-          <p role="alert" className={styles.error}>{error}</p>
-        )}
+        <div
+          className={styles.calendario}
+          style={{ gridTemplateColumns: `60px repeat(${dias.length}, minmax(0, 1fr))` }}
+        >
+          <CabeceraDias dias={dias} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
+          <Rejilla dias={dias} onSeleccionarHueco={seleccionarHueco} />
+          {citasDeLaSemana.map((cita) => {
+            const columna = columnaDeFecha(new Date(cita.inicio), dias);
+            if (columna === null) {
+              return null;
+            }
 
-        <div className={styles.calendario}>
-          <CabeceraDias />
-          <Rejilla onSeleccionarHueco={seleccionarHueco} />
-          {citasDeLaSemana.map((cita) => (
-            <TarjetaCita key={cita.id} cita={cita} onSeleccionarCita={seleccionarCita} />
-          ))}
+            return (
+              <TarjetaCita
+                key={cita.id}
+                cita={cita}
+                columna={columna}
+                onSeleccionarCita={seleccionarCita}
+              />
+            );
+          })}
         </div>
       </div>
 

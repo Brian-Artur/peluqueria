@@ -1,9 +1,14 @@
 import { HORA_APERTURA, MINUTOS_FRANJA } from "./constantes";
+import { mismoDia } from "./fechas";
 
 
-export function columnaDeDia(fecha: Date): number {
-  const dia = fecha.getDay();       // mundo JS: 0=Dom, 1= Lun...
-  return dia === 0 ? 8 : dia + 1;   // mundo grid columna 2...8
+export function columnaDeFecha(fecha: Date, dias: Date[]): number | null {
+  const indice = dias.findIndex((dia) => mismoDia(fecha, dia));
+  if (indice === -1) {
+    return null;
+  }
+
+  return indice + 2;
 }
 
 // Franjas transcurridas desde la apertura, +2 por la fila de cabecera

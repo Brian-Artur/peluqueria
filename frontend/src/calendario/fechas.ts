@@ -13,6 +13,25 @@ export function sumarDias(fecha: Date, dias: number): Date {
   return nueva;
 }
 
+export function diasDeLaSemana(lunes: Date): Date[] {
+  return Array.from({ length: 7 }, (_, indice) => sumarDias(lunes, indice));
+}
+
+export function mismoDia(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+export function numeroSemanaISO(fecha: Date): number {
+  const jueves = sumarDias(lunesDeEstaSemana(fecha), 3);
+  // El jueves fija el año ISO; UTC evita que el cambio de hora altere la cuenta de días.
+  const juevesUTC = Date.UTC(jueves.getFullYear(), jueves.getMonth(), jueves.getDate());
+  const inicioDelAnioUTC = Date.UTC(jueves.getFullYear(), 0, 1);
+  const diasDesdeInicio = (juevesUTC - inicioDelAnioUTC) / 86400000;
+  return Math.ceil((diasDesdeInicio + 1) / 7);
+}
+
 export function fechaParaInput(iso: string): string {
   const d = new Date(iso);
   const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);

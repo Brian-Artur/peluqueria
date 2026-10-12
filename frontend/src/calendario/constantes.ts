@@ -2,7 +2,10 @@ export const HORA_APERTURA = 9;
 export const HORA_CIERRE = 20;
 export const MINUTOS_FRANJA = 5;
 
-export const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+export const NOMBRES_DIA = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+// Provisional hasta que el horario del local esté en la BD (v3).
+export const DIAS_APERTURA: number[] = [2, 3, 4, 5, 6];
 
 export const FRANJAS = ((HORA_CIERRE - HORA_APERTURA) * 60) / MINUTOS_FRANJA;
 export const FRANJAS_POR_HORA = 60 / MINUTOS_FRANJA;

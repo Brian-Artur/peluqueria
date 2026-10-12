@@ -23,12 +23,30 @@
 
 .calendario {
   display: grid;
-  grid-template-columns: 60px repeat(7, 1fr); /* 8 colum = 1 cab + 7 dias */
   grid-template-rows: 40px repeat(132, 5px);  /* 1 cab + 132 franjas de 5min */
   border: 1px solid var(--color-linea);
   font-size: 13px;
 }
 
+.opciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  margin-bottom: var(--espacio-2);
+  font-size: 13px;
+}
+
+.mostrarCerrados {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  margin-left: auto;
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .error {
+  margin: 0;
   color: var(--color-error);
 }

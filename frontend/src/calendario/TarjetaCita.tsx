@@ -1,15 +1,16 @@
 import type { ReactElement } from "react";
 import type { Cita } from "../tipos";
 import { horaCorta } from "./fechas";
-import { columnaDeDia, filaDeHora } from "./posicion";
+import { filaDeHora } from "./posicion";
 import styles from "./TarjetaCita.module.css";
 
 type Props = {
   cita: Cita;
+  columna: number;
   onSeleccionarCita: (id: number) => void;
 };
 
-function TarjetaCita({ cita, onSeleccionarCita }: Props): ReactElement {
+function TarjetaCita({ cita, columna, onSeleccionarCita }: Props): ReactElement {
   const inicio = new Date(cita.inicio);
   const fin = new Date(cita.fin);
   const duracionMinutos = (fin.getTime() - inicio.getTime()) / 60000;
@@ -40,7 +41,7 @@ function TarjetaCita({ cita, onSeleccionarCita }: Props): ReactElement {
       className={`${styles.cita} ${styles[cita.estado]}`}
       title={textoCompleto}
       style={{
-        gridColumn: columnaDeDia(inicio),
+        gridColumn: columna,
         gridRow: `${filaDeHora(inicio)} / ${filaDeHora(fin)}`,
       }}
       onClick={() => onSeleccionarCita(cita.id)}

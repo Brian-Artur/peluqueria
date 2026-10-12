@@ -1,15 +1,17 @@
+import type { ReactElement } from "react";
 import { HORAS } from "./constantes";
 import FilaHora from "./FilaHora";
 
 type Props = {
-  onSeleccionarHueco: (d: number, hora: number) => void;
+  dias: Date[];
+  onSeleccionarHueco: (dia: Date, hora: number) => void;
 };
 
-function Rejilla({ onSeleccionarHueco }: Props) {
+function Rejilla({ dias, onSeleccionarHueco }: Props): ReactElement {
   return (
     <>
       {HORAS.map((hora) => (
-        <FilaHora key={hora} hora={hora} onSeleccionarHueco={onSeleccionarHueco} />
+        <FilaHora key={hora} hora={hora} dias={dias} onSeleccionarHueco={onSeleccionarHueco} />
       ))}
     </>
   );
