@@ -32,10 +32,23 @@ export function numeroSemanaISO(fecha: Date): number {
   return Math.ceil((diasDesdeInicio + 1) / 7);
 }
 
-export function fechaParaInput(iso: string): string {
-  const d = new Date(iso);
-  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
+export function diasDelMes(fecha: Date): (Date | null)[] {
+  const anio = fecha.getFullYear();
+  const mes = fecha.getMonth();
+  const primerDia = new Date(anio, mes, 1);
+  const huecosAntes = (primerDia.getDay() + 6) % 7;
+  const cantidadDias = new Date(anio, mes + 1, 0).getDate();
+  const dias: (Date | null)[] = [];
+
+  for (let hueco = 0; hueco < huecosAntes; hueco += 1) {
+    dias.push(null);
+  }
+
+  for (let dia = 1; dia <= cantidadDias; dia += 1) {
+    dias.push(new Date(anio, mes, dia));
+  }
+
+  return dias;
 }
 
 export function horaCorta(fecha: Date): string {

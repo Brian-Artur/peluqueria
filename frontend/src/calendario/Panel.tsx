@@ -1,6 +1,6 @@
 import { useState, type ReactElement } from "react";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
-import { fechaParaInput } from "./fechas";
+import SelectorFechaHora from "./SelectorFechaHora";
 import styles from "./Panel.module.css";
 
 type Props = {
@@ -31,7 +31,13 @@ function Panel({
 
   const [clienteId, setClienteId] = useState<number | null>(null);
   const [servicioId, setServicioId] = useState<number | null>(null);
-  const [nuevoInicio, setNuevoInicio] = useState("");
+  const [inicio, setInicio] = useState<Date>(() => {
+    if (seleccion.tipo === "hueco") return seleccion.inicio;
+    return new Date(citaSeleccionada?.inicio ?? Date.now());
+  });
+  const [nuevoInicio, setNuevoInicio] = useState<Date>(
+    () => new Date(citaSeleccionada?.inicio ?? Date.now())
+  );
 
   return (
     <div className={styles.panel}>
@@ -40,11 +46,11 @@ function Panel({
 
       {seleccion.tipo === "hueco" && (
         <div>
-          <p className={styles.titulo}>
-            Nueva cita: {seleccion.inicio.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
-          </p>
+          <p className={styles.titulo}>Nueva cita</p>
+          <SelectorFechaHora valor={inicio} onCambiar={setInicio} />
 
           <select
+            className={styles.campo}
             value={clienteId ?? ""}
             onChange={(e) => setClienteId(Number(e.target.value) || null)}
           >
@@ -55,6 +61,7 @@ function Panel({
           </select>
 
           <select
+            className={styles.campo}
             value={servicioId ?? ""}
             onChange={(e) => setServicioId(Number(e.target.value) || null)}
           >
@@ -69,7 +76,7 @@ function Panel({
             disabled={clienteId === null || servicioId === null}
             onClick={() => {
               if (clienteId === null || servicioId === null) return;
-              onCrear(clienteId, servicioId, seleccion.inicio);
+              onCrear(clienteId, servicioId, inicio);
             }}
           >
             Crear cita
@@ -86,12 +93,7 @@ function Panel({
 
           {citaSeleccionada.estado === "reservada" && (
             <>
-              <input
-                type="datetime-local"
-                step={300}
-                value={nuevoInicio || fechaParaInput(citaSeleccionada.inicio)}
-                onChange={(e) => setNuevoInicio(e.target.value)}
-              />
+              <SelectorFechaHora valor={nuevoInicio} onCambiar={setNuevoInicio} />
               <button className={styles.secundario} onClick={() => onCompletar(citaSeleccionada.id)}>
                 Completar cita
               </button>
@@ -100,8 +102,7 @@ function Panel({
                 onClick={() =>
                   onMover(
                     citaSeleccionada.id,
-                    new Date(nuevoInicio || fechaParaInput(citaSeleccionada.inicio))
-                      .toISOString()
+                    nuevoInicio.toISOString()
                   )
                 }
               >

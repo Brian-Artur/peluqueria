@@ -1,0 +1,71 @@
+.calendario {
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-1);
+  margin-bottom: var(--espacio-2);
+}
+
+.flecha {
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: var(--color-superficie);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--espacio-1);
+}
+
+.inicial {
+  padding: var(--espacio-1) 0;
+  color: var(--color-texto-suave);
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.dia {
+  min-width: 0;
+  padding: var(--espacio-2) 0;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dia:hover {
+  background: var(--color-acento-tinte);
+}
+
+.cerrado {
+  color: var(--color-texto-suave);
+}
+
+.hoy {
+  border-color: var(--color-linea);
+}
+
+.elegido,
+.elegido:hover {
+  background: var(--color-acento);
+  color: var(--color-sobre-acento);
+}
+
+.dia:focus-visible,
+.flecha:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}
