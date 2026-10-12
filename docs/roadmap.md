@@ -19,7 +19,6 @@ Deuda detectada en la auditoría del 11/10/2026:
 - `precio` es `DECIMAL`: mysql2 lo devuelve como string y el frontend lo tipa como `number`.
 - Mover acepta minutos arbitrarios (10:07) y `posicion.ts` divide entre 5 sin redondear → fila fraccionaria.
 - JSON mal formado en el body → 500 genérico en vez de 400.
-- Tipos duplicados a mano entre frontend y backend, sin validar respuestas.
 - Sobras de la plantilla de Vite (`hero.png`, `react.svg`, `vite.svg`); `.panel` y `.controles-semana` sin reglas CSS.
 - Backend sin scripts de `build` ni `typecheck`.
 
@@ -41,8 +40,8 @@ En el Windows donde corre `bot_trading`, con Docker Compose y sin que los proyec
 
 | Versión | Contenido | Dominio |
 |---|---|---|
-| **v2 — Cimientos** | Migraciones versionadas (una BD v1 con datos se actualiza sin perder nada), tests con Vitest, usuarios y roles comprobados en el backend. Sin esto, tocar el esquema es peligroso. | — |
-| **v3 — Plantilla, tiempos y local** | Empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. | §1–5 |
+| **v2 — Cimientos** | Migraciones versionadas (una BD v1 con datos se actualiza sin perder nada), tests con Vitest, usuarios y roles comprobados en el backend, y una sola definición de los tipos para frontend y backend (hoy duplicados a mano, sin validar respuestas). Sin esto, tocar el esquema es peligroso. | — |
+| **v3 — Plantilla, tiempos y local** | Empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
 | **v4 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. Después, **arrastrar citas**. | §6–7 |
 | **v5 — Dinero y stock** | Tickets, cobros, caja, comisiones, reparto con externos; productos, movimientos de stock, proveedores. VERI\*FACTU antes de cobrar de verdad. | §8 |
 | **v6 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v4. | §10 |
@@ -72,6 +71,7 @@ Se deciden de una en una, cuando toque.
 | Repartir `dev.artesaniaartur.es`: por ruta (`dev…/peluqueria`, obliga a `base` en Vite) o subdominio por proyecto | Despliegue |
 | Migraciones: SQL numerados + tabla de control propia, o herramienta (dbmate, Knex…) | v2 |
 | Autenticación: sesión con cookie o token; cuántos roles | v2 |
+| Tipos compartidos: paquete común en el monorepo, o validar respuestas con Zod en el frontend | v2 |
 | ¿El cliente puede elegir empleado o solo expresar preferencia? | v3 |
 | ¿Alguien en prácticas puede hacer algún servicio sin tutor? | v3 |
 | ¿Qué cubre el margen de un servicio (retraso, limpieza, cambio de cliente)? | v3 |

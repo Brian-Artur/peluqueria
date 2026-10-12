@@ -70,6 +70,7 @@ Es la parte más específica del proyecto y la que no resuelve ningún software 
 
 ### 5. Tiempo: horarios, turnos, ausencias, bloqueos
 
+- **zona horaria del salón** (`Europe/Madrid`) como dato. La BD guarda UTC; el frontend hoy convierte a la zona del **dispositivo**, y un ordenador o móvil mal configurado vería las citas desplazadas. Cuando exista el horario del local, la agenda se mostrará en la zona del salón, venga de donde venga quien mira.
 - **horario_local**: tramos por día de la semana (mañana y tarde son dos filas) + **excepciones por fecha** (festivo, horario de verano, apertura especial).
 - **turno**: horario de cada empleado. Recurrente (día de la semana) para la plantilla; puntual (fecha concreta) para externos.
 - **ausencia**: vacaciones, baja, formación. Rango de fechas.
@@ -106,6 +107,7 @@ El mismo motor sirve a la pantalla de crear cita, a la validación del arrastrar
 - **acuerdo con externos**: cómo se reparte lo que cobra un servicio subcontratado (porcentaje o importe fijo), con fechas de vigencia, porque el trato puede cambiar y las ventas viejas deben conservar el reparto que tenían.
 - **producto**: uso `venta` / `consumo` / ambos, unidad, stock mínimo, proveedor.
 - **movimiento_stock**: compra, venta, consumo en servicio, ajuste. **El stock actual es la suma de movimientos, no una columna que se pisa**: mismo espíritu que el snapshot de la cita, el histórico no se reescribe.
+- **Análisis del dinero** (idea): escandallo —cuánto cuesta de verdad cada servicio en producto y tiempo— e ingresos por día y temporada. Podría ser un servicio aparte en Python que lea la BD, como el análisis de bot_trading.
 - ⚠️ **Antes de emitir tickets o facturas reales**: en España el software de facturación debe cumplir el reglamento de sistemas informáticos de facturación (**VERI\*FACTU**, RD 1007/2023), con obligatoriedad en 2027 (comprobar fechas vigentes). Mientras sea demo no aplica; si un salón real lo usa para cobrar, sí.
 
 ### 9. Plano del local (lo último)

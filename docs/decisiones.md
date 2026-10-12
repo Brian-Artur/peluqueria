@@ -22,6 +22,8 @@
 - Errores tipados con middleware central, montado el último: `ErrorNoEncontrado` → 404, `ErrorConflicto` → 409.
 - `/health` comprueba de verdad la BD; no devuelve un OK de mentira.
 - **Snapshot**: la cita congela su `fin`. Lo mismo se hará con precio y duración aplicada.
+- **La BD guarda las fechas en UTC** (`timezone: "Z"` en el pool de mysql2), no en la hora de la máquina. Así no depende de cómo esté configurado el servidor (12/10/2026). La semilla está escrita en UTC.
+- **`precio` viaja como texto**: mysql2 devuelve `DECIMAL` como string y así se tipa. Cómo representar el dinero para hacer cuentas (céntimos enteros, librería decimal…) se decide en v5.
 
 ## Despliegue y rutas
 
