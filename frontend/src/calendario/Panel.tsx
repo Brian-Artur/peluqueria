@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
 import { fechaParaInput } from "./fechas";
+import styles from "./Panel.module.css";
 
 type Props = {
   seleccion: Seleccion;
   clientes: Cliente[];
   servicios: Servicio[];
   citaSeleccionada: Cita | null;
+  error: string | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
   onCancelar: (id: number) => void;
   onCompletar: (id: number) => void;
@@ -19,12 +21,13 @@ function Panel({
   clientes,
   servicios,
   citaSeleccionada,
+  error,
   onCrear,
   onCancelar,
   onCompletar,
   onMover,
   onCerrar
-}: Props) {
+}: Props): ReactElement {
 
   const [clienteId, setClienteId] = useState<number | null>(null);
   const [servicioId, setServicioId] = useState<number | null>(null);
@@ -33,6 +36,7 @@ function Panel({
   return (
     <div className="panel">
       <button onClick={onCerrar}>Cerrar</button>
+      {error !== null && <p role="alert" className={styles.error}>{error}</p>}
 
       {seleccion.tipo === "hueco" && (
         <div>

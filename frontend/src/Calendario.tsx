@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
+import { mensajeDeError, pedir, pedirJson } from "./peticion";
 import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
@@ -9,7 +10,7 @@ import ControlesSemana from "./calendario/ControlesSemana";
 import Panel from "./calendario/Panel";
 
 
-function Calendario() {
+function Calendario(): ReactElement {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [lunesVisible, setLunesVisible] = useState(() =>
     lunesDeEstaSemana(new Date())
@@ -18,68 +19,92 @@ function Calendario() {
   const [servicios, setServicios] = useState<Servicio[]>([]);
 
   const [seleccion, setSeleccion] = useState<Seleccion | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const refrescarCitas = async (): Promise<void> => {
+    try {
+      setCitas(await pedirJson<Cita[]>("/api/citas"));
+    } catch (fallo) {
+      const aviso = `No se pudieron cargar las citas: ${mensajeDeError(fallo)}`;
+      // Si también falló la acción, conservar su motivo ayuda a corregirla.
+      setError((anterior) => anterior ? `${anterior} ${aviso}` : aviso);
+    }
+  };
+
+  // Mismo ciclo para crear, mover, cancelar y completar. Si falla, el panel
+  // sigue abierto con el motivo, y se refresca igualmente: tras un 409 lo
+  // que se ve está desactualizado.
+  const ejecutarAccion = async (
+    accion: () => Promise<Response>,
+    porDefecto: string
+  ): Promise<void> => {
+    try {
+      await accion();
+    } catch (fallo) {
+      setError(mensajeDeError(fallo, porDefecto));
+      await refrescarCitas();
+      return;
+    }
+
+    setError(null);
+    await refrescarCitas();
+    setSeleccion(null);
+  };
 
   const seleccionarHueco = (d: number, hora: number) => {
     const inicio = sumarDias(lunesVisible, d); // día correcto, a las 00:00
     inicio.setHours(hora, 0, 0, 0);            // fija la hora, minutos 0
+    setError(null);
     setSeleccion({ tipo: "hueco", inicio });
   };
 
-  const seleccionarCita = (id: number) => setSeleccion({ tipo: "cita", id });
+  const seleccionarCita = (id: number) => {
+    setError(null);
+    setSeleccion({ tipo: "cita", id });
+  };
 
-  const crearCita = async (clienteId: number, servicioId: number, inicio: Date) => {
-    await fetch("/api/citas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cliente_id: clienteId,
-        servicio_id: servicioId,
-        inicio: inicio.toISOString(),
+  const crearCita = (clienteId: number, servicioId: number, inicio: Date) =>
+    ejecutarAccion(
+      () => pedir("/api/citas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cliente_id: clienteId,
+          servicio_id: servicioId,
+          inicio: inicio.toISOString(),
+        }),
       }),
-    });
+      "No se pudo crear la cita"
+    );
 
-    const res = await fetch("/api/citas");   // refrescar desde el servidor
-    setCitas(await res.json());
+  const cancelarCita = (id: number) =>
+    ejecutarAccion(
+      () => pedir(`/api/citas/${id}/cancelar`, { method: "POST" }),
+      "No se pudo cancelar la cita"
+    );
 
-    setSeleccion(null);                       // cerrar el panel
-  };
-
-  const cancelarCita = async (id: number) => {
-    await fetch(`/api/citas/${id}/cancelar`, { method: "POST" });
-
-    const res = await fetch("/api/citas");   // refrescar desde el servidor
-    setCitas(await res.json());
-
-    setSeleccion(null);                       // cerrar el panel
-  };
-
-  const completarCita = async (id: number) => {
-    await fetch(`/api/citas/${id}/completar`, { method: "POST" });
-
-    const res = await fetch("/api/citas");   // refrescar desde el servidor
-    setCitas(await res.json());
-
-    setSeleccion(null);                       // cerrar el panel
-  };
+  const completarCita = (id: number) =>
+    ejecutarAccion(
+      () => pedir(`/api/citas/${id}/completar`, { method: "POST" }),
+      "No se pudo completar la cita"
+    );
 
   useEffect(() => {
-    fetch("/api/citas")
-      .then((res) => res.json())
+    pedirJson<Cita[]>("/api/citas")
       .then(setCitas)
-      .catch(() => setCitas([]));
-  }, []);
-  useEffect(() => {
-    fetch("/api/clientes")
-      .then((res) => res.json())
-      .then(setClientes)
-      .catch(() => setClientes([]));
+      .catch((fallo) => setError(`No se pudieron cargar las citas: ${mensajeDeError(fallo)}`));
   }, []);
 
   useEffect(() => {
-    fetch("/api/servicios")
-      .then((res) => res.json())
+    pedirJson<Cliente[]>("/api/clientes")
+      .then(setClientes)
+      .catch((fallo) => setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`));
+  }, []);
+
+  useEffect(() => {
+    pedirJson<Servicio[]>("/api/servicios")
       .then(setServicios)
-      .catch(() => setServicios([]));
+      .catch((fallo) => setError(`No se pudieron cargar los servicios: ${mensajeDeError(fallo)}`));
   }, []);
 
 
@@ -91,17 +116,15 @@ function Calendario() {
       ? citas.find((c) => c.id === seleccion.id) ?? null
       : null;
 
-  const moverCita = async (id: number, inicio: string) => {
-    await fetch(`/api/citas/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inicio }),
-    });
-
-    const res = await fetch("/api/citas");
-    setCitas(await res.json());
-    setSeleccion(null);
-  };
+  const moverCita = (id: number, inicio: string) =>
+    ejecutarAccion(
+      () => pedir(`/api/citas/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inicio }),
+      }),
+      "No se pudo mover la cita"
+    );
 
   const domingoSiguiente = sumarDias(lunesVisible, 7);
 
@@ -117,6 +140,10 @@ function Calendario() {
         onAnterior={semanaAnterior}
         onSiguiente={semanaSiguiente}
       />
+
+      {seleccion === null && error !== null && (
+        <p role="alert" className={styles.error}>{error}</p>
+      )}
 
       <div className={styles.calendario}>
         <CabeceraDias />
@@ -137,11 +164,15 @@ function Calendario() {
           clientes={clientes}
           servicios={servicios}
           citaSeleccionada={citaSeleccionada}
+          error={error}
           onCrear={crearCita}
           onCancelar={cancelarCita}
           onCompletar={completarCita}
           onMover={moverCita}
-          onCerrar={() => setSeleccion(null)}
+          onCerrar={() => {
+            setError(null);
+            setSeleccion(null);
+          }}
         />
       )}
     </>
