@@ -8,14 +8,11 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v1.0** (22/08/2026, tag `v1.0.0`) — Agenda de una persona: crear, mover, cancelar y completar citas sobre un calendario semanal propio. Detalle en [arquitectura.md](arquitectura.md).
 - **v1.1** (12/10/2026, tag `v1.1.0`) — CSS Modules: un `.module.css` por componente, sin cambios visuales. Primera versión implementada por Codex y revisada por Claude.
 - **v1.2** (12/10/2026, tag `v1.2.0`) — Robustez: avisos de error del backend en la interfaz, fechas en UTC en la BD, inicio en franjas de 5 min, 400 en JSON mal formado, `precio` como texto, limpieza y script `typecheck`.
+- **v1.3** (12/10/2026, tag `v1.3.0`) — Pulido estético: paleta ciruela en variables CSS, tarjetas con tinte y barra, calendario a todo el alto, panel a la derecha con selección visible, días de apertura (mar–sáb) con los de cierre bajo demanda, semana ISO y flechas en la cabecera. Resuelta la deuda del orden de la semana.
 
 ## Siguiente
 
 Sin urgencia (solo importa con volumen real): **cargar citas por rango de fechas** desde el backend, con un `useEffect` que dependa de `lunesVisible`. Hoy se traen todas de una vez.
-
-### v1.3 — Pulido estético
-
-Texto desbordado en citas de 30 min, color distinguible para `cancelada` y `completada`, tema general con variables CSS.
 
 ### v1.4 — Selector de fecha/hora propio
 

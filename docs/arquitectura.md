@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v1.2)
+# Arquitectura — cómo está construido hoy (v1.3)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -49,24 +49,25 @@ Capas: **router** (HTTP + Zod) → **service** (reglas de negocio) → **reposit
 
 ## Frontend
 
-Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: cada componente tiene su `.module.css` al lado; solo `index.css` es global.
+Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: cada componente tiene su `.module.css` al lado; solo `index.css` es global y define todas las variables (colores de la paleta ciruela, espacios, radio).
 
-![Rejilla del calendario y sus componentes](_assets/calendario-semanal.png)
+![Rejilla del calendario y sus componentes (dibujo de v1.0: hoy las columnas de días son variables y no existe ControlesSemana)](_assets/calendario-semanal.png)
 
-- 8 columnas (etiquetas de hora + 7 días) y 133 filas (cabecera + 132 franjas de 5 min, de 9:00 a 20:00).
-- La malla de 5 min está por debajo; las líneas solo se ven en las horas en punto.
+- Columnas: 1 de horas + **una por día visible**. Por defecto martes a sábado (`DIAS_APERTURA`); un lunes o domingo aparece si esa semana tiene citas, o con "Mostrar días cerrados" (`diasVisibles.ts`). Las columnas salen de la lista de fechas visibles: `columnaDeFecha` busca cada cita en ella.
+- Filas: cabecera de 48px + 132 franjas de 5 min (9:00 a 20:00), **elásticas** (`minmax(4px, 1fr)`): la rejilla ocupa el alto de la ventana.
 - Cada cita se coloca por columna (día) y filas (inicio → fin): **la altura del bloque es la duración**.
-- Colores por estado: reservada azul, completada verde, cancelada gris tachada.
+- Tarjetas con tinte y barra del color del estado (reservada ciruela, completada verde azulado con ✓, cancelada sin relleno, discontinua y tachada). Línea 1: cliente; línea 2: servicio y horario, que un *container query* oculta si no cabe. La seleccionada, con contorno.
+- Cabecera: número de semana ISO en la esquina, "Mar 13" en cada día, y flechas circulares de semana flotando sobre los extremos.
 
 | Archivo | Papel |
 |---|---|
 | `Calendario.tsx` | Dueño del estado (`citas`, `clientes`, `servicios`, `lunesVisible`, `seleccion`) y de los fetch. |
-| `calendario/CabeceraDias.tsx` | Nombres de los días. |
-| `calendario/Rejilla.tsx`, `FilaHora.tsx` | Horas y celdas clicables. |
+| `calendario/CabeceraDias.tsx` | Semana ISO, días con su número y flechas de semana anterior / siguiente. |
+| `calendario/Rejilla.tsx`, `FilaHora.tsx` | Horas y celdas clicables; marcan el hueco seleccionado. |
 | `calendario/TarjetaCita.tsx` | Una cita en la rejilla. |
-| `calendario/ControlesSemana.tsx` | Semana anterior / siguiente (±7 días). |
-| `calendario/Panel.tsx` | Crear (cliente + servicio), mover (`datetime-local`), cancelar, completar. |
-| `calendario/fechas.ts`, `posicion.ts`, `constantes.ts` | Utilidades puras: semanas, fila y columna de una fecha, horario. |
+| `calendario/Panel.tsx` | Columna fija a la derecha: crear (cliente + servicio), mover (`datetime-local`), cancelar, completar. Se cierra con la cruz roja. |
+| `calendario/diasVisibles.ts` | Qué días de la semana se pintan. |
+| `calendario/fechas.ts`, `posicion.ts`, `constantes.ts` | Utilidades puras: semanas, semana ISO, fila y columna de una fecha, horario y días de apertura. |
 | `tipos.ts` | Tipos del frontend, incluida la unión `Seleccion`. |
 | `peticion.ts` | `pedir` / `pedirJson`: si la respuesta es un error, lanzan el mensaje del backend. |
 

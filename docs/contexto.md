@@ -6,9 +6,9 @@ Actualizado: **12/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v1.2.0` (12/10/2026): robustez — errores visibles, UTC en la BD, franjas de 5 min. |
+| **Última versión cerrada** | `v1.3.0` (12/10/2026): pulido estético — paleta ciruela, tarjetas legibles, calendario a todo el alto, días de apertura y semana ISO. |
 | **En curso** | Nada. |
-| **Siguiente** | **v1.3: pulido estético** — texto desbordado en citas cortas, colores de estado, tema con variables CSS. |
+| **Siguiente** | **v1.4: selector de fecha/hora propio** — el `datetime-local` sale en formato US con el navegador en inglés; franjas de 5 min al crear. |
 | **Pendiente de mí** | Hacer push de `main` y los tags. Decidir cómo repartir `dev.artesaniaartur.es` antes del despliegue. |
 
 ## Para retomar
