@@ -17,6 +17,10 @@ El usuario quiere que Codex asuma una parte equivalente del trabajo. Por defecto
 - Si Codex y Claude discrepan en algo de diseño, se le presenta al usuario como bifurcación; no se elige en silencio.
 - El sandbox de Codex **no tiene red** (configuración por defecto, a propósito): `npm install`, `npm audit` y búsquedas web los hace Claude. En tareas de solo lectura además no puede escribir nada, ni `tsbuildinfo`: si hace falta `npm run build`, o se le da una tarea de escritura o lo ejecuta Claude.
 
+## Ver la app en el navegador integrado
+
+El navegador integrado del escritorio bloquea `/@vite/client`, así que `npm run dev` sale en blanco ahí. Para comprobar algo visualmente: `npm run build` en `frontend/` y `preview_start` con la configuración `peluqueria-preview` de `.claude/launch.json` (`vite preview` en el 5181, que usa el mismo proxy a `/api`). Al terminar, parar el servidor y borrar `frontend/dist/`. El backend en el 3100 suele estar ya arrancado por el usuario.
+
 ## Bóveda personal
 
 Desde el 12/10/2026 toda la documentación del proyecto vive en este repo. La bóveda `~/Documentos/Boveda/` solo tiene una nota-puntero (`10-Proyectos/peluqueria/peluqueria.md`) y las notas antiguas en `99-Papelera/peluqueria-*`. No escribir estado del proyecto allí.

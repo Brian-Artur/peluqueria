@@ -36,10 +36,11 @@ curl http://127.0.0.1:3100/health        # comprueba backend + BD
 
 # Backend
 cd backend && npm run dev                # tsx watch
-cd backend && npx tsc --noEmit -p .      # comprobar tipos (no hay script)
+cd backend && npm run typecheck
 
 # Frontend
 cd frontend && npm run dev
+cd frontend && npm run typecheck
 cd frontend && npm run lint
 cd frontend && npm run build             # tsc -b && vite build
 ```
@@ -63,6 +64,7 @@ backend/src/
 frontend/src/
   Calendario.tsx        dueño del estado (citas, clientes, servicios, semana, selección) y de los fetch
   tipos.ts              tipos compartidos del frontend
+  peticion.ts           fetch que lanza el mensaje de error del backend
   calendario/           componentes de la rejilla y el panel + utilidades puras (fechas, posicion, constantes)
 infra/mariadb/          docker-compose + initdb/01-schema.sql, 02-seed.sql
 docs/                   documentación + bóveda de Obsidian (.obsidian/, _assets/)
@@ -112,7 +114,7 @@ Están en [`docs/decisiones.md`](docs/decisiones.md). **No se re-litigan de paso
 
 ## Verificar antes de dar algo por hecho
 
-1. Tipos: backend `npx tsc --noEmit -p .`; frontend `npx tsc --noEmit -p tsconfig.app.json` y `-p tsconfig.node.json` (su `tsconfig.json` solo tiene referencias).
+1. Tipos: `npm run typecheck` en el paquete tocado.
 2. Lint del frontend: `npm run lint`.
 3. Backend: `curl` al endpoint con los tres caminos (éxito / 409 / 404).
 4. Frontend: decir qué comprobar en el navegador; no afirmar que se ve bien sin haberlo visto.

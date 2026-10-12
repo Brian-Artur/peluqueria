@@ -6,9 +6,9 @@ Actualizado: **12/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v1.1.0` (12/10/2026): CSS Modules, sin cambios visuales. Antes, `v1.0.0`: agenda de una persona. |
+| **Última versión cerrada** | `v1.2.0` (12/10/2026): robustez — errores visibles, UTC en la BD, franjas de 5 min. |
 | **En curso** | Nada. |
-| **Siguiente** | **v1.2: robustez** — la deuda de la auditoría, en el roadmap. |
+| **Siguiente** | **v1.3: pulido estético** — texto desbordado en citas cortas, colores de estado, tema con variables CSS. |
 | **Pendiente de mí** | Hacer push de `main` y los tags. Decidir cómo repartir `dev.artesaniaartur.es` antes del despliegue. |
 
 ## Para retomar

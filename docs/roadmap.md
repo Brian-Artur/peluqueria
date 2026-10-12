@@ -7,20 +7,9 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v0** — Esqueleto del monorepo, Git, `.gitignore`, MariaDB en Docker.
 - **v1.0** (22/08/2026, tag `v1.0.0`) — Agenda de una persona: crear, mover, cancelar y completar citas sobre un calendario semanal propio. Detalle en [arquitectura.md](arquitectura.md).
 - **v1.1** (12/10/2026, tag `v1.1.0`) — CSS Modules: un `.module.css` por componente, sin cambios visuales. Primera versión implementada por Codex y revisada por Claude.
+- **v1.2** (12/10/2026, tag `v1.2.0`) — Robustez: avisos de error del backend en la interfaz, fechas en UTC en la BD, inicio en franjas de 5 min, 400 en JSON mal formado, `precio` como texto, limpieza y script `typecheck`.
 
 ## Siguiente
-
-### v1.2 — Robustez
-
-Deuda detectada en la auditoría del 11/10/2026:
-
-- Los `fetch` ignoran `res.ok`: tras un error el panel se cierra como si nada, o se guarda un objeto de error donde se espera un array (`Calendario.tsx`).
-- El pool de mysql2 no fija `timezone`: convierte los `DATETIME` con la zona del **proceso Node**. Si el backend corre con otra zona (los contenedores suelen ir en UTC), las horas se desplazan (`db.ts`).
-- `precio` es `DECIMAL`: mysql2 lo devuelve como string y el frontend lo tipa como `number`.
-- Mover acepta minutos arbitrarios (10:07) y `posicion.ts` divide entre 5 sin redondear → fila fraccionaria.
-- JSON mal formado en el body → 500 genérico en vez de 400.
-- Sobras de la plantilla de Vite (`hero.png`, `react.svg`, `vite.svg`); `.panel` y `.controles-semana` sin reglas CSS.
-- Backend sin scripts de `build` ni `typecheck`.
 
 Sin urgencia (solo importa con volumen real): **cargar citas por rango de fechas** desde el backend, con un `useEffect` que dependa de `lunesVisible`. Hoy se traen todas de una vez.
 

@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v1.1)
+# Arquitectura — cómo está construido hoy (v1.2)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -38,12 +38,13 @@ Capas: **router** (HTTP + Zod) → **service** (reglas de negocio) → **reposit
 | `GET /health` | Comprueba de verdad la conexión a la BD. Fuera de `/api` a propósito. |
 | `GET /api/clientes`, `/api/servicios` | Listados. |
 | `GET /api/citas` | Con JOIN que resuelve nombres de cliente y servicio. |
-| `POST /api/citas` | Zod: `cliente_id`, `servicio_id`, `inicio` (ISO). El `fin` lo calcula el backend. |
-| `PATCH /api/citas/:id` | Mover: solo llega `inicio`; el service recalcula el `fin`. |
+| `POST /api/citas` | Zod: `cliente_id`, `servicio_id`, `inicio` (ISO, en franja de 5 min). El `fin` lo calcula el backend. |
+| `PATCH /api/citas/:id` | Mover: solo llega `inicio` (en franja de 5 min); el service recalcula el `fin`. |
 | `POST /api/citas/:id/cancelar` | Transición a `cancelada`. |
 | `POST /api/citas/:id/completar` | Transición a `completada`. |
 
-- Mover, cancelar y completar solo desde `reservada`. Si no → **409**. Si no existe → **404**.
+- Mover, cancelar y completar solo desde `reservada`. Si no → **409**. Si no existe → **404**. Datos inválidos o JSON mal formado → **400**. Todos los errores responden `{ "error": "mensaje" }`.
+- El pool de mysql2 usa `timezone: "Z"`: los `DATETIME` de la BD están en **UTC**.
 - Errores tipados (`ErrorNoEncontrado`, `ErrorConflicto`) y middleware central, montado el último.
 
 ## Frontend
@@ -67,11 +68,13 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 | `calendario/Panel.tsx` | Crear (cliente + servicio), mover (`datetime-local`), cancelar, completar. |
 | `calendario/fechas.ts`, `posicion.ts`, `constantes.ts` | Utilidades puras: semanas, fila y columna de una fecha, horario. |
 | `tipos.ts` | Tipos del frontend, incluida la unión `Seleccion`. |
+| `peticion.ts` | `pedir` / `pedirJson`: si la respuesta es un error, lanzan el mensaje del backend. |
 
 - Solo se pintan las citas de la semana visible.
 - Los botones de transición solo aparecen si `estado === "reservada"`.
 - El `Panel` lleva `key` derivada de la selección para que el formulario nazca limpio al cambiar.
 - BD y API en UTC; el navegador convierte a hora local solo para mostrar y para el `datetime-local`.
+- Si una petición falla, el aviso sale dentro del panel si está abierto (que no se cierra), o encima del calendario si no. Tras una acción fallida se refrescan igualmente las citas.
 
 ## Verificado en v1.0
 
