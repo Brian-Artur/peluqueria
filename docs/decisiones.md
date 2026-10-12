@@ -46,7 +46,8 @@
 - **El hijo avisa, el padre decide.** Las hojas reportan; `Calendario` hace los fetch.
 - **Refrescar desde el servidor, nunca parchear el estado local** tras crear, mover, cancelar o completar.
 - **La UI respeta la máquina de estados del backend**: un botón solo aparece si la transición es legal.
-- **Fechas en UTC al viajar**; conversión a local solo para mostrar y para el `datetime-local`.
+- **Fechas en UTC al viajar**; conversión a local solo para mostrar y para elegir fecha y hora.
+- **Selector de fecha y hora propio**, sin `datetime-local` ni `type="date"` (su formato lo decide el idioma del navegador): mini calendario del mes y desplegables de hora y minutos de 5 en 5. Al pulsar un hueco, la cita empieza en la franja de 5 min bajo el ratón.
 
 ## Deuda anotada — no "arreglar" por sorpresa
 

@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v1.3)
+# Arquitectura — cómo está construido hoy (v1.4)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -63,9 +63,10 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 |---|---|
 | `Calendario.tsx` | Dueño del estado (`citas`, `clientes`, `servicios`, `lunesVisible`, `seleccion`) y de los fetch. |
 | `calendario/CabeceraDias.tsx` | Semana ISO, días con su número y flechas de semana anterior / siguiente. |
-| `calendario/Rejilla.tsx`, `FilaHora.tsx` | Horas y celdas clicables; marcan el hueco seleccionado. |
+| `calendario/Rejilla.tsx`, `FilaHora.tsx`, `CeldaHora.tsx` | Horas y celdas de una hora. Al pulsar, la franja de 5 min bajo el ratón (resaltada al pasar por encima); marcan la franja seleccionada. |
 | `calendario/TarjetaCita.tsx` | Una cita en la rejilla. |
-| `calendario/Panel.tsx` | Columna fija a la derecha: crear (cliente + servicio), mover (`datetime-local`), cancelar, completar. Se cierra con la cruz roja. |
+| `calendario/Panel.tsx` | Columna fija a la derecha: crear (cliente + servicio + fecha y hora), mover, cancelar, completar. Se cierra con la cruz roja. |
+| `calendario/SelectorFechaHora.tsx`, `MiniCalendario.tsx` | Elegir fecha (mes con lunes primero, días de cierre atenuados) y hora (desplegables de 5 en 5), sin depender del idioma del navegador. |
 | `calendario/diasVisibles.ts` | Qué días de la semana se pintan. |
 | `calendario/fechas.ts`, `posicion.ts`, `constantes.ts` | Utilidades puras: semanas, semana ISO, fila y columna de una fecha, horario y días de apertura. |
 | `tipos.ts` | Tipos del frontend, incluida la unión `Seleccion`. |
@@ -74,7 +75,7 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 - Solo se pintan las citas de la semana visible.
 - Los botones de transición solo aparecen si `estado === "reservada"`.
 - El `Panel` lleva `key` derivada de la selección para que el formulario nazca limpio al cambiar.
-- BD y API en UTC; el navegador convierte a hora local solo para mostrar y para el `datetime-local`.
+- BD y API en UTC; el navegador convierte a hora local solo para mostrar y para elegir fecha y hora.
 - Si una petición falla, el aviso sale dentro del panel si está abierto (que no se cierra), o encima del calendario si no. Tras una acción fallida se refrescan igualmente las citas.
 
 ## Verificado en v1.0
