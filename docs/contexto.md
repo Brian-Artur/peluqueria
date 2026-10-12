@@ -6,17 +6,17 @@ Actualizado: **12/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v1.0.0` (22/08/2026): agenda de una persona — crear, mover, cancelar y completar citas. |
-| **En curso** | **v1.1: CSS Modules** — refactor puro, debe verse idéntico. Lo implementa Codex y lo revisa Claude. |
-| **Siguiente** | v1.2: robustez (deuda de la auditoría, en el roadmap). |
-| **Pendiente de mí** | Decidir cómo repartir `dev.artesaniaartur.es` antes del despliegue. Resto de decisiones abiertas en el roadmap. |
+| **Última versión cerrada** | `v1.1.0` (12/10/2026): CSS Modules, sin cambios visuales. Antes, `v1.0.0`: agenda de una persona. |
+| **En curso** | Nada. |
+| **Siguiente** | **v1.2: robustez** — la deuda de la auditoría, en el roadmap. |
+| **Pendiente de mí** | Hacer push de `main` y los tags. Decidir cómo repartir `dev.artesaniaartur.es` antes del despliegue. |
 
 ## Para retomar
 
 ```bash
 docker compose -f infra/mariadb/docker-compose.yml up -d
-cd backend && npm run dev        # y comprobar: curl http://127.0.0.1:3000/health
-cd frontend && npm run dev       # http://127.0.0.1:5173
+cd backend && npm run dev        # y comprobar: curl http://127.0.0.1:3100/health
+cd frontend && npm run dev       # http://127.0.0.1:5180
 ```
 
 ## Mapa

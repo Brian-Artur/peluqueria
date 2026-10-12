@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v1.0)
+# Arquitectura — cómo está construido hoy (v1.1)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -48,7 +48,7 @@ Capas: **router** (HTTP + Zod) → **service** (reglas de negocio) → **reposit
 
 ## Frontend
 
-Calendario semanal en **CSS Grid escrito a mano**.
+Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: cada componente tiene su `.module.css` al lado; solo `index.css` es global.
 
 ![Rejilla del calendario y sus componentes](_assets/calendario-semanal.png)
 

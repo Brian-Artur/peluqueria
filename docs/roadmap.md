@@ -6,18 +6,9 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 - **v0** — Esqueleto del monorepo, Git, `.gitignore`, MariaDB en Docker.
 - **v1.0** (22/08/2026, tag `v1.0.0`) — Agenda de una persona: crear, mover, cancelar y completar citas sobre un calendario semanal propio. Detalle en [arquitectura.md](arquitectura.md).
+- **v1.1** (12/10/2026, tag `v1.1.0`) — CSS Modules: un `.module.css` por componente, sin cambios visuales. Primera versión implementada por Codex y revisada por Claude.
 
 ## Siguiente
-
-### Sanear el entorno
-
-`npm ci` en ambos paquetes y permisos de vuelta a 644 tras copiar la carpeta. Subir a GitHub el commit pendiente y esta documentación.
-
-### v1.1 — CSS Modules (refactor puro)
-
-Migrar `Calendario.css` global a un `.module.css` por componente. **Sin cambios visuales**: debe verse idéntico; ese es el criterio. Va antes del pulido para no escribir CSS global que luego haya que migrar dos veces. Tarea para Codex.
-
-Reparto de selectores: `.calendario` → Calendario; `.cabecera-dia`, `.esquina` → CabeceraDias; `.etiqueta-hora`, `.celda` → FilaHora; `.cita`, `.cita.completada`, `.cita.cancelada`, `.cita-cliente`, `.cita-servicio` → TarjetaCita. `index.css` sigue global (reset y variables).
 
 ### v1.2 — Robustez
 
