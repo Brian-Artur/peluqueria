@@ -134,48 +134,57 @@ function Calendario(): ReactElement {
   });
 
   return (
-    <>
-      <ControlesSemana
-        lunesVisible={lunesVisible}
-        onAnterior={semanaAnterior}
-        onSiguiente={semanaSiguiente}
-      />
+    <div className={styles.distribucion}>
+      <div className={styles.agenda}>
+        <ControlesSemana
+          lunesVisible={lunesVisible}
+          onAnterior={semanaAnterior}
+          onSiguiente={semanaSiguiente}
+        />
 
-      {seleccion === null && error !== null && (
-        <p role="alert" className={styles.error}>{error}</p>
-      )}
+        {seleccion === null && error !== null && (
+          <p role="alert" className={styles.error}>{error}</p>
+        )}
 
-      <div className={styles.calendario}>
-        <CabeceraDias />
-        <Rejilla onSeleccionarHueco={seleccionarHueco} />
-        {citasDeLaSemana.map((cita) => (
-          <TarjetaCita key={cita.id} cita={cita} onSeleccionarCita={seleccionarCita} />
-        ))}
+        <div className={styles.calendario}>
+          <CabeceraDias />
+          <Rejilla onSeleccionarHueco={seleccionarHueco} />
+          {citasDeLaSemana.map((cita) => (
+            <TarjetaCita key={cita.id} cita={cita} onSeleccionarCita={seleccionarCita} />
+          ))}
+        </div>
       </div>
 
-      {seleccion && (
-        <Panel
-          key={
-            seleccion.tipo === "cita"
-              ? `cita-${seleccion.id}`
-              : `hueco-${seleccion.inicio.toISOString()}`
-          }
-          seleccion={seleccion}
-          clientes={clientes}
-          servicios={servicios}
-          citaSeleccionada={citaSeleccionada}
-          error={error}
-          onCrear={crearCita}
-          onCancelar={cancelarCita}
-          onCompletar={completarCita}
-          onMover={moverCita}
-          onCerrar={() => {
-            setError(null);
-            setSeleccion(null);
-          }}
-        />
-      )}
-    </>
+      <div className={styles.columnaPanel}>
+        {seleccion === null && (
+          <p className={styles.ayuda}>
+            Pulsa un hueco para crear una cita o una cita para verla.
+          </p>
+        )}
+        {seleccion && (
+          <Panel
+            key={
+              seleccion.tipo === "cita"
+                ? `cita-${seleccion.id}`
+                : `hueco-${seleccion.inicio.toISOString()}`
+            }
+            seleccion={seleccion}
+            clientes={clientes}
+            servicios={servicios}
+            citaSeleccionada={citaSeleccionada}
+            error={error}
+            onCrear={crearCita}
+            onCancelar={cancelarCita}
+            onCompletar={completarCita}
+            onMover={moverCita}
+            onCerrar={() => {
+              setError(null);
+              setSeleccion(null);
+            }}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 

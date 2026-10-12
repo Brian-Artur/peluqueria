@@ -1,0 +1,9 @@
+.pagina {
+  padding: var(--espacio-5);
+}
+
+.titulo {
+  margin: 0 0 var(--espacio-5);
+  font-size: 1.75rem;
+  color: var(--color-texto);
+}

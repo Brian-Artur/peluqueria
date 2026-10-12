@@ -1,3 +1,39 @@
+:root {
+  /* Centralizar los colores permite cambiar de paleta o añadir modo oscuro en un solo archivo. */
+  --color-fondo: #FFFFFF;
+  --color-superficie: #F7F4F7;
+  --color-texto: #2D2430;
+  --color-texto-suave: #776B7A;
+  --color-linea: #ECE6EC;
+  --color-acento: #7A4E7E;
+  --color-acento-tinte: #F1E7F2;
+  --color-ok: #2F7A72;
+  --color-ok-tinte: #E1F1EE;
+  --color-error: #B00020;
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --radio: 6px;
+  --fuente: system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  font-family: var(--fuente);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+button,
+input,
+select {
+  font: inherit;
 }

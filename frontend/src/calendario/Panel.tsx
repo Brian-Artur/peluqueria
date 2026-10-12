@@ -34,8 +34,8 @@ function Panel({
   const [nuevoInicio, setNuevoInicio] = useState("");
 
   return (
-    <div>
-      <button onClick={onCerrar}>Cerrar</button>
+    <div className={styles.panel}>
+      <button className={styles.secundario} onClick={onCerrar}>Cerrar</button>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
 
       {seleccion.tipo === "hueco" && (
@@ -63,6 +63,7 @@ function Panel({
           </select>
 
           <button
+            className={styles.principal}
             disabled={clienteId === null || servicioId === null}
             onClick={() => {
               if (clienteId === null || servicioId === null) return;
@@ -89,10 +90,11 @@ function Panel({
                 value={nuevoInicio || fechaParaInput(citaSeleccionada.inicio)}
                 onChange={(e) => setNuevoInicio(e.target.value)}
               />
-              <button onClick={() => onCompletar(citaSeleccionada.id)}>
+              <button className={styles.secundario} onClick={() => onCompletar(citaSeleccionada.id)}>
                 Completar cita
               </button>
               <button
+                className={styles.principal}
                 onClick={() =>
                   onMover(
                     citaSeleccionada.id,
@@ -104,7 +106,7 @@ function Panel({
                 Mover cita
               </button>
 
-              <button onClick={() => onCancelar(citaSeleccionada.id)}>
+              <button className={styles.secundario} onClick={() => onCancelar(citaSeleccionada.id)}>
                 Cancelar cita
               </button>
             </>

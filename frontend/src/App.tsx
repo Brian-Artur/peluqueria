@@ -1,9 +1,11 @@
+import type { ReactElement } from "react";
 import Calendario from "./Calendario";
+import styles from "./App.module.css";
 
-function App() {
+function App(): ReactElement {
   return (
-    <div>
-      <h1>Agenda</h1>
+    <div className={styles.pagina}>
+      <h1 className={styles.titulo}>Agenda</h1>
       <Calendario />
     </div>
   );

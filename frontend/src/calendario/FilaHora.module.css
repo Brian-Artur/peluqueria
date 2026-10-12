@@ -3,12 +3,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding-right: 6px;
-  color: #666;
+  padding-right: var(--espacio-2);
+  color: var(--color-texto-suave);
   font-size: 11px;
 }
 
 .celda {
-  border-left: 1px solid #eee;
-  border-bottom: 1px solid #f5f5f5;
+  border-left: 1px solid var(--color-linea);
+  border-bottom: 1px solid var(--color-linea);
 }

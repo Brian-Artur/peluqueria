@@ -1,3 +1,51 @@
+.panel {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  padding: var(--espacio-4);
+}
+
+.panel p {
+  margin: var(--espacio-3) 0;
+}
+
+.panel input,
+.panel select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: var(--espacio-3);
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+.principal,
+.secundario {
+  padding: var(--espacio-2) var(--espacio-3);
+  margin-bottom: var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  cursor: pointer;
+}
+
+.principal {
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+  color: var(--color-fondo);
+}
+
+.secundario {
+  background: transparent;
+  color: var(--color-texto);
+}
+
+.principal:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .error {
-  color: #b00020;
+  color: var(--color-error);
 }

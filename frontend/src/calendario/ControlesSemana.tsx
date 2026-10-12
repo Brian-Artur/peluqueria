@@ -1,15 +1,18 @@
+import type { ReactElement } from "react";
+import styles from "./ControlesSemana.module.css";
+
 type Props = {
   lunesVisible: Date;
   onAnterior: () => void;
   onSiguiente: () => void;
 };
 
-function ControlesSemana({ lunesVisible, onAnterior, onSiguiente }: Props) {
+function ControlesSemana({ lunesVisible, onAnterior, onSiguiente }: Props): ReactElement {
   return (
-    <div>
-      <button onClick={onAnterior}>← Anterior</button>
+    <div className={styles.controles}>
+      <button className={styles.secundario} onClick={onAnterior}>← Anterior</button>
       <span>{lunesVisible.toLocaleDateString("es-ES")}</span>
-      <button onClick={onSiguiente}>Siguiente →</button>
+      <button className={styles.secundario} onClick={onSiguiente}>Siguiente →</button>
     </div>
   );
 }

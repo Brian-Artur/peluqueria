@@ -1,4 +1,6 @@
+import type { ReactElement } from "react";
 import type { Cita } from "../tipos";
+import { horaCorta } from "./fechas";
 import { columnaDeDia, filaDeHora } from "./posicion";
 import styles from "./TarjetaCita.module.css";
 
@@ -7,21 +9,43 @@ type Props = {
   onSeleccionarCita: (id: number) => void;
 };
 
-function TarjetaCita({ cita, onSeleccionarCita }: Props) {
+function TarjetaCita({ cita, onSeleccionarCita }: Props): ReactElement {
   const inicio = new Date(cita.inicio);
   const fin = new Date(cita.fin);
+  const duracionMinutos = (fin.getTime() - inicio.getTime()) / 60000;
+  const hora = horaCorta(inicio);
+  const marcaEstado = cita.estado === "completada" ? "✓ " : "";
+  const textoCliente = `${marcaEstado}${hora} ${cita.cliente_nombre}`;
+  const textoCompleto = `${textoCliente} · ${cita.servicio_nombre} · ${cita.estado}`;
+
+  function contenido(): ReactElement {
+    if (duracionMinutos <= 30) {
+      return (
+        <div className={styles.lineaCorta}>
+          {textoCliente} · {cita.servicio_nombre}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className={styles.citaCliente}>{textoCliente}</div>
+        <div className={styles.citaServicio}>{cita.servicio_nombre}</div>
+      </>
+    );
+  }
 
   return (
     <div
       className={`${styles.cita} ${styles[cita.estado]}`}
+      title={textoCompleto}
       style={{
         gridColumn: columnaDeDia(inicio),
         gridRow: `${filaDeHora(inicio)} / ${filaDeHora(fin)}`,
       }}
       onClick={() => onSeleccionarCita(cita.id)}
     >
-      <div className={styles.citaCliente}>{cita.cliente_nombre}</div>
-      <div className={styles.citaServicio}>{cita.servicio_nombre}</div>
+      {contenido()}
     </div>
   );
 }

@@ -18,3 +18,9 @@ export function fechaParaInput(iso: string): string {
   const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
 }
+
+export function horaCorta(fecha: Date): string {
+  const hora = String(fecha.getHours()).padStart(2, "0");
+  const minutos = String(fecha.getMinutes()).padStart(2, "0");
+  return `${hora}:${minutos}`;
+}

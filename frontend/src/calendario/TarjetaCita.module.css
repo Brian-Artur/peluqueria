@@ -1,26 +1,33 @@
 .cita {
-  margin: 1px 2px;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: white;
+  min-width: 0;
+  margin: calc(var(--espacio-1) / 4) calc(var(--espacio-1) / 2);
+  padding: calc(var(--espacio-1) / 2) var(--espacio-1);
+  border-left: 3px solid;
+  border-radius: calc(var(--radio) / 2);
+  color: var(--color-texto);
   font-size: 11px;
   line-height: 1.2;
   overflow: hidden;
   z-index: 1;
   position: relative;
+  cursor: pointer;
 }
 
 .cita.reservada {
-  background: #4a7ba7;
+  background: var(--color-acento-tinte);
+  border-left-color: var(--color-acento);
 }
 
 .cita.completada {
-  background: #5a8a5a;
+  background: var(--color-ok-tinte);
+  border-left-color: var(--color-ok);
 }
 
 .cita.cancelada {
-  background: #999;
-  opacity: 0.5;
+  background: transparent;
+  border: 1px dashed var(--color-texto-suave);
+  border-left: 3px solid var(--color-texto-suave);
+  color: var(--color-texto-suave);
   text-decoration: line-through;
 }
 
@@ -29,5 +36,11 @@
 }
 
 .citaServicio {
-  opacity: 0.85;
+  color: var(--color-texto-suave);
+}
+
+.lineaCorta {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
