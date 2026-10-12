@@ -1,13 +1,13 @@
 import type { ReactElement } from "react";
 import { FRANJAS_POR_HORA, HORA_APERTURA } from "./constantes";
-import { mismoDia } from "./fechas";
+import CeldaHora from "./CeldaHora";
 import styles from "./FilaHora.module.css";
 
 type Props = {
   hora: number;
   dias: Date[];
   huecoSeleccionado: Date | null;
-  onSeleccionarHueco: (dia: Date, hora: number) => void;
+  onSeleccionarHueco: (dia: Date, hora: number, minuto: number) => void;
 };
 
 function FilaHora({ hora, dias, huecoSeleccionado, onSeleccionarHueco }: Props): ReactElement {
@@ -22,20 +22,17 @@ function FilaHora({ hora, dias, huecoSeleccionado, onSeleccionarHueco }: Props):
         {hora}:00
       </div>
 
-      {dias.map((dia, indice) => {
-        const seleccionada = huecoSeleccionado !== null
-          && mismoDia(dia, huecoSeleccionado)
-          && huecoSeleccionado.getHours() === hora;
-
-        return (
-          <div
-            key={dia.getTime()}
-            className={`${styles.celda} ${seleccionada ? styles.seleccionada : ""}`}
-            style={{ gridColumn: indice + 2, gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}` }}
-            onClick={() => onSeleccionarHueco(dia, hora)}
-          />
-        );
-      })}
+      {dias.map((dia, indice) => (
+        <CeldaHora
+          key={dia.getTime()}
+          dia={dia}
+          hora={hora}
+          columna={indice + 2}
+          filaInicio={filaInicio}
+          huecoSeleccionado={huecoSeleccionado}
+          onSeleccionarHueco={onSeleccionarHueco}
+        />
+      ))}
     </>
   );
 }

@@ -53,9 +53,9 @@ function Calendario(): ReactElement {
     setSeleccion(null);
   };
 
-  const seleccionarHueco = (dia: Date, hora: number): void => {
+  const seleccionarHueco = (dia: Date, hora: number, minuto: number): void => {
     const inicio = new Date(dia);
-    inicio.setHours(hora, 0, 0, 0);
+    inicio.setHours(hora, minuto, 0, 0);
     setError(null);
     setSeleccion({ tipo: "hueco", inicio });
   };
