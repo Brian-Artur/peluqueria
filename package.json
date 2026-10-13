@@ -1,0 +1,14 @@
+{
+  "name": "peluqueria",
+  "private": true,
+  "workspaces": [
+    "compartido",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}
