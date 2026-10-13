@@ -31,6 +31,8 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 
 ## Comandos
 
+La guía completa (montar desde cero, usuarios de prueba, puertos) está en [`README.md`](README.md); si cambia un comando, se actualiza allí también.
+
 ```bash
 # Desde la raíz: los tres paquetes
 npm install

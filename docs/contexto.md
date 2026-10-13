@@ -13,6 +13,8 @@ Actualizado: **13/10/2026**
 
 ## Para retomar
 
+Todos los comandos, cómo montar desde cero y los usuarios de prueba: [`README.md`](../README.md).
+
 ```bash
 npm install                      # desde la raíz, si cambiaron dependencias
 docker compose -f infra/mariadb/docker-compose.yml up -d
