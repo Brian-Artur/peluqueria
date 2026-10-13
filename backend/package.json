@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "migrar": "tsx src/scripts/migrar.ts",
+    "sembrar": "tsx src/scripts/sembrar.ts"
   },
   "keywords": [],
   "author": "",
