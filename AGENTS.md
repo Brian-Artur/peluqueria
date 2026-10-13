@@ -64,7 +64,7 @@ cd frontend && npm run build             # tsc -b && vite build
 ## Estructura
 
 ```
-compartido/src/         contratos de la API: esquemas Zod + tipos (cita, cliente, servicio, error)
+compartido/src/         contratos de la API: esquemas Zod + tipos (cita, cliente, servicio, error) y teléfono (E.164)
 backend/src/
   index.ts              arranque y montaje (/health en la raíz, el resto bajo /api)
   db.ts                 pool mysql2
@@ -74,7 +74,9 @@ backend/src/
   services/             reglas de negocio. Nada de HTTP ni SQL aquí
   repositories/         solo SQL parametrizado
 frontend/src/
-  Calendario.tsx        dueño del estado (citas, clientes, servicios, semana, selección) y de los fetch
+  App.tsx, Marco.tsx    rutas (React Router) y barra de navegación común
+  Calendario.tsx        pantalla /agenda: dueño del estado (citas, clientes, servicios, semana, selección) y de los fetch
+  clientes/             pantalla /clientes: lista + ficha, campo de teléfono con prefijo
   tipos.ts              reexporta los tipos de compartido + Seleccion (solo de la interfaz)
   peticion.ts           fetch que lanza el mensaje de error del backend y valida la respuesta con su esquema
   calendario/           componentes de la rejilla y el panel + utilidades puras (fechas, posicion, constantes)

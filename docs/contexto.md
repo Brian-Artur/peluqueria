@@ -6,9 +6,9 @@ Actualizado: **13/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v2.2.0` (13/10/2026): monorepo con workspaces y contratos compartidos. **Serie v2 (cimientos) completa**: migraciones, tests y contratos. |
+| **Última versión cerrada** | `v3.0.0` (13/10/2026): clientes — pantalla, búsqueda, alta rápida, teléfonos con prefijo. **Series v2 y v3 completas.** |
 | **En curso** | Nada. |
-| **Siguiente** | **v3.0: gestión de clientes** (alta, edición, búsqueda). Después v3.1 teléfono normalizado. |
+| **Siguiente** | **v4: plantilla, tiempos y local**, empezando por **v4.0 usuarios y roles** (el encargado ajusta tiempos y bloqueos). |
 | **Pendiente de mí** | Nada urgente. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
 ## Para retomar

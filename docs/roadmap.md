@@ -13,6 +13,7 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v2.0** (13/10/2026, tag `v2.0.0`) — Migraciones con script propio: `backend/migraciones/` como única fuente del esquema, `npm run migrar` y `npm run sembrar`; fuera `initdb/`.
 - **v2.1** (13/10/2026, tag `v2.1.0`) — Tests con Vitest de la lógica pura: fechas, semana ISO, días visibles, posición, franjas, peticiones, archivos de migración y validación del inicio (59 tests). Pendiente: tests de integración con MariaDB, cuando haya migraciones que probar.
 - **v2.2** (13/10/2026, tag `v2.2.0`) — Monorepo con npm workspaces y contratos de la API en `compartido/` (esquemas Zod), usados por backend y frontend; el frontend valida cada respuesta. Cierra v2.
+- **v3.0** (13/10/2026, tag `v3.0.0`) — Clientes: navegación con React Router, pantalla lista + ficha con búsqueda, alta rápida desde la cita, email y notas (migraciones 001–002), teléfonos en E.164 con prefijo y formato (migración 003; absorbe la antigua v3.1). Cierra la serie v3.
 
 ## Siguiente
 
@@ -23,10 +24,8 @@ Sin esto, tocar el esquema o crecer el código es peligroso.
 
 ### v3 — Clientes
 
-Hoy no se puede dar de alta un cliente desde la app: solo existen los de la semilla.
+Hecha (ver arriba). Pendiente para más adelante: archivar clientes y su historial de citas en la ficha.
 
-- **v3.0 — Gestión de clientes**: alta, edición y búsqueda.
-- **v3.1 — Teléfono normalizado** (`+34…`): la pista con la que los asistentes reconocerán a quien llama o escribe. No es único: una familia puede compartir número.
 
 ## Después
 
