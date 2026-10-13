@@ -1,6 +1,6 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { z } from "zod";
-import { pedir, pedirJson, mensajeDeError } from "./peticion";
+import { pedir, pedirJson, esAbortada, mensajeDeError } from "./peticion";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -49,6 +49,15 @@ describe("pedirJson", () => {
     expect(fetchSimulado).toHaveBeenCalledExactlyOnceWith("/api/citas/1", undefined);
   });
 
+  it("relanza la cancelación al leer el cuerpo de una respuesta correcta", async () => {
+    const fallo = new DOMException("La petición fue cancelada", "AbortError");
+    const respuesta = new Response(null, { status: 200 });
+    vi.spyOn(respuesta, "json").mockRejectedValue(fallo);
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(respuesta));
+
+    await expect(pedirJson("/api/clientes", z.unknown())).rejects.toBe(fallo);
+  });
+
   it("rechaza una respuesta 200 con una forma incorrecta y registra el detalle de Zod", async () => {
     const respuesta = new Response(JSON.stringify({ id: "1" }), {
       status: 200,
@@ -68,8 +77,34 @@ describe("pedirJson", () => {
 
 describe.each([
   { nombre: "pedir", ejecutar: pedir },
-  { nombre: "pedirJson", ejecutar: (url: string): Promise<unknown> => pedirJson(url, z.unknown()) },
+  { nombre: "pedirJson", ejecutar: (url: string, opciones?: RequestInit): Promise<unknown> => pedirJson(url, z.unknown(), opciones) },
 ])("$nombre ante un fallo", ({ ejecutar }) => {
+  it("relanza la cancelación de fetch sin convertirla en un error de conexión", async () => {
+    const controlador = new AbortController();
+    const fetchSimulado = vi.fn<typeof fetch>().mockImplementation((_url, opciones) => {
+      return new Promise<Response>((_resolve, reject) => {
+        opciones?.signal?.addEventListener("abort", () => reject(opciones.signal?.reason), { once: true });
+      });
+    });
+    vi.stubGlobal("fetch", fetchSimulado);
+
+    const peticion = ejecutar("/api/clientes", { signal: controlador.signal });
+    controlador.abort();
+
+    await expect(peticion).rejects.toBe(controlador.signal.reason);
+    expect(esAbortada(controlador.signal.reason)).toBe(true);
+    expect(mensajeDeError(controlador.signal.reason)).not.toContain("No se pudo conectar");
+  });
+
+  it("relanza la cancelación al leer el cuerpo de una respuesta de error", async () => {
+    const fallo = new DOMException("La petición fue cancelada", "AbortError");
+    const respuesta = new Response(null, { status: 404 });
+    vi.spyOn(respuesta, "json").mockRejectedValue(fallo);
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(respuesta));
+
+    await expect(ejecutar("/api/clientes")).rejects.toBe(fallo);
+  });
+
   it("lanza el mensaje del backend si el error contiene JSON", async () => {
     const respuesta = new Response(JSON.stringify({ error: "Cita no encontrada" }), {
       status: 404,
@@ -97,6 +132,18 @@ describe.each([
       "No se pudo conectar con el servidor. Comprueba la conexión e inténtalo de nuevo.",
     );
   });
+});
+
+describe("esAbortada", () => {
+  it("reconoce una DOMException AbortError", () => {
+    expect(esAbortada(new DOMException("Cancelada", "AbortError"))).toBe(true);
+  });
+
+  it.each([null, undefined, "AbortError", new Error("AbortError"), new DOMException("Fallo", "NetworkError")])(
+    "no confunde otros fallos con una cancelación: %s", (fallo) => {
+      expect(esAbortada(fallo)).toBe(false);
+    },
+  );
 });
 
 describe("mensajeDeError", () => {

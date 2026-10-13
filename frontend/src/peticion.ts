@@ -5,8 +5,9 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
   let respuesta: Response;
   try {
     respuesta = await fetch(url, opciones);
-  } catch {
-    throw new Error("No se pudo conectar con el servidor. Comprueba la conexión e inténtalo de nuevo.");
+  } catch (fallo) {
+    if (esAbortada(fallo)) throw fallo;
+    throw new Error("No se pudo conectar con el servidor. Comprueba la conexión e inténtalo de nuevo.", { cause: fallo });
   }
 
   if (respuesta.ok) return respuesta;
@@ -18,7 +19,8 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
     if (resultado.success) {
       mensaje = resultado.data.error;
     }
-  } catch {
+  } catch (fallo) {
+    if (esAbortada(fallo)) throw fallo;
     // Un proxy puede devolver HTML; el estado HTTP sigue siendo útil para informar.
   }
 
@@ -38,6 +40,10 @@ export async function pedirJson<T>(
     throw new Error(`El servidor devolvió datos con una forma inesperada (${url})`);
   }
   return resultado.data;
+}
+
+export function esAbortada(fallo: unknown): boolean {
+  return fallo instanceof DOMException && fallo.name === "AbortError";
 }
 
 // Un catch recibe unknown: lo que se lanzó puede no ser un Error.

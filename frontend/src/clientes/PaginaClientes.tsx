@@ -1,90 +1,69 @@
-import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { useEffect, useState, type ReactElement } from "react";
+import { Link, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import { esquemaCliente, type Cliente, type DatosCliente } from "@peluqueria/compartido";
-import { mensajeDeError, pedir, pedirJson } from "../peticion";
+import { esAbortada, mensajeDeError, pedir, pedirJson } from "../peticion";
 import FichaCliente from "./FichaCliente";
 import ListaClientes from "./ListaClientes";
 import styles from "./PaginaClientes.module.css";
 
 type Props = { nuevo?: boolean };
 type DetalleCliente = {
-  claveRuta: string;
+  id: string;
   cliente: Cliente | null;
   error: string | null;
 };
 
 function PaginaClientes({ nuevo = false }: Props): ReactElement {
   const { id } = useParams<{ id: string }>();
-  const { key: claveRuta } = useLocation();
   const navegar = useNavigate();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [buscar, setBuscar] = useState("");
   const [cargandoLista, setCargandoLista] = useState(true);
   const [errorLista, setErrorLista] = useState<string | null>(null);
   const [detalle, setDetalle] = useState<DetalleCliente | null>(null);
-  const busquedaActual = useRef("");
-  const versionLista = useRef(0);
-  const versionFicha = useRef(0);
-  const paginaActiva = useRef(false);
+  // Sube tras guardar para que el efecto de la lista vuelva a pedirla al servidor.
+  const [recargas, setRecargas] = useState(0);
 
   useEffect(() => {
-    paginaActiva.current = true;
-    return () => { paginaActiva.current = false; };
-  }, []);
+    const controlador = new AbortController();
+    const { signal } = controlador;
+    const parametros = new URLSearchParams({ buscar });
 
-  const refrescarLista = useCallback(async (): Promise<void> => {
-    const version = ++versionLista.current;
-    const parametros = new URLSearchParams({ buscar: busquedaActual.current });
-    setCargandoLista(true);
-    try {
-      const lista = await pedirJson(`/api/clientes?${parametros}`, z.array(esquemaCliente));
-      if (version !== versionLista.current) return;
-      setClientes(lista);
-      setErrorLista(null);
-    } catch (fallo) {
-      if (version !== versionLista.current) return;
-      setErrorLista(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`);
-    } finally {
-      if (version === versionLista.current) setCargandoLista(false);
-    }
-  }, []);
+    // Esperar 300 ms tras la última tecla evita una petición por letra.
+    const temporizador = setTimeout(async () => {
+      setCargandoLista(true);
+      try {
+        const lista = await pedirJson(`/api/clientes?${parametros}`, z.array(esquemaCliente), { signal });
+        setClientes(lista);
+        setErrorLista(null);
+      } catch (fallo) {
+        if (esAbortada(fallo)) return;
+        setErrorLista(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`);
+      }
+      if (!signal.aborted) setCargandoLista(false);
+    }, 300);
 
-  useEffect(() => {
-    const temporizador = setTimeout(() => { void refrescarLista(); }, 300);
+    // Al cambiar el texto (o al salir), la petición anterior se cancela: no puede pisar a la nueva.
     return () => {
       clearTimeout(temporizador);
-      // También invalida las respuestas al salir de la pantalla.
-      versionLista.current += 1;
+      controlador.abort();
     };
-  }, [buscar, refrescarLista]);
+  }, [buscar, recargas]);
 
   useEffect(() => {
-    const version = ++versionFicha.current;
-    if (id !== undefined) {
-      pedirJson(`/api/clientes/${encodeURIComponent(id)}`, esquemaCliente)
-        .then((cliente) => {
-          if (version !== versionFicha.current) return;
-          setDetalle({ claveRuta, cliente, error: null });
-        })
-        .catch((fallo) => {
-          if (version !== versionFicha.current) return;
-          setDetalle({ claveRuta, cliente: null, error: `No se pudo abrir el cliente: ${mensajeDeError(fallo)}` });
-        });
-    }
-    return () => { versionFicha.current += 1; };
-  }, [id, claveRuta]);
-
-  const cambiarBusqueda = (texto: string): void => {
-    // Invalidar al teclear evita que una petición previa aparezca durante la espera.
-    versionLista.current += 1;
-    busquedaActual.current = texto;
-    setBuscar(texto);
-  };
+    if (id === undefined) return;
+    const controlador = new AbortController();
+    pedirJson(`/api/clientes/${encodeURIComponent(id)}`, esquemaCliente, { signal: controlador.signal })
+      .then((cliente) => setDetalle({ id, cliente, error: null }))
+      .catch((fallo) => {
+        if (esAbortada(fallo)) return;
+        setDetalle({ id, cliente: null, error: `No se pudo abrir el cliente: ${mensajeDeError(fallo)}` });
+      });
+    return () => { controlador.abort(); };
+  }, [id]);
 
   const guardarCliente = async (datos: DatosCliente): Promise<boolean> => {
-    const version = versionFicha.current;
-    let idNuevo: number | null = null;
     const opciones: RequestInit = {
       method: nuevo ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -93,17 +72,14 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
 
     if (nuevo) {
       const creado = await pedirJson("/api/clientes", esquemaCliente.pick({ id: true }), opciones);
-      idNuevo = creado.id;
-    } else {
-      if (id === undefined) return false;
-      await pedir(`/api/clientes/${encodeURIComponent(id)}`, opciones);
+      setRecargas((n) => n + 1);
+      await navegar(`/clientes/${creado.id}`, { replace: true });
+      return true;
     }
 
-    if (!paginaActiva.current) return false;
-    await refrescarLista();
-    // Si se cambió de ficha mientras se guardaba, no forzar otra navegación.
-    if (version !== versionFicha.current) return false;
-    if (idNuevo !== null) await navegar(`/clientes/${idNuevo}`, { replace: true });
+    if (id === undefined) return false;
+    await pedir(`/api/clientes/${encodeURIComponent(id)}`, opciones);
+    setRecargas((n) => n + 1);
     return true;
   };
 
@@ -111,7 +87,7 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
   if (nuevo) {
     ficha = <FichaCliente key="nuevo" cliente={null} onGuardar={guardarCliente} />;
   } else if (id !== undefined) {
-    if (detalle?.claveRuta !== claveRuta) {
+    if (detalle?.id !== id) {
       ficha = <p className={styles.ayuda} role="status">Cargando cliente…</p>;
     } else if (detalle.error !== null) {
       ficha = <p className={styles.error} role="alert">{detalle.error}</p>;
@@ -131,7 +107,7 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
               <input
                 type="search"
                 value={buscar}
-                onChange={(evento) => cambiarBusqueda(evento.target.value)}
+                onChange={(evento) => setBuscar(evento.target.value)}
                 placeholder="Nombre, teléfono o email"
               />
             </label>

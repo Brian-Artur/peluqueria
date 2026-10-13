@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { z } from "zod";
 import { esquemaCita, esquemaCliente, esquemaServicio, type DatosCliente } from "@peluqueria/compartido";
 import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
-import { mensajeDeError, pedir, pedirJson } from "./peticion";
+import { esAbortada, mensajeDeError, pedir, pedirJson } from "./peticion";
 import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
@@ -20,7 +20,6 @@ function Calendario(): ReactElement {
     lunesDeEstaSemana(new Date())
   );
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const versionClientes = useRef(0);
   const [servicios, setServicios] = useState<Servicio[]>([]);
 
   const [seleccion, setSeleccion] = useState<Seleccion | null>(null);
@@ -96,7 +95,7 @@ function Calendario(): ReactElement {
 
   const crearCliente = async (datos: DatosCliente): Promise<number | null> => {
     setError(null);
-    let idCreado: number | null = null;
+    let idCreado: number;
     try {
       const creado = await pedirJson("/api/clientes", esquemaCliente.pick({ id: true }), {
         method: "POST",
@@ -104,43 +103,59 @@ function Calendario(): ReactElement {
         body: JSON.stringify(datos),
       });
       idCreado = creado.id;
-      const version = ++versionClientes.current;
-      const lista = await pedirJson("/api/clientes", z.array(esquemaCliente));
-      if (version !== versionClientes.current) return null;
-      setClientes(lista);
-      return creado.id;
     } catch (fallo) {
-      let aviso = `No se pudo crear el cliente: ${mensajeDeError(fallo)}`;
-      if (idCreado !== null) {
-        aviso = `El cliente se creó, pero no se pudo actualizar la lista. No vuelvas a crearlo: ${mensajeDeError(fallo)}`;
-      }
-      setError(aviso);
+      setError(`No se pudo crear el cliente: ${mensajeDeError(fallo)}`);
       return null;
     }
+
+    // Refrescar desde el servidor para que el nuevo aparezca en el desplegable.
+    try {
+      setClientes(await pedirJson("/api/clientes", z.array(esquemaCliente)));
+    } catch (fallo) {
+      // Avisar de que ya existe: si no, se intentaría crear dos veces.
+      setError(`El cliente se creó, pero no se pudo actualizar la lista. No vuelvas a crearlo: ${mensajeDeError(fallo)}`);
+      return null;
+    }
+    return idCreado;
   };
 
   useEffect(() => {
-    pedirJson("/api/citas", z.array(esquemaCita))
-      .then(setCitas)
-      .catch((fallo) => setError(`No se pudieron cargar las citas: ${mensajeDeError(fallo)}`));
-  }, []);
-
-  useEffect(() => {
-    const version = ++versionClientes.current;
-    pedirJson("/api/clientes", z.array(esquemaCliente))
+    const controlador = new AbortController();
+    pedirJson("/api/citas", z.array(esquemaCita), { signal: controlador.signal })
       .then((lista) => {
-        if (version === versionClientes.current) setClientes(lista);
+        if (!controlador.signal.aborted) setCitas(lista);
       })
       .catch((fallo) => {
-        if (version === versionClientes.current) setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`);
+        if (controlador.signal.aborted || esAbortada(fallo)) return;
+        setError(`No se pudieron cargar las citas: ${mensajeDeError(fallo)}`);
       });
-    return () => { versionClientes.current += 1; };
+    return () => { controlador.abort(); };
   }, []);
 
   useEffect(() => {
-    pedirJson("/api/servicios", z.array(esquemaServicio))
-      .then(setServicios)
-      .catch((fallo) => setError(`No se pudieron cargar los servicios: ${mensajeDeError(fallo)}`));
+    const controlador = new AbortController();
+    pedirJson("/api/clientes", z.array(esquemaCliente), { signal: controlador.signal })
+      .then((lista) => {
+        if (!controlador.signal.aborted) setClientes(lista);
+      })
+      .catch((fallo) => {
+        if (controlador.signal.aborted || esAbortada(fallo)) return;
+        setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`);
+      });
+    return () => { controlador.abort(); };
+  }, []);
+
+  useEffect(() => {
+    const controlador = new AbortController();
+    pedirJson("/api/servicios", z.array(esquemaServicio), { signal: controlador.signal })
+      .then((lista) => {
+        if (!controlador.signal.aborted) setServicios(lista);
+      })
+      .catch((fallo) => {
+        if (controlador.signal.aborted || esAbortada(fallo)) return;
+        setError(`No se pudieron cargar los servicios: ${mensajeDeError(fallo)}`);
+      });
+    return () => { controlador.abort(); };
   }, []);
 
 
