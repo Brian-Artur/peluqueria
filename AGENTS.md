@@ -25,7 +25,7 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 - **Backend** (`backend/`): Node 24, Express 5, TypeScript, Zod 4, mysql2. CommonJS. Puerto **3100**.
 - **Frontend** (`frontend/`): React 19, Vite, TypeScript, `Date` nativo. Puerto **5180** (fijo, `strictPort`), proxy `/api` → `127.0.0.1:3100`.
 - **BD** (`infra/mariadb/`): MariaDB 12 en Docker, `127.0.0.1:3305`. El esquema sale **solo** de las migraciones de `backend/migraciones/`; los datos de ejemplo, de `backend/semillas/demo.sql`.
-- Sin tests todavía.
+- Tests con **Vitest** (`npm test` en cada paquete), al lado del archivo que prueban (`fechas.ts` → `fechas.test.ts`). Zona horaria fijada a `Europe/Madrid` en `vitest.config.mts`.
 
 ## Comandos
 
@@ -37,12 +37,14 @@ curl http://127.0.0.1:3100/health        # comprueba backend + BD
 # Backend
 cd backend && npm run dev                # tsx watch
 cd backend && npm run typecheck
+cd backend && npm test
 cd backend && npm run migrar             # aplica las migraciones pendientes
 cd backend && npm run sembrar            # datos de ejemplo (solo si no hay clientes)
 
 # Frontend
 cd frontend && npm run dev
 cd frontend && npm run typecheck
+cd frontend && npm test
 cd frontend && npm run lint
 cd frontend && npm run build             # tsc -b && vite build
 ```
@@ -120,7 +122,7 @@ Están en [`docs/decisiones.md`](docs/decisiones.md). **No se re-litigan de paso
 
 ## Verificar antes de dar algo por hecho
 
-1. Tipos: `npm run typecheck` en el paquete tocado.
+1. Tipos y tests: `npm run typecheck` y `npm test` en el paquete tocado. Lógica pura nueva → con su test al lado.
 2. Lint del frontend: `npm run lint`.
 3. Backend: `curl` al endpoint con los tres caminos (éxito / 409 / 404).
 4. Frontend: decir qué comprobar en el navegador; no afirmar que se ve bien sin haberlo visto.

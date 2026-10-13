@@ -11,6 +11,7 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v1.3** (12/10/2026, tag `v1.3.0`) — Pulido estético: paleta ciruela en variables CSS, tarjetas con tinte y barra, calendario a todo el alto, panel a la derecha con selección visible, días de apertura (mar–sáb) con los de cierre bajo demanda, semana ISO y flechas en la cabecera. Resuelta la deuda del orden de la semana.
 - **v1.4** (12/10/2026, tag `v1.4.0`) — Selector de fecha y hora propio (mini calendario del mes y desplegables de 5 en 5) para crear y mover; al pulsar un hueco, la cita empieza en la franja de 5 min bajo el ratón. Cierra la serie v1.
 - **v2.0** (13/10/2026, tag `v2.0.0`) — Migraciones con script propio: `backend/migraciones/` como única fuente del esquema, `npm run migrar` y `npm run sembrar`; fuera `initdb/`.
+- **v2.1** (13/10/2026, tag `v2.1.0`) — Tests con Vitest de la lógica pura: fechas, semana ISO, días visibles, posición, franjas, peticiones, archivos de migración y validación del inicio (59 tests). Pendiente: tests de integración con MariaDB, cuando haya migraciones que probar.
 
 ## Siguiente
 
@@ -18,7 +19,6 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 Sin esto, tocar el esquema o crecer el código es peligroso.
 
-- **v2.1 — Tests**: Vitest. Primero la lógica pura del frontend (fechas, semana ISO, días visibles, franjas); después, algunos de integración con MariaDB (migraciones).
 - **v2.2 — Tipos compartidos**: una sola definición de la forma de los datos para frontend y backend (hoy duplicados a mano y sin validar las respuestas).
 
 ### v3 — Clientes

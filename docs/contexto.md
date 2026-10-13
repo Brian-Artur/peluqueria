@@ -6,9 +6,9 @@ Actualizado: **13/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v2.0.0` (13/10/2026): migraciones con script propio. |
+| **Última versión cerrada** | `v2.1.0` (13/10/2026): tests con Vitest de la lógica pura (59). Antes, `v2.0.0`: migraciones. |
 | **En curso** | Nada. |
-| **Siguiente** | **v2.1: tests** con Vitest (lógica pura del frontend primero). Después v2.2 tipos compartidos; luego v3 clientes. |
+| **Siguiente** | **v2.2: tipos compartidos** — primera decisión: paquete común en el monorepo, o validar las respuestas con Zod en el frontend. Luego v3 clientes. |
 | **Pendiente de mí** | Nada urgente. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
 ## Para retomar
