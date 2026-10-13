@@ -1,6 +1,7 @@
 import { useState, type MouseEvent, type ReactElement } from "react";
 import { FRANJAS_POR_HORA, MINUTOS_FRANJA } from "./constantes";
 import { mismoDia } from "./fechas";
+import { franjaEnPosicion } from "./posicion";
 import styles from "./CeldaHora.module.css";
 
 type Props = {
@@ -16,8 +17,7 @@ function franjaDelEvento(evento: MouseEvent<HTMLDivElement>): number {
   // currentTarget mantiene la referencia a la celda aunque el clic caiga en una banda.
   const limites = evento.currentTarget.getBoundingClientRect();
   const desplazamiento = evento.clientY - limites.top;
-  const franja = Math.floor(desplazamiento / limites.height * FRANJAS_POR_HORA);
-  return Math.max(0, Math.min(FRANJAS_POR_HORA - 1, franja));
+  return franjaEnPosicion(desplazamiento, limites.height);
 }
 
 function CeldaHora({

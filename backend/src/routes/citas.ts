@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import { inicioEnFranja } from "../validacion/inicioEnFranja";
 import {
   listarCitas,
   crearCita,
@@ -9,14 +10,6 @@ import {
 } from "../services/citaService";
 
 export const citasRouter = Router();
-
-// La rejilla del calendario va en franjas de 5 min: un 10:07 caería en una fila a medias
-const inicioEnFranja = z.string().datetime().refine((valor) => {
-  const inicio = new Date(valor);
-  return inicio.getUTCMinutes() % 5 === 0 &&
-    inicio.getUTCSeconds() === 0 &&
-    inicio.getUTCMilliseconds() === 0;
-}, { message: "El inicio debe estar en franjas de 5 minutos, con segundos y milisegundos a 0" });
 
 const crearCitaSchema = z.object({
   cliente_id: z.number().int().positive(),
