@@ -1,9 +1,9 @@
 import { esquemaUsuarioSesion, type UsuarioSesion } from "@peluqueria/compartido";
-import type { RowDataPacket } from "mysql2/promise";
+import type { Connection, RowDataPacket } from "mysql2/promise";
 import { pool } from "../db";
 
-export async function insertarSesion(id: string, usuarioId: number, expiraEn: Date): Promise<void> {
-  await pool.query(
+export async function insertarSesion(id: string, usuarioId: number, expiraEn: Date, conexion?: Connection): Promise<void> {
+  await (conexion ?? pool).query(
     "INSERT INTO sesion (id, usuario_id, expira_en) VALUES (?, ?, ?)",
     [id, usuarioId, expiraEn]
   );
@@ -27,4 +27,12 @@ export async function borrarSesion(id: string): Promise<void> {
 
 export async function borrarSesionesCaducadas(ahora: Date): Promise<void> {
   await pool.query("DELETE FROM sesion WHERE expira_en <= ?", [ahora]);
+}
+
+export async function borrarSesionesUsuario(usuarioId: number, conexion: Connection): Promise<void> {
+  await conexion.query("DELETE FROM sesion WHERE usuario_id = ?", [usuarioId]);
+}
+
+export async function borrarOtrasSesiones(usuarioId: number, sesionActual: string, conexion: Connection): Promise<void> {
+  await conexion.query("DELETE FROM sesion WHERE usuario_id = ? AND id <> ?", [usuarioId, sesionActual]);
 }

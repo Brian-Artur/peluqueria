@@ -3,10 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { iniciarSesion, obtenerUsuarioSesion, cerrarSesion } from "./sesionService";
 import { ErrorNoAutenticado } from "../errores";
 
-const { buscarUsuario, insertar, buscarSesion, borrar, limpiar, cifrar, comprobar } = vi.hoisted(() => ({
+const { buscarUsuario, insertar, buscarSesion, borrar, limpiar, cifrar, comprobar, conectar, conexion } = vi.hoisted(() => ({
   buscarUsuario: vi.fn(), insertar: vi.fn(), buscarSesion: vi.fn(), borrar: vi.fn(),
   limpiar: vi.fn(), cifrar: vi.fn(), comprobar: vi.fn(),
+  conectar: vi.fn(),
+  conexion: { beginTransaction: vi.fn(), commit: vi.fn(), rollback: vi.fn(), release: vi.fn() },
 }));
+vi.mock("../db", () => ({ pool: { getConnection: conectar } }));
 vi.mock("../repositories/usuarioRepository", () => ({ buscarUsuarioPorNombre: buscarUsuario }));
 vi.mock("../repositories/sesionRepository", () => ({
   insertarSesion: insertar, buscarUsuarioDeSesion: buscarSesion, borrarSesion: borrar,
@@ -23,6 +26,7 @@ beforeEach(() => {
   vi.setSystemTime(ahora);
   buscarUsuario.mockResolvedValue({ usuario, hash_contrasena: "hash", activo: true });
   comprobar.mockResolvedValue(true);
+  conectar.mockResolvedValue(conexion);
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -36,10 +40,12 @@ describe("iniciar una sesión", () => {
     expect(sesion.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(Buffer.from(sesion.token, "base64url")).toHaveLength(32);
     const hash = createHash("sha256").update(sesion.token).digest("hex");
-    expect(insertar).toHaveBeenCalledWith(hash, 1, new Date("2026-10-13T22:00:00.000Z"));
+    expect(insertar).toHaveBeenCalledWith(hash, 1, new Date("2026-10-13T22:00:00.000Z"), conexion);
     expect(limpiar).toHaveBeenCalledWith(ahora);
-    expect(buscarUsuario).toHaveBeenCalledWith("ana");
+    expect(buscarUsuario).toHaveBeenCalledWith("ana", conexion);
     expect(comprobar).toHaveBeenCalledWith("demo1234", "hash");
+    expect(conexion.commit).toHaveBeenCalledOnce();
+    expect(conexion.release).toHaveBeenCalledOnce();
   });
 
   it("genera un token distinto en cada inicio", async () => {
@@ -54,6 +60,8 @@ describe("iniciar una sesión", () => {
     expect(cifrar).toHaveBeenCalledOnce();
     expect(comprobar).not.toHaveBeenCalled();
     expect(insertar).not.toHaveBeenCalled();
+    expect(conexion.rollback).toHaveBeenCalledOnce();
+    expect(conexion.release).toHaveBeenCalledOnce();
   });
 
   it.each(["contraseña incorrecta", "usuario inactivo"])("devuelve el mismo 401 para %s", async (caso) => {
@@ -64,6 +72,14 @@ describe("iniciar una sesión", () => {
     expect(comprobar).toHaveBeenCalledWith("demo1234", "hash");
     expect(insertar).not.toHaveBeenCalled();
     expect(limpiar).toHaveBeenCalledWith(ahora);
+  });
+
+  it("revierte y libera la conexión si no puede guardar la sesión", async () => {
+    insertar.mockRejectedValue(new Error("Fallo de inserción"));
+    await expect(iniciarSesion(credenciales)).rejects.toThrow("Fallo de inserción");
+    expect(conexion.commit).not.toHaveBeenCalled();
+    expect(conexion.rollback).toHaveBeenCalledOnce();
+    expect(conexion.release).toHaveBeenCalledOnce();
   });
 });
 

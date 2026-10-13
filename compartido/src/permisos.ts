@@ -8,6 +8,7 @@ export const esquemaPermiso = z.enum([
   "clientes:ver",
   "clientes:gestionar",
   "usuarios:gestionar",
+  "sesion:contrasena",
 ]);
 
 export type Permiso = z.infer<typeof esquemaPermiso>;
@@ -21,6 +22,7 @@ export const rolesPorPermiso: Record<Permiso, Rol[]> = {
   "clientes:ver": ["admin", "encargado", "recepcion", "empleado"],
   "clientes:gestionar": ["admin", "encargado", "recepcion"],
   "usuarios:gestionar": ["admin"],
+  "sesion:contrasena": ["admin", "encargado", "recepcion", "empleado"],
 };
 
 export function puede(rol: Rol, permiso: Permiso): boolean {

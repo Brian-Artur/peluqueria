@@ -6,6 +6,8 @@ import PaginaClientes from "./clientes/PaginaClientes";
 import { SesionProvider } from "./sesion/SesionProvider";
 import RutasProtegidas from "./sesion/RutasProtegidas";
 import PaginaEntrar from "./sesion/PaginaEntrar";
+import PaginaMiCuenta from "./sesion/PaginaMiCuenta";
+import PaginaUsuarios from "./usuarios/PaginaUsuarios";
 
 function App(): ReactElement {
   return (
@@ -20,6 +22,10 @@ function App(): ReactElement {
               <Route path="/clientes" element={<PaginaClientes />} />
               <Route path="/clientes/nuevo" element={<PaginaClientes nuevo />} />
               <Route path="/clientes/:id" element={<PaginaClientes />} />
+              <Route path="/usuarios" element={<PaginaUsuarios />} />
+              <Route path="/usuarios/nuevo" element={<PaginaUsuarios nuevo />} />
+              <Route path="/usuarios/:id" element={<PaginaUsuarios />} />
+              <Route path="/mi-cuenta" element={<PaginaMiCuenta />} />
               <Route path="*" element={<Navigate to="/agenda" replace />} />
             </Route>
           </Route>

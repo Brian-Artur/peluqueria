@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { ErrorNoEncontrado, ErrorConflicto, ErrorNoAutenticado, ErrorProhibido } from "../errores";
+import { ErrorNoEncontrado, ErrorConflicto, ErrorNoAutenticado, ErrorProhibido, ErrorDatosInvalidos } from "../errores";
 
 export function manejadorErrores(
   error: unknown,
@@ -7,6 +7,10 @@ export function manejadorErrores(
   res: Response,
   _next: NextFunction
 ): Response | void {
+  if (error instanceof ErrorDatosInvalidos) {
+    return res.status(400).json({ error: error.message });
+  }
+
   if (error instanceof ErrorNoAutenticado) {
     return res.status(401).json({ error: error.message });
   }

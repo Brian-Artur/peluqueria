@@ -12,6 +12,13 @@ export class ErrorConflicto extends Error {
   }
 }
 
+export class ErrorDatosInvalidos extends Error {
+  constructor(mensaje: string) {
+    super(mensaje);
+    this.name = "ErrorDatosInvalidos";
+  }
+}
+
 export class ErrorNoAutenticado extends Error {
   constructor(mensaje: string = "Debes iniciar sesión") {
     super(mensaje);

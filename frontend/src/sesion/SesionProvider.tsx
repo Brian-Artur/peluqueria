@@ -55,6 +55,12 @@ export function SesionProvider({ children }: { children: ReactNode }): ReactElem
     setUsuario(null);
   };
 
+  const refrescar = async (signal?: AbortSignal): Promise<void> => {
+    const conectado = await pedirJson("/api/sesion", esquemaUsuarioSesion, { signal });
+    signal?.throwIfAborted();
+    setUsuario(conectado);
+  };
+
   const puede = (permiso: Permiso): boolean => {
     if (usuario === null) return false;
     return tienePermiso(usuario.rol, permiso);
@@ -71,7 +77,7 @@ export function SesionProvider({ children }: { children: ReactNode }): ReactElem
   }
 
   return (
-    <ContextoSesion.Provider value={{ usuario, puede, entrar, salir }}>
+    <ContextoSesion.Provider value={{ usuario, puede, entrar, salir, refrescar }}>
       {children}
     </ContextoSesion.Provider>
   );

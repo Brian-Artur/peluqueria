@@ -1,16 +1,9 @@
 import { useState, type ReactElement } from "react";
-import type { Rol } from "@peluqueria/compartido";
 import { NavLink, Outlet } from "react-router";
 import { mensajeDeError } from "./peticion";
 import { useSesion } from "./sesion/useSesion";
+import { textoRol } from "./usuarios/textoRol";
 import styles from "./Marco.module.css";
-
-const nombresRol: Record<Rol, string> = {
-  admin: "Admin",
-  encargado: "Encargado",
-  recepcion: "Recepción",
-  empleado: "Empleado",
-};
 
 function Marco(): ReactElement {
   const { usuario, salir, puede } = useSesion();
@@ -37,11 +30,12 @@ function Marco(): ReactElement {
         <nav className={styles.navegacion} aria-label="Navegación principal">
           {puede("citas:ver") && <NavLink to="/agenda" className={styles.enlace}>Agenda</NavLink>}
           {puede("clientes:ver") && <NavLink to="/clientes" className={styles.enlace}>Clientes</NavLink>}
+          {puede("usuarios:gestionar") && <NavLink to="/usuarios" className={styles.enlace}>Usuarios</NavLink>}
         </nav>
         {usuario !== null && (
           <div className={styles.sesion}>
-            <span>{usuario.nombre}</span>
-            <span className={styles.rol}>{nombresRol[usuario.rol]}</span>
+            <NavLink to="/mi-cuenta" className={styles.enlace}>{usuario.nombre}</NavLink>
+            <span className={styles.rol}>{textoRol(usuario.rol)}</span>
             <button type="button" className={styles.secundario} disabled={saliendo} onClick={cerrarSesion}>
               {saliendo ? "Saliendo…" : "Salir"}
             </button>

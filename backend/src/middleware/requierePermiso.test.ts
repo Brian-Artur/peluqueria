@@ -49,4 +49,10 @@ describe("requierePermiso", () => {
     requierePermiso("usuarios:gestionar")(req, simularRespuesta("admin"), next);
     expect(next).toHaveBeenCalledExactlyOnceWith();
   });
+
+  it.each(esquemaRol.options)("permite cambiar la propia contraseña a %s", (rol) => {
+    const next = vi.fn();
+    requierePermiso("sesion:contrasena")(req, simularRespuesta(rol), next);
+    expect(next).toHaveBeenCalledExactlyOnceWith();
+  });
 });

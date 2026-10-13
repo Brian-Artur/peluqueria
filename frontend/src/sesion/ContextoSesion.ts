@@ -6,6 +6,7 @@ export type Sesion = {
   puede: (permiso: Permiso) => boolean;
   entrar: (credenciales: Credenciales) => Promise<void>;
   salir: () => Promise<void>;
+  refrescar: (signal?: AbortSignal) => Promise<void>;
 };
 
 // Muchas pantallas y botones necesitan al usuario conectado; pasarlo por props

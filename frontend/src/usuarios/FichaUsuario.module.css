@@ -1,0 +1,69 @@
+.ficha {
+  padding: var(--espacio-4);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.titulo {
+  font-size: 1.125rem;
+  margin: 0 0 var(--espacio-4);
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.campo {
+  width: 100%;
+  min-width: 0;
+  padding: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-3);
+}
+
+.principal {
+  align-self: start;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-acento);
+  border-radius: var(--radio);
+  color: var(--color-sobre-acento);
+  background: var(--color-acento);
+  cursor: pointer;
+}
+
+.campos:disabled .principal {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ayuda {
+  color: var(--color-texto-suave);
+  margin: 0 0 var(--espacio-3);
+  line-height: 1.5;
+}
+
+.error {
+  margin: 0 0 var(--espacio-3);
+  color: var(--color-error);
+}
+
+.confirmacion {
+  margin: var(--espacio-3) 0 0;
+  color: var(--color-ok);
+}
