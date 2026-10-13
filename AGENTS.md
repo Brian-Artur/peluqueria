@@ -46,7 +46,8 @@ cd backend && npm run dev                # tsx watch
 cd backend && npm run typecheck
 cd backend && npm test
 cd backend && npm run migrar             # aplica las migraciones pendientes
-cd backend && npm run sembrar            # datos de ejemplo (solo si no hay clientes)
+cd backend && npm run sembrar            # datos de ejemplo (solo si no hay clientes), con 4 usuarios demo
+cd backend && npm run crear-usuario      # crea un usuario (pide la contraseña sin mostrarla)
 
 # Frontend
 cd frontend && npm run dev
@@ -73,10 +74,12 @@ backend/src/
   routes/               HTTP + validación Zod. Nada de SQL aquí (excepción: el SELECT 1 de health.ts)
   services/             reglas de negocio. Nada de HTTP ni SQL aquí
   repositories/         solo SQL parametrizado
+  seguridad/            contraseñas (scrypt) y cookies
 frontend/src/
   App.tsx, Marco.tsx    rutas (React Router) y barra de navegación común
   Calendario.tsx        pantalla /agenda: dueño del estado (citas, clientes, servicios, semana, selección) y de los fetch
   clientes/             pantalla /clientes: lista + ficha, campo de teléfono con prefijo
+  sesion/               contexto de sesión (useSesion), pantalla /entrar y rutas protegidas
   tipos.ts              reexporta los tipos de compartido + Seleccion (solo de la interfaz)
   peticion.ts           fetch que lanza el mensaje de error del backend y valida la respuesta con su esquema
   calendario/           componentes de la rejilla y el panel + utilidades puras (fechas, posicion, constantes)
@@ -99,6 +102,7 @@ Prioridad: **escalabilidad y facilidad para retomar** por encima de brevedad. Es
 - Comentarios de **por qué**, nunca de qué.
 - Nada de ternarios anidados ni cadenas largas de `.map().filter()`. Early returns y variables intermedias con nombre.
 - SQL siempre parametrizado.
+- **Permisos**: toda ruta nueva de `/api` declara su permiso con `requierePermiso`; todo botón que dependa del rol usa `puede(...)` de `compartido/`. Nunca comparar roles a mano. Si hace falta un permiso nuevo, se añade a la tabla de `compartido/src/permisos.ts`.
 - **Cambios de esquema solo con una migración nueva** (`backend/migraciones/NNN-descripcion.sql`, siguiente número libre). Nunca editar una migración ya aplicada. **Un único cambio por migración**: en MariaDB el DDL hace commit implícito, así que una migración que falla a medias deja lo que alcanzó a hacer y se corrige con otra migración.
 
 ### Estilos
