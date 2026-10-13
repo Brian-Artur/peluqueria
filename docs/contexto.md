@@ -7,7 +7,7 @@ Actualizado: **13/10/2026**
 | | |
 |---|---|
 | **Última versión cerrada** | `v3.0.0` (13/10/2026): clientes — pantalla, búsqueda, alta rápida, teléfonos con prefijo. **Series v2 y v3 completas.** |
-| **En curso** | **v4.0: usuarios y roles.** Hecho: sesiones, permisos y pantalla de entrada. Falta: pantalla de usuarios (solo admin). |
+| **En curso** | **v4.0: usuarios y roles** — completa (sesiones, permisos, entrada, pantalla de usuarios, mi cuenta); pendiente de que la revise y de poner el tag `v4.0.0`. |
 | **Siguiente** | Tras v4.0: empleados y competencias (v4.1). |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
