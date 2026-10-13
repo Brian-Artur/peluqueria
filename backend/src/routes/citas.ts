@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { esquemaCrearCita, esquemaMoverCita } from "@peluqueria/compartido";
+import { parsearId } from "./parsearId";
 import {
   listarCitas,
   crearCita,
@@ -9,11 +10,6 @@ import {
 } from "../services/citaService";
 
 export const citasRouter = Router();
-
-function parsearId(valor: string): number | null {
-  const id = Number(valor);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
 
 citasRouter.get("/citas", async (_req, res) => {
   res.json(await listarCitas());
