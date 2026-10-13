@@ -4,7 +4,7 @@ import { esquemaCliente, esquemaDatosCliente } from "./cliente";
 describe("el contrato de cliente", () => {
   const datos = {
     nombre: "Ana García",
-    telefono: "600123456",
+    telefono: "+34600123456",
     email: "ana@example.com",
     notas: "Prefiere citas por la tarde",
   };
@@ -20,13 +20,13 @@ describe("el contrato de cliente", () => {
     expect(esquemaCliente.parse(cliente)).toEqual(cliente);
   });
 
-  it("recorta los espacios de los campos sin cambiar su contenido interior", () => {
+  it("recorta los campos y convierte el teléfono a E.164 canónico", () => {
     expect(esquemaDatosCliente.parse({
       nombre: "  Ana García  ",
-      telefono: "  600 123 456  ",
+      telefono: "  +34 600 123 456  ",
       email: "  ana@example.com  ",
       notas: "  Prefiere citas por la tarde  ",
-    })).toEqual({ ...datos, telefono: "600 123 456" });
+    })).toEqual(datos);
   });
 
   it.each([
@@ -73,10 +73,25 @@ describe("el contrato de cliente", () => {
     expect(esquemaDatosCliente.safeParse({
       ...datos,
       nombre: "a".repeat(120),
-      telefono: "1".repeat(20),
       notas: "a".repeat(1000),
     }).success).toBe(true);
   });
+
+  it("acepta un teléfono internacional de otro país", () => {
+    expect(esquemaDatosCliente.parse({ ...datos, telefono: "+33 6 12 34 56 78" }).telefono)
+      .toBe("+33612345678");
+  });
+
+  it.each(["600123456", "+34123", "+999612345678", "+34 teléfono 600123456", "1".repeat(21)])(
+    "rechaza el teléfono %j con el mensaje del campo", (telefono) => {
+      const resultado = esquemaDatosCliente.safeParse({ ...datos, telefono });
+      expect(resultado.success).toBe(false);
+      if (!resultado.success) {
+        expect(resultado.error.issues[0].path).toEqual(["telefono"]);
+        expect(resultado.error.issues[0].message).toBe("El teléfono no es válido");
+      }
+    }
+  );
 
   it.each([
     { motivo: "nombre ausente", cambio: { nombre: undefined } },

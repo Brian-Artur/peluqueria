@@ -39,4 +39,13 @@ describe("la traducción de filas de cliente", () => {
       ["%Ana!!!%!_%", "%Ana!!!%!_%", "%Ana!!!%!_%"]
     );
   });
+
+  it("quita espacios solo del filtro de teléfono", async () => {
+    consultar.mockResolvedValue([[], []]);
+    await findAllClientes("612 345");
+    expect(consultar).toHaveBeenCalledWith(
+      expect.stringContaining("ESCAPE '!'"),
+      ["%612 345%", "%612345%", "%612 345%"]
+    );
+  });
 });

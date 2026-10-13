@@ -1,9 +1,9 @@
 -- Semilla v1: datos de demostración inventados
 
 INSERT INTO cliente (nombre, telefono) VALUES
-  ('María López',      '+34 600 111 222'),
-  ('Carlos Ruiz',      '+34 600 333 444'),
-  ('Lucía Fernández',  '+34 600 555 666'),
+  ('María López',      '+34600111222'),
+  ('Carlos Ruiz',      '+34600333444'),
+  ('Lucía Fernández',  '+34600555666'),
   ('Javier Moreno',    NULL);
 
 INSERT INTO servicio (nombre, duracion_min, precio) VALUES

@@ -12,7 +12,7 @@
 
 .distribucion {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 760px) 360px;
   gap: var(--espacio-5);
   flex: 1;
   min-height: 0;
@@ -20,6 +20,7 @@
 
 .lista {
   min-width: 0;
+  max-width: 760px;
 }
 
 .herramientas {
@@ -74,12 +75,13 @@
   color: var(--color-error);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1000px) {
   .distribucion {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .columnaFicha {
     position: static;
+    max-width: 360px;
   }
 }

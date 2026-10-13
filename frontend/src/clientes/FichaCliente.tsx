@@ -1,7 +1,8 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
-import { esquemaDatosCliente, type Cliente, type DatosCliente } from "@peluqueria/compartido";
+import { esquemaDatosCliente, normalizarTelefono, separarTelefono, type Cliente, type DatosCliente } from "@peluqueria/compartido";
 import { mensajeDeError } from "../peticion";
 import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "./erroresCliente";
+import CampoTelefono from "./CampoTelefono";
 import styles from "./FichaCliente.module.css";
 
 type Props = {
@@ -11,9 +12,10 @@ type Props = {
 
 function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
   const prefijo = useId();
+  const [pais, setPais] = useState(() => separarTelefono(cliente?.telefono ?? "").pais);
   const [datos, setDatos] = useState<FormularioCliente>(() => ({
     nombre: cliente?.nombre ?? "",
-    telefono: cliente?.telefono ?? "",
+    telefono: separarTelefono(cliente?.telefono ?? "").nacional,
     email: cliente?.email ?? "",
     notas: cliente?.notas ?? "",
   }));
@@ -32,7 +34,9 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
     if (guardando) return;
     setError(null);
     setGuardado(false);
-    const resultado = esquemaDatosCliente.safeParse(datos);
+    const numero = datos.telefono ?? "";
+    const telefono = normalizarTelefono(numero, pais) ?? numero;
+    const resultado = esquemaDatosCliente.safeParse({ ...datos, telefono });
     if (!resultado.success) {
       setErrores(erroresDeCliente(resultado.error.issues));
       return;
@@ -41,7 +45,9 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
     setGuardando(true);
     try {
       if (await onGuardar(resultado.data)) {
-        setDatos(resultado.data);
+        const separado = separarTelefono(resultado.data.telefono ?? "");
+        setPais(separado.pais);
+        setDatos({ ...resultado.data, telefono: separado.nacional });
         setGuardado(true);
       }
     } catch (fallo) {
@@ -70,17 +76,18 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
         {errores.nombre && <p id={`${prefijo}-error-nombre`} className={styles.error}>{errores.nombre}</p>}
 
         <label htmlFor={`${prefijo}-telefono`}>Teléfono</label>
-        <input
+        <CampoTelefono
           id={`${prefijo}-telefono`}
-          className={styles.campo}
-          type="tel"
-          value={datos.telefono ?? ""}
-          onChange={(evento) => cambiarCampo("telefono", evento.target.value)}
-          autoComplete="tel"
-          aria-invalid={errores.telefono !== undefined}
-          aria-describedby={errores.telefono ? `${prefijo}-error-telefono` : undefined}
+          pais={pais}
+          numero={datos.telefono ?? ""}
+          onCambiarPais={(nuevoPais) => {
+            setPais(nuevoPais);
+            setGuardado(false);
+          }}
+          onCambiarNumero={(numero) => cambiarCampo("telefono", numero)}
+          error={errores.telefono}
         />
-        {errores.telefono && <p id={`${prefijo}-error-telefono`} className={styles.error}>{errores.telefono}</p>}
+        {errores.telefono && <p id={`${prefijo}-telefono-error`} className={styles.error}>{errores.telefono}</p>}
 
         <label htmlFor={`${prefijo}-email`}>Email</label>
         <input

@@ -1,7 +1,7 @@
 import type { Cliente, DatosCliente } from "@peluqueria/compartido";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { pool } from "../db";
-import { patronBusqueda } from "./patronBusqueda";
+import { patronBusqueda, patronBusquedaTelefono } from "./patronBusqueda";
 
 type FilaCliente = RowDataPacket & Cliente;
 
@@ -24,13 +24,14 @@ export async function findAllClientes(buscar: string = ""): Promise<Cliente[]> {
   }
 
   const patron = patronBusqueda(buscar);
+  const patronTelefono = patronBusquedaTelefono(buscar);
   const [filas] = await pool.query<FilaCliente[]>(
     `SELECT id, nombre, telefono, email, notas FROM cliente
      WHERE LOWER(nombre) LIKE LOWER(?) ESCAPE '!'
         OR LOWER(telefono) LIKE LOWER(?) ESCAPE '!'
         OR LOWER(email) LIKE LOWER(?) ESCAPE '!'
      ORDER BY nombre`,
-    [patron, patron, patron]
+    [patron, patronTelefono, patron]
   );
   return filas.map(traducirCliente);
 }

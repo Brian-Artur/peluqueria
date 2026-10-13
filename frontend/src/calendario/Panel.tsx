@@ -1,7 +1,8 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
-import { esquemaDatosCliente, type DatosCliente } from "@peluqueria/compartido";
+import { esquemaDatosCliente, normalizarTelefono, type CountryCode, type DatosCliente } from "@peluqueria/compartido";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
 import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "../clientes/erroresCliente";
+import CampoTelefono from "../clientes/CampoTelefono";
 import SelectorFechaHora from "./SelectorFechaHora";
 import styles from "./Panel.module.css";
 
@@ -37,6 +38,7 @@ function Panel({
   const prefijo = useId();
   const [altaRapida, setAltaRapida] = useState(false);
   const [datosCliente, setDatosCliente] = useState<FormularioCliente>({ nombre: "", telefono: "" });
+  const [pais, setPais] = useState<CountryCode>("ES");
   const [erroresCliente, setErroresCliente] = useState<ErroresCliente>({});
   const [creandoCliente, setCreandoCliente] = useState(false);
   const [servicioId, setServicioId] = useState<number | null>(null);
@@ -51,7 +53,9 @@ function Panel({
   const crearCliente = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
     evento.preventDefault();
     if (creandoCliente) return;
-    const resultado = esquemaDatosCliente.safeParse(datosCliente);
+    const numero = datosCliente.telefono ?? "";
+    const telefono = normalizarTelefono(numero, pais) ?? numero;
+    const resultado = esquemaDatosCliente.safeParse({ ...datosCliente, telefono });
     if (!resultado.success) {
       setErroresCliente(erroresDeCliente(resultado.error.issues));
       return;
@@ -64,6 +68,7 @@ function Panel({
       setClienteId(id);
       setAltaRapida(false);
       setDatosCliente({ nombre: "", telefono: "" });
+      setPais("ES");
     } finally {
       setCreandoCliente(false);
     }
@@ -119,18 +124,16 @@ function Panel({
                   <p id={`${prefijo}-error-nombre`} className={styles.error}>{erroresCliente.nombre}</p>
                 )}
                 <label htmlFor={`${prefijo}-telefono`}>Teléfono</label>
-                <input
+                <CampoTelefono
                   id={`${prefijo}-telefono`}
-                  className={styles.campo}
-                  type="tel"
-                  value={datosCliente.telefono ?? ""}
-                  onChange={(evento) => setDatosCliente({ ...datosCliente, telefono: evento.target.value })}
-                  autoComplete="tel"
-                  aria-invalid={erroresCliente.telefono !== undefined}
-                  aria-describedby={erroresCliente.telefono ? `${prefijo}-error-telefono` : undefined}
+                  pais={pais}
+                  numero={datosCliente.telefono ?? ""}
+                  onCambiarPais={setPais}
+                  onCambiarNumero={(numero) => setDatosCliente({ ...datosCliente, telefono: numero })}
+                  error={erroresCliente.telefono}
                 />
                 {erroresCliente.telefono && (
-                  <p id={`${prefijo}-error-telefono`} className={styles.error}>{erroresCliente.telefono}</p>
+                  <p id={`${prefijo}-telefono-error`} className={styles.error}>{erroresCliente.telefono}</p>
                 )}
                 <div className={styles.accionesCliente}>
                   <button className={styles.principal} type="submit">
@@ -142,6 +145,7 @@ function Panel({
                     onClick={() => {
                       setAltaRapida(false);
                       setDatosCliente({ nombre: "", telefono: "" });
+                      setPais("ES");
                       setErroresCliente({});
                     }}
                   >

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizarTelefono } from "./telefono";
 
 export const esquemaCliente = z.object({
   id: z.number().int().positive(),
@@ -15,10 +16,11 @@ export const esquemaDatosCliente = z.object({
     .max(120, "El nombre no puede superar los 120 caracteres"),
   telefono: z.string({ error: "El teléfono debe ser un texto" })
     .trim()
-    .max(20, "El teléfono no puede superar los 20 caracteres")
+    .refine((valor) => valor === "" || (valor.startsWith("+") && normalizarTelefono(valor, "ES") !== null),
+      "El teléfono no es válido")
     .nullable()
     .optional()
-    .transform((valor) => valor || null),
+    .transform((valor) => valor ? normalizarTelefono(valor, "ES") : null),
   email: z.string({ error: "El email debe ser un texto" })
     .trim()
     .max(254, "El email no puede superar los 254 caracteres")

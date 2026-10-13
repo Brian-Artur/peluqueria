@@ -1,0 +1,20 @@
+.campoTelefono {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+
+.campo {
+  width: 100%;
+  min-width: 0;
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+.campo[aria-invalid="true"] {
+  border-color: var(--color-error);
+}

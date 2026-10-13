@@ -11,7 +11,7 @@ describe("erroresDeCliente", () => {
 
     expect(erroresDeCliente(resultado.error.issues)).toEqual({
       nombre: "El nombre es obligatorio",
-      telefono: "El teléfono no puede superar los 20 caracteres",
+      telefono: "El teléfono no es válido",
       email: "El email no es válido",
       notas: "Las notas no pueden superar los 1000 caracteres",
     });
