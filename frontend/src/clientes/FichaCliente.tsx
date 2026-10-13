@@ -3,6 +3,7 @@ import { esquemaDatosCliente, normalizarTelefono, separarTelefono, type Cliente,
 import { mensajeDeError } from "../peticion";
 import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "./erroresCliente";
 import CampoTelefono from "./CampoTelefono";
+import { useSesion } from "../sesion/useSesion";
 import styles from "./FichaCliente.module.css";
 
 type Props = {
@@ -11,6 +12,8 @@ type Props = {
 };
 
 function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
+  const { puede } = useSesion();
+  const puedeGestionar = puede("clientes:gestionar");
   const prefijo = useId();
   const [pais, setPais] = useState(() => separarTelefono(cliente?.telefono ?? "").pais);
   const [datos, setDatos] = useState<FormularioCliente>(() => ({
@@ -31,7 +34,7 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
 
   const guardar = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
     evento.preventDefault();
-    if (guardando) return;
+    if (guardando || !puedeGestionar) return;
     setError(null);
     setGuardado(false);
     const numero = datos.telefono ?? "";
@@ -61,7 +64,7 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
     <form className={styles.ficha} noValidate onSubmit={guardar}>
       <h2 className={styles.titulo}>{cliente === null ? "Nuevo cliente" : "Ficha del cliente"}</h2>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
-      <fieldset className={styles.campos} disabled={guardando}>
+      <fieldset className={styles.campos} disabled={guardando || !puedeGestionar}>
         <label htmlFor={`${prefijo}-nombre`}>Nombre</label>
         <input
           id={`${prefijo}-nombre`}
@@ -114,7 +117,7 @@ function FichaCliente({ cliente, onGuardar }: Props): ReactElement {
         />
         {errores.notas && <p id={`${prefijo}-error-notas`} className={styles.error}>{errores.notas}</p>}
 
-        <button className={styles.principal} type="submit">{guardando ? "Guardando…" : "Guardar"}</button>
+        {puedeGestionar && <button className={styles.principal} type="submit">{guardando ? "Guardando…" : "Guardar"}</button>}
       </fieldset>
       {guardado && <p role="status" className={styles.confirmacion}>Cliente guardado.</p>}
     </form>

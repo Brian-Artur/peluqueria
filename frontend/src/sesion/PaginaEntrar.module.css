@@ -1,0 +1,58 @@
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--espacio-5);
+}
+
+.formulario {
+  width: 100%;
+  max-width: 380px;
+  padding: var(--espacio-5);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.titulo {
+  margin: 0 0 var(--espacio-5);
+  font-size: 1.5rem;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.campo {
+  width: 100%;
+  padding: var(--espacio-2);
+  margin-bottom: var(--espacio-3);
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+.principal {
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-acento);
+  border-radius: var(--radio);
+  color: var(--color-sobre-acento);
+  background: var(--color-acento);
+  cursor: pointer;
+}
+
+.campos:disabled .principal {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.error {
+  color: var(--color-error);
+  margin: 0 0 var(--espacio-3);
+}

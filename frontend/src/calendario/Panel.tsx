@@ -4,6 +4,7 @@ import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
 import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "../clientes/erroresCliente";
 import CampoTelefono from "../clientes/CampoTelefono";
 import SelectorFechaHora from "./SelectorFechaHora";
+import { useSesion } from "../sesion/useSesion";
 import styles from "./Panel.module.css";
 
 type Props = {
@@ -33,7 +34,7 @@ function Panel({
   onMover,
   onCerrar
 }: Props): ReactElement {
-
+  const { puede } = useSesion();
   const [clienteId, setClienteId] = useState<number | null>(null);
   const prefijo = useId();
   const [altaRapida, setAltaRapida] = useState(false);
@@ -52,7 +53,7 @@ function Panel({
 
   const crearCliente = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
     evento.preventDefault();
-    if (creandoCliente) return;
+    if (creandoCliente || !puede("clientes:gestionar")) return;
     const numero = datosCliente.telefono ?? "";
     const telefono = normalizarTelefono(numero, pais) ?? numero;
     const resultado = esquemaDatosCliente.safeParse({ ...datosCliente, telefono });
@@ -79,7 +80,7 @@ function Panel({
       <button className={styles.cerrar} aria-label="Cerrar" onClick={onCerrar}>×</button>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
 
-      {seleccion.tipo === "hueco" && (
+      {seleccion.tipo === "hueco" && puede("citas:gestionar") && (
         <div>
           <p className={styles.titulo}>Nueva cita</p>
           <SelectorFechaHora valor={inicio} onCambiar={setInicio} />
@@ -102,10 +103,10 @@ function Panel({
             {clientes.map((c) => (
               <option key={c.id} value={c.id}>{c.nombre}</option>
             ))}
-            <option value="nuevo">+ Nuevo cliente…</option>
+            {puede("clientes:gestionar") && <option value="nuevo">+ Nuevo cliente…</option>}
           </select>
 
-          {altaRapida && (
+          {altaRapida && puede("clientes:gestionar") && (
             <form className={styles.altaRapida} noValidate onSubmit={crearCliente}>
               <fieldset className={styles.camposCliente} disabled={creandoCliente}>
                 <legend className={styles.subtitulo}>Nuevo cliente</legend>
@@ -189,25 +190,31 @@ function Panel({
 
           {citaSeleccionada.estado === "reservada" && (
             <>
-              <SelectorFechaHora valor={nuevoInicio} onCambiar={setNuevoInicio} />
-              <button className={styles.secundario} onClick={() => onCompletar(citaSeleccionada.id)}>
-                Completar cita
-              </button>
-              <button
-                className={styles.principal}
-                onClick={() =>
-                  onMover(
-                    citaSeleccionada.id,
-                    nuevoInicio.toISOString()
-                  )
-                }
-              >
-                Mover cita
-              </button>
+              {puede("citas:gestionar") && <SelectorFechaHora valor={nuevoInicio} onCambiar={setNuevoInicio} />}
+              {puede("citas:completar") && (
+                <button className={styles.secundario} onClick={() => onCompletar(citaSeleccionada.id)}>
+                  Completar cita
+                </button>
+              )}
+              {puede("citas:gestionar") && (
+                <>
+                  <button
+                    className={styles.principal}
+                    onClick={() =>
+                      onMover(
+                        citaSeleccionada.id,
+                        nuevoInicio.toISOString()
+                      )
+                    }
+                  >
+                    Mover cita
+                  </button>
 
-              <button className={styles.secundario} onClick={() => onCancelar(citaSeleccionada.id)}>
-                Cancelar cita
-              </button>
+                  <button className={styles.secundario} onClick={() => onCancelar(citaSeleccionada.id)}>
+                    Cancelar cita
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>

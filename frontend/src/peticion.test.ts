@@ -1,6 +1,6 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { z } from "zod";
-import { pedir, pedirJson, esAbortada, mensajeDeError } from "./peticion";
+import { alPerderSesion, pedir, pedirJson, esAbortada, mensajeDeError } from "./peticion";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -16,6 +16,103 @@ describe("pedir", () => {
 
     await expect(pedir("/api/citas", opciones)).resolves.toBe(respuesta);
     expect(fetchSimulado).toHaveBeenCalledExactlyOnceWith("/api/citas", opciones);
+  });
+});
+
+describe("sesión perdida", () => {
+  it.each([
+    { url: "/api/citas", opciones: undefined },
+    { url: "/api/sesion", opciones: undefined },
+    { url: "/api/sesion", opciones: { method: "DELETE" } },
+    { url: "/api/clientes", opciones: { method: "POST" } },
+  ])("avisa ante un 401 en $url con $opciones y conserva el mensaje", async ({ url, opciones }) => {
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ error: "Sesión necesaria" }), { status: 401 }),
+    ));
+    const olvidarUsuario = vi.fn<() => void>();
+    const dejarDeEscuchar = alPerderSesion(olvidarUsuario);
+    try {
+      await expect(pedir(url, opciones)).rejects.toThrow("Sesión necesaria");
+      expect(olvidarUsuario).toHaveBeenCalledOnce();
+    } finally {
+      dejarDeEscuchar();
+    }
+  });
+
+  it.each(["POST", "post"])("no pierde sesión ante credenciales incorrectas (%s)", async (method) => {
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ error: "Usuario o contraseña incorrectos" }), { status: 401 }),
+    ));
+    const olvidarUsuario = vi.fn<() => void>();
+    const dejarDeEscuchar = alPerderSesion(olvidarUsuario);
+    try {
+      await expect(pedirJson("/api/sesion", z.unknown(), { method }))
+        .rejects.toThrow("Usuario o contraseña incorrectos");
+      expect(olvidarUsuario).not.toHaveBeenCalled();
+    } finally {
+      dejarDeEscuchar();
+    }
+  });
+
+  it.each([200, 403, 404, 500])("no pierde sesión por una respuesta %s", async (status) => {
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status })));
+    const olvidarUsuario = vi.fn<() => void>();
+    const dejarDeEscuchar = alPerderSesion(olvidarUsuario);
+    try {
+      if (status === 200) {
+        await expect(pedir("/api/citas")).resolves.toBeInstanceOf(Response);
+      } else {
+        await expect(pedir("/api/citas")).rejects.toThrow(`Error HTTP ${status}`);
+      }
+      expect(olvidarUsuario).not.toHaveBeenCalled();
+    } finally {
+      dejarDeEscuchar();
+    }
+  });
+
+  it("avisa aunque el cuerpo del 401 no sea JSON", async () => {
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(new Response("Sin sesión", { status: 401 })));
+    const olvidarUsuario = vi.fn<() => void>();
+    const dejarDeEscuchar = alPerderSesion(olvidarUsuario);
+    try {
+      await expect(pedir("/api/citas")).rejects.toThrow("Error HTTP 401");
+      expect(olvidarUsuario).toHaveBeenCalledOnce();
+    } finally {
+      dejarDeEscuchar();
+    }
+  });
+
+  it("no pierde sesión por un 401 de una petición abandonada", async () => {
+    const controlador = new AbortController();
+    controlador.abort();
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 401 })));
+    const olvidarUsuario = vi.fn<() => void>();
+    const dejarDeEscuchar = alPerderSesion(olvidarUsuario);
+    try {
+      await expect(pedir("/api/sesion", { signal: controlador.signal })).rejects.toBe(controlador.signal.reason);
+      expect(olvidarUsuario).not.toHaveBeenCalled();
+    } finally {
+      dejarDeEscuchar();
+    }
+  });
+
+  it("permite retirar el registro sin borrar uno posterior", async () => {
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockImplementation(async () => new Response(null, { status: 401 })));
+    const anterior = vi.fn<() => void>();
+    const actual = vi.fn<() => void>();
+    const retirarAnterior = alPerderSesion(anterior);
+    const retirarActual = alPerderSesion(actual);
+    retirarAnterior();
+    try {
+      await expect(pedir("/api/citas")).rejects.toThrow("Error HTTP 401");
+      expect(anterior).not.toHaveBeenCalled();
+      expect(actual).toHaveBeenCalledOnce();
+      retirarActual();
+      await expect(pedir("/api/citas")).rejects.toThrow("Error HTTP 401");
+      expect(actual).toHaveBeenCalledOnce();
+    } finally {
+      retirarActual();
+    }
   });
 });
 

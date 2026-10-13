@@ -2,6 +2,7 @@ import { useState, type MouseEvent, type ReactElement } from "react";
 import { FRANJAS_POR_HORA, MINUTOS_FRANJA } from "./constantes";
 import { mismoDia } from "./fechas";
 import { franjaEnPosicion } from "./posicion";
+import { useSesion } from "../sesion/useSesion";
 import styles from "./CeldaHora.module.css";
 
 type Props = {
@@ -28,33 +29,37 @@ function CeldaHora({
   huecoSeleccionado,
   onSeleccionarHueco,
 }: Props): ReactElement {
+  const { puede } = useSesion();
+  const puedeGestionar = puede("citas:gestionar");
   const [franjaBajoRaton, setFranjaBajoRaton] = useState<number | null>(null);
   let franjaSeleccionada: number | null = null;
-  if (huecoSeleccionado !== null
+  if (puedeGestionar && huecoSeleccionado !== null
     && mismoDia(dia, huecoSeleccionado)
     && huecoSeleccionado.getHours() === hora) {
     franjaSeleccionada = huecoSeleccionado.getMinutes() / MINUTOS_FRANJA;
   }
 
   const actualizarFranja = (evento: MouseEvent<HTMLDivElement>): void => {
+    if (!puedeGestionar) return;
     setFranjaBajoRaton(franjaDelEvento(evento));
   };
 
   const seleccionarFranja = (evento: MouseEvent<HTMLDivElement>): void => {
+    if (!puedeGestionar) return;
     const minuto = franjaDelEvento(evento) * MINUTOS_FRANJA;
     onSeleccionarHueco(dia, hora, minuto);
   };
 
   return (
     <div
-      className={styles.celda}
+      className={puedeGestionar ? `${styles.celda} ${styles.editable}` : styles.celda}
       style={{ gridColumn: columna, gridRow: `${filaInicio} / span ${FRANJAS_POR_HORA}` }}
       onMouseEnter={actualizarFranja}
       onMouseMove={actualizarFranja}
       onMouseLeave={() => setFranjaBajoRaton(null)}
       onClick={seleccionarFranja}
     >
-      {franjaBajoRaton !== null && (
+      {puedeGestionar && franjaBajoRaton !== null && (
         <div
           className={styles.banda}
           style={{

@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactElement } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import { esquemaCliente, type Cliente, type DatosCliente } from "@peluqueria/compartido";
 import { esAbortada, mensajeDeError, pedir, pedirJson } from "../peticion";
 import FichaCliente from "./FichaCliente";
 import ListaClientes from "./ListaClientes";
+import { useSesion } from "../sesion/useSesion";
 import styles from "./PaginaClientes.module.css";
 
 type Props = { nuevo?: boolean };
@@ -15,6 +16,7 @@ type DetalleCliente = {
 };
 
 function PaginaClientes({ nuevo = false }: Props): ReactElement {
+  const { puede } = useSesion();
   const { id } = useParams<{ id: string }>();
   const navegar = useNavigate();
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -64,6 +66,7 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
   }, [id]);
 
   const guardarCliente = async (datos: DatosCliente): Promise<boolean> => {
+    if (!puede("clientes:gestionar")) return false;
     const opciones: RequestInit = {
       method: nuevo ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -83,7 +86,13 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
     return true;
   };
 
-  let ficha: ReactElement = <p className={styles.ayuda}>Elige un cliente o crea uno nuevo.</p>;
+  if (nuevo && !puede("clientes:gestionar")) return <Navigate to="/clientes" replace />;
+
+  let ficha: ReactElement = (
+    <p className={styles.ayuda}>
+      {puede("clientes:gestionar") ? "Elige un cliente o crea uno nuevo." : "Elige un cliente para ver su ficha."}
+    </p>
+  );
   if (nuevo) {
     ficha = <FichaCliente key="nuevo" cliente={null} onGuardar={guardarCliente} />;
   } else if (id !== undefined) {
@@ -111,7 +120,7 @@ function PaginaClientes({ nuevo = false }: Props): ReactElement {
                 placeholder="Nombre, teléfono o email"
               />
             </label>
-            <Link className={styles.principal} to="/clientes/nuevo">Nuevo cliente</Link>
+            {puede("clientes:gestionar") && <Link className={styles.principal} to="/clientes/nuevo">Nuevo cliente</Link>}
           </div>
           {errorLista !== null && <p role="alert" className={styles.error}>{errorLista}</p>}
           {cargandoLista && <p role="status" className={styles.ayuda}>Cargando clientes…</p>}

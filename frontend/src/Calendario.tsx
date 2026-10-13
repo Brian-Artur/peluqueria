@@ -11,9 +11,11 @@ import { diasVisibles } from "./calendario/diasVisibles";
 import { columnaDeFecha } from "./calendario/posicion";
 import styles from "./Calendario.module.css";
 import Panel from "./calendario/Panel";
+import { useSesion } from "./sesion/useSesion";
 
 
 function Calendario(): ReactElement {
+  const { puede } = useSesion();
   const [citas, setCitas] = useState<Cita[]>([]);
   const [mostrarCerrados, setMostrarCerrados] = useState(false);
   const [lunesVisible, setLunesVisible] = useState(() =>
@@ -56,6 +58,7 @@ function Calendario(): ReactElement {
   };
 
   const seleccionarHueco = (dia: Date, hora: number, minuto: number): void => {
+    if (!puede("citas:gestionar")) return;
     const inicio = new Date(dia);
     inicio.setHours(hora, minuto, 0, 0);
     setError(null);
@@ -236,7 +239,9 @@ function Calendario(): ReactElement {
         <div className={styles.columnaPanel}>
           {seleccion === null && (
             <p className={styles.ayuda}>
-              Pulsa un hueco para crear una cita o una cita para verla.
+              {puede("citas:gestionar")
+                ? "Pulsa un hueco para crear una cita o una cita para verla."
+                : "Pulsa una cita para verla."}
             </p>
           )}
           {seleccion && (

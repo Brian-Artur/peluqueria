@@ -1,6 +1,15 @@
 import { esquemaRespuestaError } from "@peluqueria/compartido";
 import type { z } from "zod";
 
+let avisarSesionPerdida: (() => void) | null = null;
+
+export function alPerderSesion(callback: () => void): () => void {
+  avisarSesionPerdida = callback;
+  return (): void => {
+    if (avisarSesionPerdida === callback) avisarSesionPerdida = null;
+  };
+}
+
 export async function pedir(url: string, opciones?: RequestInit): Promise<Response> {
   let respuesta: Response;
   try {
@@ -11,6 +20,11 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
   }
 
   if (respuesta.ok) return respuesta;
+
+  // Una petición abandonada no debe cerrar una sesión que se abrió después.
+  opciones?.signal?.throwIfAborted();
+  const esEntrada = url === "/api/sesion" && opciones?.method?.toUpperCase() === "POST";
+  if (respuesta.status === 401 && !esEntrada) avisarSesionPerdida?.();
 
   let mensaje = `Error HTTP ${respuesta.status}`;
   try {
