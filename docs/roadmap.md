@@ -39,7 +39,7 @@ Hoy no se puede dar de alta un cliente desde la app: solo existen los de la semi
 | **v8 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v6. | §10 |
 | **v9 — Plano del local** | Editor sobre rejilla y puesto de cada empleado por jornada. | §9 |
 | **Más allá** | Estadísticas (cancelaciones, ocupación, tiempo real frente a estimado), zona de espera y cola. | §11 |
-| **Despliegue** | Aparcado: el Windows de bot_trading va justo. Cuando toque, en una máquina virtual del portátil o en otro ordenador, con Docker Compose. | — |
+| **Despliegue** | Aparcado: el Windows de bot_trading va justo. Cuando toque, en una máquina virtual del portátil o en otro ordenador, con Docker Compose. **Dos servicios independientes**: frontend estático (el build ya incluye `compartido/`) servido por Nginx, que reenvía `/api` al contenedor del backend. Decidir entonces si el backend corre con `tsx` o se empaqueta en un solo JS. Al cambiar un contrato: añadir campos es seguro; quitar o renombrar exige desplegar primero el backend aceptando ambos. | — |
 
 ### Arrastrar citas (v6)
 
