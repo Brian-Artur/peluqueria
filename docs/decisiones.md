@@ -17,7 +17,8 @@
 - **Días visibles**: los de apertura (martes a sábado, constante `DIAS_APERTURA` hasta que el horario esté en la BD en v4). Un día de cierre aparece solo si esa semana tiene alguna cita, para que nunca haya citas invisibles; "Mostrar días cerrados" enseña los que faltan. Las columnas salen de la lista de fechas visibles: **una sola numeración de días**, la de `getDay()`.
 - **Semana por número ISO** en la esquina de la rejilla; flechas de semana dentro de la cabecera.
 - **Panel a la derecha** del calendario, fijo al hacer scroll. Modo oscuro: más adelante, sobre las mismas variables.
-- Esquema y semilla versionados en `infra/mariadb/initdb/`, con prefijo numérico: mismo `docker compose up`, misma BD en cualquier máquina.
+- **Migraciones con script propio** (13/10/2026): `backend/migraciones/NNN-descripcion.sql` son la **única fuente del esquema**; `npm run migrar` aplica las pendientes en orden y las anota en la tabla `migracion`. Sin "deshacer": un error se corrige con otra migración. Un único cambio por archivo, porque el DDL de MariaDB no es transaccional. Descartadas: dbmate (binario externo) y Knex/Drizzle (chocan con los repositories de SQL a mano).
+- **Datos de ejemplo aparte** (`npm run sembrar`), que se niega a ejecutarse si ya hay clientes. Una BD nueva: `docker compose up` → `npm run migrar` → `npm run sembrar`.
 - Credenciales fuera del repo (`db.env`, `.env`). Usuario de app (`peluqueria_app`) separado de root, con privilegio mínimo.
 - Puertos propios para convivir con otros proyectos en la misma máquina: BD **3305**, backend **3100**, Vite **5180** con `strictPort` (si está ocupado, falla en vez de saltar a otro).
 - Puerto de MariaDB atado a loopback **en el compose**: así se esquiva que Docker se salte UFW, sin tocar el firewall.

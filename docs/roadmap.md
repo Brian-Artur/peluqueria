@@ -10,6 +10,7 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v1.2** (12/10/2026, tag `v1.2.0`) — Robustez: avisos de error del backend en la interfaz, fechas en UTC en la BD, inicio en franjas de 5 min, 400 en JSON mal formado, `precio` como texto, limpieza y script `typecheck`.
 - **v1.3** (12/10/2026, tag `v1.3.0`) — Pulido estético: paleta ciruela en variables CSS, tarjetas con tinte y barra, calendario a todo el alto, panel a la derecha con selección visible, días de apertura (mar–sáb) con los de cierre bajo demanda, semana ISO y flechas en la cabecera. Resuelta la deuda del orden de la semana.
 - **v1.4** (12/10/2026, tag `v1.4.0`) — Selector de fecha y hora propio (mini calendario del mes y desplegables de 5 en 5) para crear y mover; al pulsar un hueco, la cita empieza en la franja de 5 min bajo el ratón. Cierra la serie v1.
+- **v2.0** (13/10/2026, tag `v2.0.0`) — Migraciones con script propio: `backend/migraciones/` como única fuente del esquema, `npm run migrar` y `npm run sembrar`; fuera `initdb/`.
 
 ## Siguiente
 
@@ -17,7 +18,6 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 Sin esto, tocar el esquema o crecer el código es peligroso.
 
-- **v2.0 — Migraciones**: archivos SQL numerados que llevan una BD con datos de una versión a la siguiente sin perder nada. Hoy el esquema solo se aplica con el volumen vacío (`initdb/`).
 - **v2.1 — Tests**: Vitest. Primero la lógica pura del frontend (fechas, semana ISO, días visibles, franjas); después, algunos de integración con MariaDB (migraciones).
 - **v2.2 — Tipos compartidos**: una sola definición de la forma de los datos para frontend y backend (hoy duplicados a mano y sin validar las respuestas).
 
@@ -64,7 +64,6 @@ Se deciden de una en una, cuando toque.
 | Decisión | Cuándo |
 |---|---|
 | Dónde y cómo desplegar (máquina virtual del portátil u otro ordenador; si se usa `dev.artesaniaartur.es`, por ruta o por subdominio) | Despliegue |
-| Migraciones: SQL numerados + tabla de control propia, o herramienta (dbmate, Knex…) | v2.0 |
 | Tipos compartidos: paquete común en el monorepo, o validar respuestas con Zod en el frontend | v2.2 |
 | Autenticación: sesión con cookie o token; cuántos roles | v4.0 |
 | ¿El cliente puede elegir empleado o solo expresar preferencia? | v4 |

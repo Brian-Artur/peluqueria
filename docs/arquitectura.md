@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v1.4)
+# Arquitectura — cómo está construido hoy (v2.0)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -7,7 +7,7 @@ Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); e
 ```
 backend/    Express + TypeScript + Zod + mysql2
 frontend/   React + Vite + TypeScript
-infra/      MariaDB en Docker (docker-compose + initdb/)
+infra/      MariaDB en Docker (docker-compose)
 docs/       esta documentación (bóveda de Obsidian)
 ```
 
@@ -15,7 +15,7 @@ docs/       esta documentación (bóveda de Obsidian)
 
 ## Base de datos
 
-MariaDB 12 en Docker, puerto `127.0.0.1:3305` (solo loopback). `initdb/01-schema.sql` y `02-seed.sql` se ejecutan solos la primera vez, con el volumen vacío; el prefijo numérico fija el orden.
+MariaDB 12 en Docker, puerto `127.0.0.1:3305` (solo loopback). Docker solo crea la BD vacía y el usuario de la app; el esquema lo construyen las **migraciones** de `backend/migraciones/` (`npm run migrar`), y la tabla `migracion` recuerda cuáles se aplicaron. Los datos de ejemplo están en `backend/semillas/demo.sql` (`npm run sembrar`).
 
 | Tabla | Columnas | Notas |
 |---|---|---|

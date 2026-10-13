@@ -24,8 +24,8 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 
 - **Backend** (`backend/`): Node 24, Express 5, TypeScript, Zod 4, mysql2. CommonJS. Puerto **3100**.
 - **Frontend** (`frontend/`): React 19, Vite, TypeScript, `Date` nativo. Puerto **5180** (fijo, `strictPort`), proxy `/api` → `127.0.0.1:3100`.
-- **BD** (`infra/mariadb/`): MariaDB 12 en Docker, `127.0.0.1:3305`. Esquema y semilla en `initdb/` (solo se ejecutan con el volumen vacío).
-- Sin tests todavía. Sin sistema de migraciones todavía.
+- **BD** (`infra/mariadb/`): MariaDB 12 en Docker, `127.0.0.1:3305`. El esquema sale **solo** de las migraciones de `backend/migraciones/`; los datos de ejemplo, de `backend/semillas/demo.sql`.
+- Sin tests todavía.
 
 ## Comandos
 
@@ -37,6 +37,8 @@ curl http://127.0.0.1:3100/health        # comprueba backend + BD
 # Backend
 cd backend && npm run dev                # tsx watch
 cd backend && npm run typecheck
+cd backend && npm run migrar             # aplica las migraciones pendientes
+cd backend && npm run sembrar            # datos de ejemplo (solo si no hay clientes)
 
 # Frontend
 cd frontend && npm run dev
@@ -66,7 +68,10 @@ frontend/src/
   tipos.ts              tipos compartidos del frontend
   peticion.ts           fetch que lanza el mensaje de error del backend
   calendario/           componentes de la rejilla y el panel + utilidades puras (fechas, posicion, constantes)
-infra/mariadb/          docker-compose + initdb/01-schema.sql, 02-seed.sql
+backend/migraciones/    NNN-descripcion.sql: única fuente del esquema
+backend/semillas/       datos de ejemplo
+backend/src/scripts/    migrar.ts y sembrar.ts
+infra/mariadb/          docker-compose
 docs/                   documentación + bóveda de Obsidian (.obsidian/, _assets/)
 ```
 
@@ -82,6 +87,7 @@ Prioridad: **escalabilidad y facilidad para retomar** por encima de brevedad. Es
 - Comentarios de **por qué**, nunca de qué.
 - Nada de ternarios anidados ni cadenas largas de `.map().filter()`. Early returns y variables intermedias con nombre.
 - SQL siempre parametrizado.
+- **Cambios de esquema solo con una migración nueva** (`backend/migraciones/NNN-descripcion.sql`, siguiente número libre). Nunca editar una migración ya aplicada. **Un único cambio por migración**: en MariaDB el DDL hace commit implícito, así que una migración que falla a medias deja lo que alcanzó a hacer y se corrige con otra migración.
 
 ### Estilos
 

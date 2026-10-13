@@ -6,15 +6,16 @@ Actualizado: **13/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v1.4.0` (12/10/2026): selector de fecha y hora propio y franjas de 5 min al pulsar. **Serie v1 completa.** |
+| **Última versión cerrada** | `v2.0.0` (13/10/2026): migraciones con script propio. |
 | **En curso** | Nada. |
-| **Siguiente** | **v2.0: migraciones** — primera decisión: SQL numerados con tabla de control propia, o una herramienta. Después v2.1 tests y v2.2 tipos compartidos; luego v3 clientes. |
+| **Siguiente** | **v2.1: tests** con Vitest (lógica pura del frontend primero). Después v2.2 tipos compartidos; luego v3 clientes. |
 | **Pendiente de mí** | Nada urgente. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
 ## Para retomar
 
 ```bash
 docker compose -f infra/mariadb/docker-compose.yml up -d
+cd backend && npm run migrar     # por si hay migraciones nuevas
 cd backend && npm run dev        # y comprobar: curl http://127.0.0.1:3100/health
 cd frontend && npm run dev       # http://127.0.0.1:5180
 ```
