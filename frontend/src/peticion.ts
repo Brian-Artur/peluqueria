@@ -26,7 +26,7 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
 
 export async function pedirJson<T>(url: string): Promise<T> {
   const respuesta = await pedir(url);
-  // La validación de la forma del JSON queda para v2; aquí solo comprobamos el resultado HTTP.
+  // La validación de la forma del JSON queda para v2.2 (tipos compartidos); aquí solo comprobamos el resultado HTTP.
   return respuesta.json();
 }
 

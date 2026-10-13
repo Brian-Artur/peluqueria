@@ -137,7 +137,7 @@ Prerrequisitos: motor de asignación expuesto como API, teléfono normalizado, e
 ## Librerías
 
 - **Arrastrar citas**: [`dnd-kit`](https://dndkit.com) es la opción natural. No impone estilos (encaja con CSS Modules y con la rejilla hecha a mano), soporta ratón, táctil y teclado, y tiene *modifiers* para ajustar a la franja de 5 min. Alternativas: `pragmatic-drag-and-drop` (Atlassian; más bajo nivel, basado en el drag nativo del navegador, táctil más flojo) y `react-dnd` (veterana, menos activa). **Descartado**: FullCalendar y similares, porque sustituyen el calendario hecho a mano (decisión cerrada).
-- **Plano**: dos caminos razonables, a decidir en v7.
+- **Plano**: dos caminos razonables, a decidir en v9.
   - SVG a mano + `dnd-kit`: control total y nada nuevo que aprender, pero zoom, desplazamiento y redimensionar piezas hay que escribirlos.
   - **React Flow** (`@xyflow/react`, MIT): pensado para nodos y conexiones, pero sirve para piezas sueltas sobre un lienzo. Trae zoom, desplazamiento, ajuste a rejilla, selección y redimensionado. Sus nodos son componentes React normales, así que se estilan con CSS Modules.
 - **Descartadas** para este proyecto: **JointJS** (núcleo MPL; lo potente está en JointJS+, de pago por desarrollador; no es React de origen), **VisuallyJs** (sucesor comercial de jsPlumb, de pago) y **Workflow Builder** (de Synergy Codes, montado sobre React Flow; es un editor de flujos de trabajo, no aporta nada a un plano). Todas son librerías de diagramas, no de arrastrar citas a una rejilla.

@@ -23,5 +23,5 @@ export type Servicio = {
   id: number;
   nombre: string;
   duracion_min: number;
-  precio: string; // DECIMAL llega como texto; la representación del dinero se decidirá en v5.
+  precio: string; // DECIMAL llega como texto; la representación del dinero se decidirá en v7.
 };

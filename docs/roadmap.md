@@ -1,6 +1,6 @@
 # Roadmap
 
-Orden pensado para que cada paso se apoye en el anterior. **No se adelanta trabajo de una versión posterior**: si surge algo, se anota aquí y se sigue con lo actual. El detalle de lo que viene a partir de v3 está en [dominio.md](dominio.md).
+Orden pensado para que cada paso se apoye en el anterior. **No se adelanta trabajo de una versión posterior**: si surge algo, se anota aquí y se sigue con lo actual. El detalle de lo que viene a partir de v4 está en [dominio.md](dominio.md).
 
 ## Hecho
 
@@ -13,25 +13,35 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 ## Siguiente
 
-Sin urgencia (solo importa con volumen real): **cargar citas por rango de fechas** desde el backend, con un `useEffect` que dependa de `lunesVisible`. Hoy se traen todas de una vez.
+### v2 — Cimientos
 
-### Despliegue (infraestructura, en paralelo)
+Sin esto, tocar el esquema o crecer el código es peligroso.
 
-En el Windows donde corre `bot_trading`, con Docker Compose y sin que los proyectos se pisen. Túnel de Cloudflare ya montado: `bot.artesaniaartur.es` (bot_trading) y `dev.artesaniaartur.es` (demos). A mano: `compose.yml` de bot_trading, config de Nginx y `config.yml` del túnel.
+- **v2.0 — Migraciones**: archivos SQL numerados que llevan una BD con datos de una versión a la siguiente sin perder nada. Hoy el esquema solo se aplica con el volumen vacío (`initdb/`).
+- **v2.1 — Tests**: Vitest. Primero la lógica pura del frontend (fechas, semana ISO, días visibles, franjas); después, algunos de integración con MariaDB (migraciones).
+- **v2.2 — Tipos compartidos**: una sola definición de la forma de los datos para frontend y backend (hoy duplicados a mano y sin validar las respuestas).
+
+### v3 — Clientes
+
+Hoy no se puede dar de alta un cliente desde la app: solo existen los de la semilla.
+
+- **v3.0 — Gestión de clientes**: alta, edición y búsqueda.
+- **v3.1 — Teléfono normalizado** (`+34…`): la pista con la que los asistentes reconocerán a quien llama o escribe. No es único: una familia puede compartir número.
 
 ## Después
 
 | Versión | Contenido | Dominio |
 |---|---|---|
-| **v2 — Cimientos** | Migraciones versionadas (una BD v1 con datos se actualiza sin perder nada), tests con Vitest, usuarios y roles comprobados en el backend, y una sola definición de los tipos para frontend y backend (hoy duplicados a mano, sin validar respuestas). Sin esto, tocar el esquema es peligroso. | — |
-| **v3 — Plantilla, tiempos y local** | Empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
-| **v4 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. El panel de la cita gana una sección con el empleado o empleados asignados. Después, **arrastrar citas**. | §6–7 |
-| **v5 — Dinero y stock** | Tickets, cobros, caja, comisiones, reparto con externos; productos, movimientos de stock, proveedores. VERI\*FACTU antes de cobrar de verdad. | §8 |
-| **v6 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v4. | §10 |
-| **v7 — Plano del local** | Editor sobre rejilla y puesto de cada empleado por jornada. | §9 |
+| **v4 — Plantilla, tiempos y local** | **v4.0** usuarios y roles comprobados en el backend (el encargado es quien ajusta tiempos y bloqueos). Después: empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
+| **v5 — Mejoras sueltas** | Modo oscuro (sobre las variables de `index.css`), vista para móvil y cargar las citas por rango de fechas desde el backend (hoy se traen todas; solo importa con volumen real). | — |
+| **v6 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. El panel de la cita gana una sección con el empleado o empleados asignados. Después, **arrastrar citas**. | §6–7 |
+| **v7 — Dinero y stock** | Tickets, cobros, caja, comisiones, reparto con externos; productos, movimientos de stock, proveedores. VERI\*FACTU antes de cobrar de verdad. | §8 |
+| **v8 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v6. | §10 |
+| **v9 — Plano del local** | Editor sobre rejilla y puesto de cada empleado por jornada. | §9 |
 | **Más allá** | Estadísticas (cancelaciones, ocupación, tiempo real frente a estimado), zona de espera y cola. | §11 |
+| **Despliegue** | Aparcado: el Windows de bot_trading va justo. Cuando toque, en una máquina virtual del portátil o en otro ordenador, con Docker Compose. | — |
 
-### Arrastrar citas (v4)
+### Arrastrar citas (v6)
 
 - Librería recomendada: **dnd-kit** (ya usada en bot_trading); se confirma al llegar. Ver [dominio.md](dominio.md) → "Librerías".
 - Reintroduce la variante `{ tipo: "moviendo"; id }` en `Seleccion` (descartada en v1 porque el `datetime-local` la hacía innecesaria).
@@ -53,12 +63,12 @@ Se deciden de una en una, cuando toque.
 
 | Decisión | Cuándo |
 |---|---|
-| Repartir `dev.artesaniaartur.es`: por ruta (`dev…/peluqueria`, obliga a `base` en Vite) o subdominio por proyecto | Despliegue |
-| Migraciones: SQL numerados + tabla de control propia, o herramienta (dbmate, Knex…) | v2 |
-| Autenticación: sesión con cookie o token; cuántos roles | v2 |
-| Tipos compartidos: paquete común en el monorepo, o validar respuestas con Zod en el frontend | v2 |
-| ¿El cliente puede elegir empleado o solo expresar preferencia? | v3 |
-| ¿Alguien en prácticas puede hacer algún servicio sin tutor? | v3 |
-| ¿Qué cubre el margen de un servicio (retraso, limpieza, cambio de cliente)? | v3 |
-| Arrastrar citas: confirmar dnd-kit | v4 |
-| Plano: SVG a mano + dnd-kit, o React Flow | v7 |
+| Dónde y cómo desplegar (máquina virtual del portátil u otro ordenador; si se usa `dev.artesaniaartur.es`, por ruta o por subdominio) | Despliegue |
+| Migraciones: SQL numerados + tabla de control propia, o herramienta (dbmate, Knex…) | v2.0 |
+| Tipos compartidos: paquete común en el monorepo, o validar respuestas con Zod en el frontend | v2.2 |
+| Autenticación: sesión con cookie o token; cuántos roles | v4.0 |
+| ¿El cliente puede elegir empleado o solo expresar preferencia? | v4 |
+| ¿Alguien en prácticas puede hacer algún servicio sin tutor? | v4 |
+| ¿Qué cubre el margen de un servicio (retraso, limpieza, cambio de cliente)? | v4 |
+| Arrastrar citas: confirmar dnd-kit | v6 |
+| Plano: SVG a mano + dnd-kit, o React Flow | v9 |
