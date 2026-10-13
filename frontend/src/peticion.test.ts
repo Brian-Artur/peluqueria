@@ -1,8 +1,10 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
+import { z } from "zod";
 import { pedir, pedirJson, mensajeDeError } from "./peticion";
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("pedir", () => {
@@ -27,14 +29,30 @@ describe("pedirJson", () => {
     const fetchSimulado = vi.fn<typeof fetch>().mockResolvedValue(respuesta);
     vi.stubGlobal("fetch", fetchSimulado);
 
-    await expect(pedirJson<{ id: number }>("/api/citas/1")).resolves.toEqual(cuerpo);
+    await expect(pedirJson("/api/citas/1", z.object({ id: z.number() }))).resolves.toEqual(cuerpo);
     expect(fetchSimulado).toHaveBeenCalledExactlyOnceWith("/api/citas/1", undefined);
+  });
+
+  it("rechaza una respuesta 200 con una forma incorrecta y registra el detalle de Zod", async () => {
+    const respuesta = new Response(JSON.stringify({ id: "1" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(respuesta));
+    const registrarError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(pedirJson("/api/citas/1", z.object({ id: z.number() }))).rejects.toThrow(
+      "El servidor devolvió datos con una forma inesperada (/api/citas/1)",
+    );
+    expect(registrarError).toHaveBeenCalledExactlyOnceWith(
+      "Respuesta inválida (/api/citas/1)", expect.any(z.ZodError),
+    );
   });
 });
 
 describe.each([
   { nombre: "pedir", ejecutar: pedir },
-  { nombre: "pedirJson", ejecutar: pedirJson },
+  { nombre: "pedirJson", ejecutar: (url: string): Promise<unknown> => pedirJson(url, z.unknown()) },
 ])("$nombre ante un fallo", ({ ejecutar }) => {
   it("lanza el mensaje del backend si el error contiene JSON", async () => {
     const respuesta = new Response(JSON.stringify({ error: "Cita no encontrada" }), {

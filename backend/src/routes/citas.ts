@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { z } from "zod";
-import { inicioEnFranja } from "../validacion/inicioEnFranja";
+import { esquemaCrearCita, esquemaMoverCita } from "@peluqueria/compartido";
 import {
   listarCitas,
   crearCita,
@@ -10,16 +9,6 @@ import {
 } from "../services/citaService";
 
 export const citasRouter = Router();
-
-const crearCitaSchema = z.object({
-  cliente_id: z.number().int().positive(),
-  servicio_id: z.number().int().positive(),
-  inicio: inicioEnFranja,
-});
-
-const moverCitaSchema = z.object({
-  inicio: inicioEnFranja,
-});
 
 function parsearId(valor: string): number | null {
   const id = Number(valor);
@@ -31,7 +20,7 @@ citasRouter.get("/citas", async (_req, res) => {
 });
 
 citasRouter.post("/citas", async (req, res) => {
-  const parsed = crearCitaSchema.safeParse(req.body);
+  const parsed = esquemaCrearCita.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Datos inválidos", detalles: parsed.error.issues });
   }
@@ -45,7 +34,7 @@ citasRouter.patch("/citas/:id", async (req, res) => {
   const id = parsearId(req.params.id);
   if (!id) return res.status(400).json({ error: "Id inválido" });
 
-  const parsed = moverCitaSchema.safeParse(req.body);
+  const parsed = esquemaMoverCita.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Datos inválidos", detalles: parsed.error.issues });
   }

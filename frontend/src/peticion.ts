@@ -1,3 +1,6 @@
+import { esquemaRespuestaError } from "@peluqueria/compartido";
+import type { z } from "zod";
+
 export async function pedir(url: string, opciones?: RequestInit): Promise<Response> {
   let respuesta: Response;
   try {
@@ -11,11 +14,9 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
   let mensaje = `Error HTTP ${respuesta.status}`;
   try {
     const cuerpo: unknown = await respuesta.json();
-    if (
-      typeof cuerpo === "object" && cuerpo !== null &&
-      "error" in cuerpo && typeof cuerpo.error === "string"
-    ) {
-      mensaje = cuerpo.error;
+    const resultado = esquemaRespuestaError.safeParse(cuerpo);
+    if (resultado.success) {
+      mensaje = resultado.data.error;
     }
   } catch {
     // Un proxy puede devolver HTML; el estado HTTP sigue siendo útil para informar.
@@ -24,10 +25,15 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
   throw new Error(mensaje);
 }
 
-export async function pedirJson<T>(url: string): Promise<T> {
+export async function pedirJson<T>(url: string, esquema: z.ZodType<T>): Promise<T> {
   const respuesta = await pedir(url);
-  // La validación de la forma del JSON queda para v2.2 (tipos compartidos); aquí solo comprobamos el resultado HTTP.
-  return respuesta.json();
+  const cuerpo: unknown = await respuesta.json();
+  const resultado = esquema.safeParse(cuerpo);
+  if (!resultado.success) {
+    console.error(`Respuesta inválida (${url})`, resultado.error);
+    throw new Error(`El servidor devolvió datos con una forma inesperada (${url})`);
+  }
+  return resultado.data;
 }
 
 // Un catch recibe unknown: lo que se lanzó puede no ser un Error.

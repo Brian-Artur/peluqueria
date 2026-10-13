@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
+import { z } from "zod";
+import { esquemaCita, esquemaCliente, esquemaServicio } from "@peluqueria/compartido";
 import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
 import { mensajeDeError, pedir, pedirJson } from "./peticion";
 import CabeceraDias from "./calendario/CabeceraDias";
@@ -25,7 +27,7 @@ function Calendario(): ReactElement {
 
   const refrescarCitas = async (): Promise<void> => {
     try {
-      setCitas(await pedirJson<Cita[]>("/api/citas"));
+      setCitas(await pedirJson("/api/citas", z.array(esquemaCita)));
     } catch (fallo) {
       const aviso = `No se pudieron cargar las citas: ${mensajeDeError(fallo)}`;
       // Si también falló la acción, conservar su motivo ayuda a corregirla.
@@ -92,19 +94,19 @@ function Calendario(): ReactElement {
     );
 
   useEffect(() => {
-    pedirJson<Cita[]>("/api/citas")
+    pedirJson("/api/citas", z.array(esquemaCita))
       .then(setCitas)
       .catch((fallo) => setError(`No se pudieron cargar las citas: ${mensajeDeError(fallo)}`));
   }, []);
 
   useEffect(() => {
-    pedirJson<Cliente[]>("/api/clientes")
+    pedirJson("/api/clientes", z.array(esquemaCliente))
       .then(setClientes)
       .catch((fallo) => setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`));
   }, []);
 
   useEffect(() => {
-    pedirJson<Servicio[]>("/api/servicios")
+    pedirJson("/api/servicios", z.array(esquemaServicio))
       .then(setServicios)
       .catch((fallo) => setError(`No se pudieron cargar los servicios: ${mensajeDeError(fallo)}`));
   }, []);

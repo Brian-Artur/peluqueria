@@ -1,2 +1,6 @@
-// Contratos de la API: la forma de los datos que viajan entre backend y frontend.
-export {};
+// Solo contratos HTTP y su validación, sin negocio ni BD, para que otros servicios puedan usarlos.
+export * from "./cita";
+export * from "./cliente";
+export * from "./servicio";
+export * from "./error";
+export * from "./inicioEnFranja";

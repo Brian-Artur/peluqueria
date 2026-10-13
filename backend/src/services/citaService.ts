@@ -1,3 +1,4 @@
+import type { Cita } from "@peluqueria/compartido";
 import {
   findAllCitas,
   createCita,
@@ -9,7 +10,7 @@ import { findClienteById } from "../repositories/clienteRepository";
 import { findServicioById } from "../repositories/servicioRepository";
 import { ErrorNoEncontrado, ErrorConflicto } from "../errores";
 
-export async function listarCitas() {
+export async function listarCitas(): Promise<Cita[]> {
   return findAllCitas();
 }
 
@@ -17,7 +18,7 @@ export async function crearCita(
   cliente_id: number,
   servicio_id: number,
   inicio: string
-) {
+): Promise<number> {
   const cliente = await findClienteById(cliente_id);
   if (!cliente) throw new ErrorNoEncontrado("Cliente no encontrado");
 
@@ -30,7 +31,7 @@ export async function crearCita(
   return createCita(cliente_id, servicio_id, fechaInicio, fechaFin);
 }
 
-export async function moverCita(id: number, inicio: string) {
+export async function moverCita(id: number, inicio: string): Promise<void> {
   const cita = await findCitaById(id);
   if (!cita) throw new ErrorNoEncontrado("Cita no encontrada");
 
@@ -47,7 +48,7 @@ export async function moverCita(id: number, inicio: string) {
   await updateInicioFin(id, fechaInicio, fechaFin);
 }
 
-export async function cancelarCita(id: number) {
+export async function cancelarCita(id: number): Promise<void> {
   const cita = await findCitaById(id);
   if (!cita) throw new ErrorNoEncontrado("Cita no encontrada");
 
@@ -58,7 +59,7 @@ export async function cancelarCita(id: number) {
   await updateEstado(id, "cancelada");
 }
 
-export async function completarCita(id: number) {
+export async function completarCita(id: number): Promise<void> {
   const cita = await findCitaById(id);
   if (!cita) throw new ErrorNoEncontrado("Cita no encontrada");
 

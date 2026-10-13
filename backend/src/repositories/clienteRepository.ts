@@ -1,17 +1,34 @@
+import type { Cliente } from "@peluqueria/compartido";
+import type { RowDataPacket } from "mysql2/promise";
 import { pool } from "../db";
 
-export async function findAllClientes() {
-  const [rows] = await pool.query(
-    "SELECT id, nombre, telefono FROM cliente ORDER BY nombre"
-  );
-  return rows;
+interface FilaCliente extends RowDataPacket {
+  id: number;
+  nombre: string;
+  telefono: string | null;
 }
 
-export async function findClienteById(id: number) {
-  const [rows] = await pool.query(
+function traducirCliente(fila: FilaCliente): Cliente {
+  return {
+    id: fila.id,
+    nombre: fila.nombre,
+    telefono: fila.telefono,
+  };
+}
+
+export async function findAllClientes(): Promise<Cliente[]> {
+  const [filas] = await pool.query<FilaCliente[]>(
+    "SELECT id, nombre, telefono FROM cliente ORDER BY nombre"
+  );
+  return filas.map(traducirCliente);
+}
+
+export async function findClienteById(id: number): Promise<Cliente | null> {
+  const [filas] = await pool.query<FilaCliente[]>(
     "SELECT id, nombre, telefono FROM cliente WHERE id = ?",
     [id]
   );
-  const clientes = rows as { id: number }[];
-  return clientes[0] ?? null;
+  const fila = filas[0];
+  if (!fila) return null;
+  return traducirCliente(fila);
 }

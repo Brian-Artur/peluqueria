@@ -1,7 +1,45 @@
+import type { Cita, EstadoCita } from "@peluqueria/compartido";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { pool } from "../db";
 
-export async function findAllCitas() {
-  const [rows] = await pool.query(
+// La consulta por id no incluye los nombres de las tablas relacionadas.
+type CitaSinNombres = Omit<Cita, "cliente_nombre" | "servicio_nombre">;
+
+interface FilaCita extends RowDataPacket {
+  id: number;
+  inicio: Date;
+  fin: Date;
+  estado: EstadoCita;
+  cliente_id: number;
+  servicio_id: number;
+}
+
+interface FilaCitaConNombres extends FilaCita {
+  cliente_nombre: string;
+  servicio_nombre: string;
+}
+
+function traducirCitaSinNombres(fila: FilaCita): CitaSinNombres {
+  return {
+    id: fila.id,
+    inicio: fila.inicio.toISOString(),
+    fin: fila.fin.toISOString(),
+    estado: fila.estado,
+    cliente_id: fila.cliente_id,
+    servicio_id: fila.servicio_id,
+  };
+}
+
+function traducirCita(fila: FilaCitaConNombres): Cita {
+  return {
+    ...traducirCitaSinNombres(fila),
+    cliente_nombre: fila.cliente_nombre,
+    servicio_nombre: fila.servicio_nombre,
+  };
+}
+
+export async function findAllCitas(): Promise<Cita[]> {
+  const [filas] = await pool.query<FilaCitaConNombres[]>(
     `SELECT
        cita.id,
        cita.inicio,
@@ -16,7 +54,7 @@ export async function findAllCitas() {
      JOIN servicio ON cita.servicio_id = servicio.id
      ORDER BY cita.inicio`
   );
-  return rows;
+  return filas.map(traducirCita);
 }
 
 export async function createCita(
@@ -24,24 +62,25 @@ export async function createCita(
   servicio_id: number,
   inicio: Date,
   fin: Date
-) {
-  const [result] = await pool.query(
+): Promise<number> {
+  const [resultado] = await pool.query<ResultSetHeader>(
     "INSERT INTO cita (cliente_id, servicio_id, inicio, fin) VALUES (?, ?, ?, ?)",
     [cliente_id, servicio_id, inicio, fin]
   );
-  return (result as { insertId: number }).insertId;
+  return resultado.insertId;
 }
 
-export async function findCitaById(id: number) {
-  const [rows] = await pool.query(
+export async function findCitaById(id: number): Promise<CitaSinNombres | null> {
+  const [filas] = await pool.query<FilaCita[]>(
     "SELECT id, cliente_id, servicio_id, inicio, fin, estado FROM cita WHERE id = ?",
     [id]
   );
-  const citas = rows as { id: number; servicio_id: number; estado: string }[];
-  return citas[0] ?? null;
+  const fila = filas[0];
+  if (!fila) return null;
+  return traducirCitaSinNombres(fila);
 }
 
-export async function updateInicioFin(id: number, inicio: Date, fin: Date) {
+export async function updateInicioFin(id: number, inicio: Date, fin: Date): Promise<void> {
   await pool.query("UPDATE cita SET inicio = ?, fin = ? WHERE id = ?", [
     inicio,
     fin,
@@ -49,6 +88,6 @@ export async function updateInicioFin(id: number, inicio: Date, fin: Date) {
   ]);
 }
 
-export async function updateEstado(id: number, estado: string) {
+export async function updateEstado(id: number, estado: EstadoCita): Promise<void> {
   await pool.query("UPDATE cita SET estado = ? WHERE id = ?", [estado, id]);
 }

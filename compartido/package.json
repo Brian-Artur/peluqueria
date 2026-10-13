@@ -5,6 +5,10 @@
   "description": "Contratos de la API (esquemas Zod) compartidos por backend y frontend",
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p ."
+  },
   "dependencies": {
     "zod": "^4.4.3"
   }
