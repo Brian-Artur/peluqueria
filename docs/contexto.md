@@ -6,14 +6,15 @@ Actualizado: **13/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v2.1.0` (13/10/2026): tests con Vitest de la lógica pura (59). Antes, `v2.0.0`: migraciones. |
+| **Última versión cerrada** | `v2.2.0` (13/10/2026): monorepo con workspaces y contratos compartidos. **Serie v2 (cimientos) completa**: migraciones, tests y contratos. |
 | **En curso** | Nada. |
-| **Siguiente** | **v2.2: tipos compartidos** — primera decisión: paquete común en el monorepo, o validar las respuestas con Zod en el frontend. Luego v3 clientes. |
+| **Siguiente** | **v3.0: gestión de clientes** (alta, edición, búsqueda). Después v3.1 teléfono normalizado. |
 | **Pendiente de mí** | Nada urgente. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
 ## Para retomar
 
 ```bash
+npm install                      # desde la raíz, si cambiaron dependencias
 docker compose -f infra/mariadb/docker-compose.yml up -d
 cd backend && npm run migrar     # por si hay migraciones nuevas
 cd backend && npm run dev        # y comprobar: curl http://127.0.0.1:3100/health

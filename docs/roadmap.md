@@ -12,6 +12,7 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v1.4** (12/10/2026, tag `v1.4.0`) — Selector de fecha y hora propio (mini calendario del mes y desplegables de 5 en 5) para crear y mover; al pulsar un hueco, la cita empieza en la franja de 5 min bajo el ratón. Cierra la serie v1.
 - **v2.0** (13/10/2026, tag `v2.0.0`) — Migraciones con script propio: `backend/migraciones/` como única fuente del esquema, `npm run migrar` y `npm run sembrar`; fuera `initdb/`.
 - **v2.1** (13/10/2026, tag `v2.1.0`) — Tests con Vitest de la lógica pura: fechas, semana ISO, días visibles, posición, franjas, peticiones, archivos de migración y validación del inicio (59 tests). Pendiente: tests de integración con MariaDB, cuando haya migraciones que probar.
+- **v2.2** (13/10/2026, tag `v2.2.0`) — Monorepo con npm workspaces y contratos de la API en `compartido/` (esquemas Zod), usados por backend y frontend; el frontend valida cada respuesta. Cierra v2.
 
 ## Siguiente
 
@@ -19,7 +20,6 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 Sin esto, tocar el esquema o crecer el código es peligroso.
 
-- **v2.2 — Tipos compartidos**: una sola definición de la forma de los datos para frontend y backend (hoy duplicados a mano y sin validar las respuestas).
 
 ### v3 — Clientes
 
@@ -64,7 +64,6 @@ Se deciden de una en una, cuando toque.
 | Decisión | Cuándo |
 |---|---|
 | Dónde y cómo desplegar (máquina virtual del portátil u otro ordenador; si se usa `dev.artesaniaartur.es`, por ruta o por subdominio) | Despliegue |
-| Tipos compartidos: paquete común en el monorepo, o validar respuestas con Zod en el frontend | v2.2 |
 | Autenticación: sesión con cookie o token; cuántos roles | v4.0 |
 | ¿El cliente puede elegir empleado o solo expresar preferencia? | v4 |
 | ¿Alguien en prácticas puede hacer algún servicio sin tutor? | v4 |

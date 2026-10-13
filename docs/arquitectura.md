@@ -1,10 +1,11 @@
-# Arquitectura — cómo está construido hoy (v2.0)
+# Arquitectura — cómo está construido hoy (v2.2)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
 ## Monorepo
 
 ```
+compartido/ contratos de la API: esquemas Zod + tipos (npm workspace)
 backend/    Express + TypeScript + Zod + mysql2
 frontend/   React + Vite + TypeScript
 infra/      MariaDB en Docker (docker-compose)

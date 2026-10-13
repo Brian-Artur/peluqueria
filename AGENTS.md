@@ -22,14 +22,21 @@ Español en todo: identificadores de dominio (`cita`, `servicio`, `lunesVisible`
 
 ## Stack
 
+- **Monorepo con npm workspaces**: `compartido/`, `backend/`, `frontend/`; un solo `package-lock.json` en la raíz. `npm install`, `npm test`, `npm run typecheck` y `npm run lint` se lanzan **desde la raíz**.
+- **Contratos** (`compartido/`): esquemas Zod de lo que viaja por la API y sus tipos (`z.infer`). **Solo contratos**: nada de negocio ni BD.
 - **Backend** (`backend/`): Node 24, Express 5, TypeScript, Zod 4, mysql2. CommonJS. Puerto **3100**.
 - **Frontend** (`frontend/`): React 19, Vite, TypeScript, `Date` nativo. Puerto **5180** (fijo, `strictPort`), proxy `/api` → `127.0.0.1:3100`.
 - **BD** (`infra/mariadb/`): MariaDB 12 en Docker, `127.0.0.1:3305`. El esquema sale **solo** de las migraciones de `backend/migraciones/`; los datos de ejemplo, de `backend/semillas/demo.sql`.
-- Tests con **Vitest** (`npm test` en cada paquete), al lado del archivo que prueban (`fechas.ts` → `fechas.test.ts`). Zona horaria fijada a `Europe/Madrid` en `vitest.config.mts`.
+- Tests con **Vitest** (`npm test` desde la raíz o en cada paquete), al lado del archivo que prueban (`fechas.ts` → `fechas.test.ts`). Zona horaria fijada a `Europe/Madrid` en `vitest.config.mts`.
 
 ## Comandos
 
 ```bash
+# Desde la raíz: los tres paquetes
+npm install
+npm test
+npm run typecheck
+
 # Base de datos (desde la raíz)
 docker compose -f infra/mariadb/docker-compose.yml up -d
 curl http://127.0.0.1:3100/health        # comprueba backend + BD
@@ -57,6 +64,7 @@ cd frontend && npm run build             # tsc -b && vite build
 ## Estructura
 
 ```
+compartido/src/         contratos de la API: esquemas Zod + tipos (cita, cliente, servicio, error)
 backend/src/
   index.ts              arranque y montaje (/health en la raíz, el resto bajo /api)
   db.ts                 pool mysql2
@@ -67,8 +75,8 @@ backend/src/
   repositories/         solo SQL parametrizado
 frontend/src/
   Calendario.tsx        dueño del estado (citas, clientes, servicios, semana, selección) y de los fetch
-  tipos.ts              tipos compartidos del frontend
-  peticion.ts           fetch que lanza el mensaje de error del backend
+  tipos.ts              reexporta los tipos de compartido + Seleccion (solo de la interfaz)
+  peticion.ts           fetch que lanza el mensaje de error del backend y valida la respuesta con su esquema
   calendario/           componentes de la rejilla y el panel + utilidades puras (fechas, posicion, constantes)
 backend/migraciones/    NNN-descripcion.sql: única fuente del esquema
 backend/semillas/       datos de ejemplo
@@ -83,7 +91,7 @@ Prioridad: **escalabilidad y facilidad para retomar** por encima de brevedad. Es
 
 - Un archivo por caso de uso, no por entidad.
 - Tipo de retorno explícito en todo lo exportado.
-- Zod en la frontera; `z.infer` como tipo. Una sola definición de la forma del dato.
+- Zod en la frontera; `z.infer` como tipo. Una sola definición de la forma del dato: **lo que viaja por la API se define en `compartido/`** y lo usan los dos lados.
 - Cada capa traduce: la fila de MariaDB no llega a React.
 - Regla de tres antes de abstraer.
 - Comentarios de **por qué**, nunca de qué.
