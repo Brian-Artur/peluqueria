@@ -31,13 +31,13 @@ Hecha (ver arriba). Pendiente para más adelante: archivar clientes y su histori
 
 | Versión | Contenido | Dominio |
 |---|---|---|
-| **v4 — Plantilla, tiempos y local** | **v4.0** usuarios y roles comprobados en el backend (el encargado es quien ajusta tiempos y bloqueos). Después: empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
+| **v4 — Plantilla, tiempos y local** | **v4.0** usuarios y roles (admin, encargado, recepción, empleado): inicio de sesión, permisos y pantalla de usuarios. **Incidencias de clientes**: el encargado anota situaciones problemáticas con un cliente (visibles solo para encargado y admin). Después: empleados (plantilla / prueba / prácticas / externo), competencias, duraciones ajustables por empleado, recursos físicos, horarios, turnos, ausencias y bloqueos por eventos. La zona horaria del salón como dato: mostrar en su hora, no en la del dispositivo. | §1–5 |
 | **v5 — Mejoras sueltas** | Modo oscuro (sobre las variables de `index.css`), vista para móvil y cargar las citas por rango de fechas desde el backend (hoy se traen todas; solo importa con volumen real). | — |
 | **v6 — Agenda real y motor** | Cabecera + líneas con participantes y fases, `no_asistio` y `solicitada`, solapes, motor que sugiere empleado + recurso + hora, guardado transaccional. El panel de la cita gana una sección con el empleado o empleados asignados. Después, **arrastrar citas**. | §6–7 |
 | **v7 — Dinero y stock** | Tickets, cobros, caja, comisiones, reparto con externos; productos, movimientos de stock, proveedores. VERI\*FACTU antes de cobrar de verdad. | §8 |
 | **v8 — Asistentes** | Telegram → WhatsApp → llamadas, sobre el motor de v6. | §10 |
 | **v9 — Plano del local** | Editor sobre rejilla y puesto de cada empleado por jornada. | §9 |
-| **Más allá** | Estadísticas (cancelaciones, ocupación, tiempo real frente a estimado), zona de espera y cola. | §11 |
+| **Más allá** | Estadísticas para el encargado: **productividad y trato de cada empleado** (tiempo real frente a estimado, servicios por día, valoraciones), cancelaciones y no presentados por cliente, ocupación. Zona de espera y cola. | §11 |
 | **Despliegue** | Aparcado: el Windows de bot_trading va justo. Cuando toque, en una máquina virtual del portátil o en otro ordenador, con Docker Compose. **Dos servicios independientes**: frontend estático (el build ya incluye `compartido/`) servido por Nginx, que reenvía `/api` al contenedor del backend. Decidir entonces si el backend corre con `tsx` o se empaqueta en un solo JS. Nginx debe devolver `index.html` para cualquier ruta del frontend (`try_files`), porque las URLs de React Router (`/clientes/12`) no son archivos. Al cambiar un contrato: añadir campos es seguro; quitar o renombrar exige desplegar primero el backend aceptando ambos. | — |
 
 ### Arrastrar citas (v6)

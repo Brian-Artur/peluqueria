@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit -p .",
     "migrar": "tsx src/scripts/migrar.ts",
     "sembrar": "tsx src/scripts/sembrar.ts",
+    "crear-usuario": "tsx src/scripts/crearUsuario.ts",
     "test": "vitest run"
   },
   "keywords": [],

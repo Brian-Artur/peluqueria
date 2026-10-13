@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { esquemaCrearCita, esquemaMoverCita } from "@peluqueria/compartido";
 import { parsearId } from "./parsearId";
+import { requierePermiso } from "../middleware/requierePermiso";
 import {
   listarCitas,
   crearCita,
@@ -11,11 +12,11 @@ import {
 
 export const citasRouter = Router();
 
-citasRouter.get("/citas", async (_req, res) => {
+citasRouter.get("/citas", requierePermiso("citas:ver"), async (_req, res) => {
   res.json(await listarCitas());
 });
 
-citasRouter.post("/citas", async (req, res) => {
+citasRouter.post("/citas", requierePermiso("citas:gestionar"), async (req, res) => {
   const parsed = esquemaCrearCita.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Datos inválidos", detalles: parsed.error.issues });
@@ -26,7 +27,7 @@ citasRouter.post("/citas", async (req, res) => {
   res.status(201).json({ id });
 });
 
-citasRouter.patch("/citas/:id", async (req, res) => {
+citasRouter.patch("/citas/:id", requierePermiso("citas:gestionar"), async (req, res) => {
   const id = parsearId(req.params.id);
   if (!id) return res.status(400).json({ error: "Id inválido" });
 
@@ -39,7 +40,7 @@ citasRouter.patch("/citas/:id", async (req, res) => {
   res.status(204).send();
 });
 
-citasRouter.post("/citas/:id/cancelar", async (req, res) => {
+citasRouter.post("/citas/:id/cancelar", requierePermiso("citas:gestionar"), async (req, res) => {
   const id = parsearId(req.params.id);
   if (!id) return res.status(400).json({ error: "Id inválido" });
 
@@ -47,7 +48,7 @@ citasRouter.post("/citas/:id/cancelar", async (req, res) => {
   res.status(204).send();
 });
 
-citasRouter.post("/citas/:id/completar", async (req, res) => {
+citasRouter.post("/citas/:id/completar", requierePermiso("citas:completar"), async (req, res) => {
   const id = parsearId(req.params.id);
   if (!id) return res.status(400).json({ error: "Id inválido" });
 

@@ -1,5 +1,13 @@
 -- Semilla v1: datos de demostración inventados
 
+-- Solo para desarrollo: un usuario por rol, todos con contraseña demo1234.
+-- Hashes generados con cifrarContrasena; cada contraseña tiene su propia sal.
+INSERT INTO usuario (nombre_usuario, nombre, hash_contrasena, rol) VALUES
+  ('admin', 'Administración demo', 'scrypt$3Hp/sfpiyn5NVUDupxW0qg==$f0biBqPAvVqj++yvIzPMRnnABfLsUDC/pljhG5lHYcGn8fhRzXFL8VfwH2qgcXSnYlo3Q8UQ2VD8MqOZUfnLgg==', 'admin'),
+  ('encargado', 'Encargado demo', 'scrypt$zc3goVwng7hCQmF4yy1g8A==$sF0sBSIfySVnxPmn2tblgAcLM8dXUUenfSx2kp08O3JDrbfWbvLmlPuynSFaF1yfEdp96/UpwnX6JZ0ve59gjg==', 'encargado'),
+  ('recepcion', 'Recepción demo', 'scrypt$RcfWINByqP64TkkLRxRnMQ==$YfSPGVBUesWQ8pdtP9sYp0ASPrkh+PPcOSdqNpaUlFnW4qcxolHodSR4m+owhLIEtVx//FLKbAekwAMoON5S0w==', 'recepcion'),
+  ('empleado', 'Empleado demo', 'scrypt$ZUyOYFT39I1WerV4lf4Mjg==$jcbfhECNQMcIuS8/ghRJjCDhS5qXq+4jj6/LrBjPBJ1GnRH2MG7w4BnoJAFH0p+zGOLdIBFl+XIraMngwHBu5w==', 'empleado');
+
 INSERT INTO cliente (nombre, telefono) VALUES
   ('María López',      '+34600111222'),
   ('Carlos Ruiz',      '+34600333444'),

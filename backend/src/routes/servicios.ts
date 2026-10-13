@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { findAllServicios } from "../repositories/servicioRepository";
+import { requierePermiso } from "../middleware/requierePermiso";
 
 export const serviciosRouter = Router();
 
-serviciosRouter.get("/servicios", async (_req, res) => {
+serviciosRouter.get("/servicios", requierePermiso("citas:ver"), async (_req, res) => {
   try {
     const servicios = await findAllServicios();
     res.json(servicios);
