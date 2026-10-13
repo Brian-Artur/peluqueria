@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 import { z } from "zod";
-import { esquemaCita, esquemaCliente, esquemaServicio } from "@peluqueria/compartido";
+import { esquemaCita, esquemaCliente, esquemaServicio, type DatosCliente } from "@peluqueria/compartido";
 import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
 import { mensajeDeError, pedir, pedirJson } from "./peticion";
 import CabeceraDias from "./calendario/CabeceraDias";
@@ -20,6 +20,7 @@ function Calendario(): ReactElement {
     lunesDeEstaSemana(new Date())
   );
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const versionClientes = useRef(0);
   const [servicios, setServicios] = useState<Servicio[]>([]);
 
   const [seleccion, setSeleccion] = useState<Seleccion | null>(null);
@@ -93,6 +94,31 @@ function Calendario(): ReactElement {
       "No se pudo completar la cita"
     );
 
+  const crearCliente = async (datos: DatosCliente): Promise<number | null> => {
+    setError(null);
+    let idCreado: number | null = null;
+    try {
+      const creado = await pedirJson("/api/clientes", esquemaCliente.pick({ id: true }), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+      idCreado = creado.id;
+      const version = ++versionClientes.current;
+      const lista = await pedirJson("/api/clientes", z.array(esquemaCliente));
+      if (version !== versionClientes.current) return null;
+      setClientes(lista);
+      return creado.id;
+    } catch (fallo) {
+      let aviso = `No se pudo crear el cliente: ${mensajeDeError(fallo)}`;
+      if (idCreado !== null) {
+        aviso = `El cliente se creó, pero no se pudo actualizar la lista. No vuelvas a crearlo: ${mensajeDeError(fallo)}`;
+      }
+      setError(aviso);
+      return null;
+    }
+  };
+
   useEffect(() => {
     pedirJson("/api/citas", z.array(esquemaCita))
       .then(setCitas)
@@ -100,9 +126,15 @@ function Calendario(): ReactElement {
   }, []);
 
   useEffect(() => {
+    const version = ++versionClientes.current;
     pedirJson("/api/clientes", z.array(esquemaCliente))
-      .then(setClientes)
-      .catch((fallo) => setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`));
+      .then((lista) => {
+        if (version === versionClientes.current) setClientes(lista);
+      })
+      .catch((fallo) => {
+        if (version === versionClientes.current) setError(`No se pudieron cargar los clientes: ${mensajeDeError(fallo)}`);
+      });
+    return () => { versionClientes.current += 1; };
   }, []);
 
   useEffect(() => {
@@ -139,81 +171,85 @@ function Calendario(): ReactElement {
   const dias = diasVisibles(lunesVisible, citasDeLaSemana, mostrarCerrados);
 
   return (
-    <div className={styles.distribucion}>
-      <div className={styles.agenda}>
-        <div className={styles.opciones}>
-          {seleccion === null && error !== null && (
-            <p role="alert" className={styles.error}>{error}</p>
-          )}
-          <label className={styles.mostrarCerrados}>
-            <input
-              type="checkbox"
-              checked={mostrarCerrados}
-              onChange={(evento) => setMostrarCerrados(evento.target.checked)}
-            />
-            Mostrar días cerrados
-          </label>
-        </div>
-
-        <div
-          className={styles.calendario}
-          style={{ gridTemplateColumns: `60px repeat(${dias.length}, minmax(0, 1fr))` }}
-        >
-          <CabeceraDias dias={dias} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
-          <Rejilla
-            dias={dias}
-            huecoSeleccionado={seleccion?.tipo === "hueco" ? seleccion.inicio : null}
-            onSeleccionarHueco={seleccionarHueco}
-          />
-          {citasDeLaSemana.map((cita) => {
-            const columna = columnaDeFecha(new Date(cita.inicio), dias);
-            if (columna === null) {
-              return null;
-            }
-
-            return (
-              <TarjetaCita
-                key={cita.id}
-                cita={cita}
-                columna={columna}
-                seleccionada={seleccion?.tipo === "cita" && seleccion.id === cita.id}
-                onSeleccionarCita={seleccionarCita}
+    <section className={styles.pagina}>
+      <h1 className={styles.titulo}>Agenda</h1>
+      <div className={styles.distribucion}>
+        <div className={styles.agenda}>
+          <div className={styles.opciones}>
+            {seleccion === null && error !== null && (
+              <p role="alert" className={styles.error}>{error}</p>
+            )}
+            <label className={styles.mostrarCerrados}>
+              <input
+                type="checkbox"
+                checked={mostrarCerrados}
+                onChange={(evento) => setMostrarCerrados(evento.target.checked)}
               />
-            );
-          })}
+              Mostrar días cerrados
+            </label>
+          </div>
+
+          <div
+            className={styles.calendario}
+            style={{ gridTemplateColumns: `60px repeat(${dias.length}, minmax(0, 1fr))` }}
+          >
+            <CabeceraDias dias={dias} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
+            <Rejilla
+              dias={dias}
+              huecoSeleccionado={seleccion?.tipo === "hueco" ? seleccion.inicio : null}
+              onSeleccionarHueco={seleccionarHueco}
+            />
+            {citasDeLaSemana.map((cita) => {
+              const columna = columnaDeFecha(new Date(cita.inicio), dias);
+              if (columna === null) {
+                return null;
+              }
+
+              return (
+                <TarjetaCita
+                  key={cita.id}
+                  cita={cita}
+                  columna={columna}
+                  seleccionada={seleccion?.tipo === "cita" && seleccion.id === cita.id}
+                  onSeleccionarCita={seleccionarCita}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.columnaPanel}>
+          {seleccion === null && (
+            <p className={styles.ayuda}>
+              Pulsa un hueco para crear una cita o una cita para verla.
+            </p>
+          )}
+          {seleccion && (
+            <Panel
+              key={
+                seleccion.tipo === "cita"
+                  ? `cita-${seleccion.id}`
+                  : `hueco-${seleccion.inicio.toISOString()}`
+              }
+              seleccion={seleccion}
+              clientes={clientes}
+              servicios={servicios}
+              citaSeleccionada={citaSeleccionada}
+              error={error}
+              onCrear={crearCita}
+              onCrearCliente={crearCliente}
+              onCancelar={cancelarCita}
+              onCompletar={completarCita}
+              onMover={moverCita}
+              onCerrar={() => {
+                setError(null);
+                setSeleccion(null);
+              }}
+            />
+          )}
         </div>
       </div>
-
-      <div className={styles.columnaPanel}>
-        {seleccion === null && (
-          <p className={styles.ayuda}>
-            Pulsa un hueco para crear una cita o una cita para verla.
-          </p>
-        )}
-        {seleccion && (
-          <Panel
-            key={
-              seleccion.tipo === "cita"
-                ? `cita-${seleccion.id}`
-                : `hueco-${seleccion.inicio.toISOString()}`
-            }
-            seleccion={seleccion}
-            clientes={clientes}
-            servicios={servicios}
-            citaSeleccionada={citaSeleccionada}
-            error={error}
-            onCrear={crearCita}
-            onCancelar={cancelarCita}
-            onCompletar={completarCita}
-            onMover={moverCita}
-            onCerrar={() => {
-              setError(null);
-              setSeleccion(null);
-            }}
-          />
-        )}
-      </div>
-    </div>
+    </section>
   );
 }
 

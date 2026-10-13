@@ -1,0 +1,48 @@
+.pagina {
+  /* Sin border-box, el padding se suma al 100dvh y la agenda se sale por abajo. */
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-5) var(--espacio-5) var(--espacio-4);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--espacio-5);
+  padding-bottom: var(--espacio-4);
+  margin-bottom: var(--espacio-5);
+  border-bottom: 1px solid var(--color-linea);
+}
+
+.nombre {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.navegacion {
+  display: flex;
+  gap: var(--espacio-4);
+}
+
+.enlace {
+  color: var(--color-texto-suave);
+  text-decoration: none;
+  padding: var(--espacio-2) 0;
+  border-bottom: 2px solid transparent;
+}
+
+.enlace[aria-current="page"] {
+  color: var(--color-acento);
+  border-bottom-color: var(--color-acento);
+  font-weight: 600;
+}
+
+.contenido {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}

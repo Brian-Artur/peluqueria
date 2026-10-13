@@ -20,7 +20,7 @@ MariaDB 12 en Docker, puerto `127.0.0.1:3305` (solo loopback). Docker solo crea 
 
 | Tabla | Columnas | Notas |
 |---|---|---|
-| `cliente` | id, nombre, telefono | Teléfono opcional y **texto**, no número. |
+| `cliente` | id, nombre, telefono, email, notas | Todo opcional salvo el nombre. Teléfono como **texto**, no número. |
 | `servicio` | id, nombre, duracion_min, precio | Catálogo. `precio` aún no se usa. |
 | `cita` | id, cliente_id, servicio_id, inicio, fin, estado | FK a cliente y servicio. |
 
@@ -37,7 +37,10 @@ Capas: **router** (HTTP + Zod) → **service** (reglas de negocio) → **reposit
 | Método y ruta | Qué hace |
 |---|---|
 | `GET /health` | Comprueba de verdad la conexión a la BD. Fuera de `/api` a propósito. |
-| `GET /api/clientes`, `/api/servicios` | Listados. |
+| `GET /api/servicios` | Listado. |
+| `GET /api/clientes?buscar=` | Listado por nombre; `buscar` filtra por nombre, teléfono o email (`%` y `_` se buscan literalmente). |
+| `GET /api/clientes/:id` | Un cliente o 404. |
+| `POST /api/clientes`, `PATCH /api/clientes/:id` | Crear (201 `{ id }`) y editar (204). Mismo cuerpo, validado con `esquemaDatosCliente`. Los clientes no se borran. |
 | `GET /api/citas` | Con JOIN que resuelve nombres de cliente y servicio. |
 | `POST /api/citas` | Zod: `cliente_id`, `servicio_id`, `inicio` (ISO, en franja de 5 min). El `fin` lo calcula el backend. |
 | `PATCH /api/citas/:id` | Mover: solo llega `inicio` (en franja de 5 min); el service recalcula el `fin`. |

@@ -20,6 +20,22 @@ describe("pedir", () => {
 });
 
 describe("pedirJson", () => {
+  it("envía un cuerpo JSON y valida la respuesta de un alta", async () => {
+    const fetchSimulado = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ id: 8 }), { status: 201 }),
+    );
+    vi.stubGlobal("fetch", fetchSimulado);
+    const opciones: RequestInit = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre: "Ana", telefono: null, email: null, notas: null }),
+    };
+
+    await expect(pedirJson("/api/clientes", z.object({ id: z.number() }), opciones))
+      .resolves.toEqual({ id: 8 });
+    expect(fetchSimulado).toHaveBeenCalledExactlyOnceWith("/api/clientes", opciones);
+  });
+
   it("devuelve el JSON de una respuesta correcta", async () => {
     const cuerpo = { id: 1 };
     const respuesta = new Response(JSON.stringify(cuerpo), {

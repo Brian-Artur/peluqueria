@@ -1,0 +1,39 @@
+.lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.lista li + li {
+  border-top: 1px solid var(--color-linea);
+}
+
+.fila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  padding: var(--espacio-3) var(--espacio-4);
+  color: var(--color-texto);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.fila:hover {
+  background: var(--color-superficie);
+}
+
+.fila.abierta {
+  background: var(--color-acento-tinte);
+}
+
+.nombre {
+  font-weight: 600;
+}
+
+.contacto {
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+}

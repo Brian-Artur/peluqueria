@@ -1,5 +1,7 @@
-import { useState, type ReactElement } from "react";
+import { useId, useState, type FormEvent, type ReactElement } from "react";
+import { esquemaDatosCliente, type DatosCliente } from "@peluqueria/compartido";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
+import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "../clientes/erroresCliente";
 import SelectorFechaHora from "./SelectorFechaHora";
 import styles from "./Panel.module.css";
 
@@ -10,6 +12,7 @@ type Props = {
   citaSeleccionada: Cita | null;
   error: string | null;
   onCrear: (clienteId: number, servicioId: number, inicio: Date) => void;
+  onCrearCliente: (datos: DatosCliente) => Promise<number | null>;
   onCancelar: (id: number) => void;
   onCompletar: (id: number) => void;
   onMover: (id: number, inicio: string) => void;
@@ -23,6 +26,7 @@ function Panel({
   citaSeleccionada,
   error,
   onCrear,
+  onCrearCliente,
   onCancelar,
   onCompletar,
   onMover,
@@ -30,6 +34,11 @@ function Panel({
 }: Props): ReactElement {
 
   const [clienteId, setClienteId] = useState<number | null>(null);
+  const prefijo = useId();
+  const [altaRapida, setAltaRapida] = useState(false);
+  const [datosCliente, setDatosCliente] = useState<FormularioCliente>({ nombre: "", telefono: "" });
+  const [erroresCliente, setErroresCliente] = useState<ErroresCliente>({});
+  const [creandoCliente, setCreandoCliente] = useState(false);
   const [servicioId, setServicioId] = useState<number | null>(null);
   const [inicio, setInicio] = useState<Date>(() => {
     if (seleccion.tipo === "hueco") return seleccion.inicio;
@@ -38,6 +47,27 @@ function Panel({
   const [nuevoInicio, setNuevoInicio] = useState<Date>(
     () => new Date(citaSeleccionada?.inicio ?? Date.now())
   );
+
+  const crearCliente = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
+    evento.preventDefault();
+    if (creandoCliente) return;
+    const resultado = esquemaDatosCliente.safeParse(datosCliente);
+    if (!resultado.success) {
+      setErroresCliente(erroresDeCliente(resultado.error.issues));
+      return;
+    }
+    setErroresCliente({});
+    setCreandoCliente(true);
+    try {
+      const id = await onCrearCliente(resultado.data);
+      if (id === null) return;
+      setClienteId(id);
+      setAltaRapida(false);
+      setDatosCliente({ nombre: "", telefono: "" });
+    } finally {
+      setCreandoCliente(false);
+    }
+  };
 
   return (
     <div className={styles.panel}>
@@ -51,14 +81,76 @@ function Panel({
 
           <select
             className={styles.campo}
-            value={clienteId ?? ""}
-            onChange={(e) => setClienteId(Number(e.target.value) || null)}
+            aria-label="Cliente"
+            value={altaRapida ? "nuevo" : clienteId ?? ""}
+            disabled={creandoCliente}
+            onChange={(evento) => {
+              if (evento.target.value === "nuevo") {
+                setAltaRapida(true);
+                return;
+              }
+              setAltaRapida(false);
+              setClienteId(Number(evento.target.value) || null);
+            }}
           >
             <option value="">— Cliente —</option>
             {clientes.map((c) => (
               <option key={c.id} value={c.id}>{c.nombre}</option>
             ))}
+            <option value="nuevo">+ Nuevo cliente…</option>
           </select>
+
+          {altaRapida && (
+            <form className={styles.altaRapida} noValidate onSubmit={crearCliente}>
+              <fieldset className={styles.camposCliente} disabled={creandoCliente}>
+                <legend className={styles.subtitulo}>Nuevo cliente</legend>
+                <label htmlFor={`${prefijo}-nombre`}>Nombre</label>
+                <input
+                  id={`${prefijo}-nombre`}
+                  className={styles.campo}
+                  value={datosCliente.nombre}
+                  onChange={(evento) => setDatosCliente({ ...datosCliente, nombre: evento.target.value })}
+                  autoComplete="name"
+                  required
+                  aria-invalid={erroresCliente.nombre !== undefined}
+                  aria-describedby={erroresCliente.nombre ? `${prefijo}-error-nombre` : undefined}
+                />
+                {erroresCliente.nombre && (
+                  <p id={`${prefijo}-error-nombre`} className={styles.error}>{erroresCliente.nombre}</p>
+                )}
+                <label htmlFor={`${prefijo}-telefono`}>Teléfono</label>
+                <input
+                  id={`${prefijo}-telefono`}
+                  className={styles.campo}
+                  type="tel"
+                  value={datosCliente.telefono ?? ""}
+                  onChange={(evento) => setDatosCliente({ ...datosCliente, telefono: evento.target.value })}
+                  autoComplete="tel"
+                  aria-invalid={erroresCliente.telefono !== undefined}
+                  aria-describedby={erroresCliente.telefono ? `${prefijo}-error-telefono` : undefined}
+                />
+                {erroresCliente.telefono && (
+                  <p id={`${prefijo}-error-telefono`} className={styles.error}>{erroresCliente.telefono}</p>
+                )}
+                <div className={styles.accionesCliente}>
+                  <button className={styles.principal} type="submit">
+                    {creandoCliente ? "Creando…" : "Crear cliente"}
+                  </button>
+                  <button
+                    className={styles.secundario}
+                    type="button"
+                    onClick={() => {
+                      setAltaRapida(false);
+                      setDatosCliente({ nombre: "", telefono: "" });
+                      setErroresCliente({});
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </fieldset>
+            </form>
+          )}
 
           <select
             className={styles.campo}
@@ -73,7 +165,7 @@ function Panel({
 
           <button
             className={styles.principal}
-            disabled={clienteId === null || servicioId === null}
+            disabled={clienteId === null || servicioId === null || altaRapida || creandoCliente}
             onClick={() => {
               if (clienteId === null || servicioId === null) return;
               onCrear(clienteId, servicioId, inicio);

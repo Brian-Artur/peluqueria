@@ -25,8 +25,12 @@ export async function pedir(url: string, opciones?: RequestInit): Promise<Respon
   throw new Error(mensaje);
 }
 
-export async function pedirJson<T>(url: string, esquema: z.ZodType<T>): Promise<T> {
-  const respuesta = await pedir(url);
+export async function pedirJson<T>(
+  url: string,
+  esquema: z.ZodType<T>,
+  opciones?: RequestInit,
+): Promise<T> {
+  const respuesta = await pedir(url, opciones);
   const cuerpo: unknown = await respuesta.json();
   const resultado = esquema.safeParse(cuerpo);
   if (!resultado.success) {
