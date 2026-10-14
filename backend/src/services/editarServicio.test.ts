@@ -2,17 +2,39 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ErrorConflicto, ErrorNoEncontrado } from "../errores";
 import { editarServicio } from "./editarServicio";
 
-const dobles = vi.hoisted(() => ({ buscarServicio: vi.fn(), buscarCategoria: vi.fn(), actualizar: vi.fn() }));
+const dobles = vi.hoisted(() => ({ buscarServicio: vi.fn(), buscarCategoria: vi.fn(), buscarTipo: vi.fn(), actualizar: vi.fn() }));
+vi.mock("../repositories/buscarTipoRecurso", () => ({ buscarTipoRecurso: dobles.buscarTipo }));
 vi.mock("../repositories/categoriaRepository", () => ({ buscarCategoriaPorId: dobles.buscarCategoria }));
 vi.mock("../repositories/servicioRepository", () => ({
   findServicioById: dobles.buscarServicio, actualizarServicio: dobles.actualizar,
 }));
 afterEach(() => vi.resetAllMocks());
 
-const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 45, margen_min: 10, dificultad: "alta" as const, precio: "20.00", activo: true };
-const anterior = { ...datos, id: 1, categoria_nombre: "Pelo", duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00" };
+const datos = { nombre: "Corte", tipo_recurso_id: null, categoria_id: 2, duracion_min: 45, margen_min: 10, dificultad: "alta" as const, precio: "20.00", activo: true };
+const anterior = { ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: "Pelo", duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00" };
 
 describe("editar un servicio", () => {
+  it("conserva el tipo anterior inactivo y permite quitarlo", async () => {
+    dobles.buscarServicio.mockResolvedValue({ ...anterior, tipo_recurso_id: 3 });
+    await editarServicio(1, { ...datos, tipo_recurso_id: 3 });
+    await editarServicio(1, datos);
+    expect(dobles.buscarTipo).not.toHaveBeenCalled();
+    expect(dobles.actualizar).toHaveBeenLastCalledWith(1, datos);
+  });
+
+  it("permite un tipo nuevo activo y rechaza uno inactivo o inexistente", async () => {
+    dobles.buscarServicio.mockResolvedValue(anterior);
+    dobles.buscarTipo.mockResolvedValue({ id: 3, activo: true });
+    await editarServicio(1, { ...datos, tipo_recurso_id: 3 });
+    expect(dobles.actualizar).toHaveBeenCalledWith(1, { ...datos, tipo_recurso_id: 3 });
+    dobles.actualizar.mockClear();
+    dobles.buscarTipo.mockResolvedValue({ id: 3, activo: false });
+    await expect(editarServicio(1, { ...datos, tipo_recurso_id: 3 })).rejects.toThrow(ErrorConflicto);
+    dobles.buscarTipo.mockResolvedValue(null);
+    await expect(editarServicio(1, { ...datos, tipo_recurso_id: 99 })).rejects.toThrow(ErrorNoEncontrado);
+    expect(dobles.actualizar).not.toHaveBeenCalled();
+  });
+
   it("rechaza un servicio inexistente con 404", async () => {
     dobles.buscarServicio.mockResolvedValue(null);
     await expect(editarServicio(99, datos)).rejects.toThrow(ErrorNoEncontrado);

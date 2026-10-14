@@ -3,7 +3,7 @@ import type { Servicio } from "@peluqueria/compartido";
 import { agruparServicios } from "./agruparServicios";
 
 function servicio(id: number, nombre: string, categoria_id: number | null, categoria_nombre: string | null, activo = true): Servicio {
-  return { id, nombre, categoria_id, categoria_nombre, activo, duracion_min: 30, margen_min: 0, dificultad: "media", precio: "15.00" };
+  return { id, nombre, tipo_recurso_id: null, tipo_recurso_nombre: null, categoria_id, categoria_nombre, activo, duracion_min: 30, margen_min: 0, dificultad: "media", precio: "15.00" };
 }
 
 describe("servicios agrupados por categorías de datos", () => {

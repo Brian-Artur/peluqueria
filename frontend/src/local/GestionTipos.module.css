@@ -1,0 +1,16 @@
+.bloque {
+  padding: var(--espacio-4);
+  margin-bottom: var(--espacio-5);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.titulo {
+  margin: 0 0 var(--espacio-3);
+  font-size: 1.125rem;
+}
+
+.ayuda {
+  color: var(--color-texto-suave);
+  line-height: 1.5;
+}

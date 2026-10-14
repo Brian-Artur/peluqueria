@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
-import { esquemaDatosServicio, esquemaDificultad, type Categoria, type DatosServicio, type Dificultad, type Servicio } from "@peluqueria/compartido";
+import { esquemaDatosServicio, esquemaDificultad, type Categoria, type DatosServicio, type Dificultad, type Servicio, type TipoRecurso } from "@peluqueria/compartido";
 import { opcionesMinutos } from "../catalogo/opcionesMinutos";
 import { mensajeDeError } from "../peticion";
 import { useSesion } from "../sesion/useSesion";
@@ -9,15 +9,17 @@ import styles from "./FichaServicio.module.css";
 type Props = {
   servicio: Servicio | null;
   categorias: Categoria[];
+  tipos: TipoRecurso[];
   onGuardar: (datos: DatosServicio) => Promise<boolean>;
 };
 
-function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement {
+function FichaServicio({ servicio, categorias, tipos, onGuardar }: Props): ReactElement {
   const { puede } = useSesion();
   const puedeGestionar = puede("servicios:gestionar");
   const prefijo = useId();
   const [nombre, setNombre] = useState(servicio?.nombre ?? "");
   const [categoriaId, setCategoriaId] = useState<number | null>(servicio?.categoria_id ?? null);
+  const [tipoId, setTipoId] = useState<number | null>(servicio?.tipo_recurso_id ?? null);
   const [duracion, setDuracion] = useState(String(servicio?.duracion_min ?? 30));
   const [margen, setMargen] = useState(servicio?.margen_min ?? 0);
   const [dificultad, setDificultad] = useState<Dificultad>(servicio?.dificultad ?? "media");
@@ -27,6 +29,8 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
   const categoriaActual = categorias.find((categoria) => categoria.id === categoriaId);
+  const tiposActivos = tipos.filter((tipo) => tipo.activo);
+  const tipoActual = tipos.find((tipo) => tipo.id === tipoId);
   const categoriasActivas = categorias.filter((categoria) => categoria.activa);
 
   const guardar = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -35,7 +39,7 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
     setGuardado(false);
     setError(null);
     const resultado = esquemaDatosServicio.safeParse({
-      nombre, categoria_id: categoriaId, duracion_min: Number(duracion),
+      nombre, categoria_id: categoriaId, tipo_recurso_id: tipoId, duracion_min: Number(duracion),
       precio: precio.replace(",", "."), activo, margen_min: margen, dificultad,
     });
     if (!resultado.success) {
@@ -73,6 +77,14 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
           {categoriaActual && !categoriaActual.activa && (
             <option value={categoriaActual.id} disabled>{categoriaActual.nombre} (inactiva)</option>
           )}
+        </select>
+
+        <label htmlFor={`${prefijo}-recurso`}>Recurso que ocupa</label>
+        <select id={`${prefijo}-recurso`} className={styles.campo} value={tipoId ?? ""}
+          onChange={(evento) => setTipoId(evento.target.value === "" ? null : Number(evento.target.value))}>
+          <option value="">Ninguno</option>
+          {tiposActivos.map((tipo) => <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>)}
+          {tipoActual && !tipoActual.activo && <option value={tipoActual.id} disabled>{tipoActual.nombre} (inactivo)</option>}
         </select>
 
         <label htmlFor={`${prefijo}-duracion`}>Duración (minutos)</label>

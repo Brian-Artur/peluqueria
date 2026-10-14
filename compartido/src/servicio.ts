@@ -15,6 +15,8 @@ export const esquemaServicio = z.object({
   nombre: z.string(),
   categoria_id: z.number().int().positive().nullable(),
   categoria_nombre: z.string().nullable(),
+  tipo_recurso_id: z.number().int().positive().nullable(),
+  tipo_recurso_nombre: z.string().nullable(),
   activo: z.boolean(),
   duracion_min: z.number().int().min(5).max(600).multipleOf(5),
   margen_min: esquemaMargen,
@@ -31,6 +33,10 @@ export const esquemaDatosServicio = z.object({
   categoria_id: z.number({ error: "La categoría debe ser un número o null" })
     .int("La categoría debe ser un número entero")
     .positive("La categoría debe ser un id positivo")
+    .nullable(),
+  tipo_recurso_id: z.number({ error: "El tipo de recurso debe ser un número o null" })
+    .int("El tipo de recurso debe ser un número entero")
+    .positive("El tipo de recurso debe ser un id positivo")
     .nullable(),
   duracion_min: z.number({ error: "La duración debe ser un número" })
     .int("La duración debe ser un número entero")

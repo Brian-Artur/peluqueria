@@ -33,8 +33,8 @@ function solicitar(metodo: string, url: string, cuerpo?: unknown, rol?: Rol): Pr
   });
 }
 
-const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
-const servicio = { ...datos, id: 2, categoria_nombre: null };
+const datos = { nombre: "Corte", tipo_recurso_id: null, categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
+const servicio = { ...datos, id: 2, tipo_recurso_nombre: null, categoria_nombre: null };
 const rutas: [string, string, unknown][] = [
   ["GET", "/servicios", undefined], ["GET", "/servicios/2", undefined],
   ["POST", "/servicios", datos], ["PATCH", "/servicios/2", datos],

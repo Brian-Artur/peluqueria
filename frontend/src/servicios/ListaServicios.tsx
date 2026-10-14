@@ -23,6 +23,7 @@ function ListaServicios({ servicios, servicioId }: Props): ReactElement {
                   aria-current={servicio.id === servicioId ? "page" : undefined}
                 >
                   <span className={styles.nombre}>{servicio.nombre}</span>
+                  <span className={styles.recurso}>Recurso: {servicio.tipo_recurso_nombre ?? "Ninguno"}</span>
                   <span className={styles.dificultad}>Dificultad {textosDificultad[servicio.dificultad]}</span>
                   <span>{servicio.duracion_min} min{servicio.margen_min > 0 && ` + ${servicio.margen_min}`}</span>
                   <span>{formatearPrecio(servicio.precio)}</span>

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import {
-  esquemaCategoria, esquemaServicio, type Categoria, type DatosCategoria, type DatosServicio, type Servicio,
+  esquemaCategoria, esquemaServicio, esquemaTipoRecurso, type TipoRecurso, type Categoria, type DatosCategoria, type DatosServicio, type Servicio,
 } from "@peluqueria/compartido";
 import { esAbortada, mensajeDeError, pedir, pedirJson } from "../peticion";
 import { useSesion } from "../sesion/useSesion";
@@ -19,6 +19,7 @@ function PaginaServicios({ nuevo = false }: Props): ReactElement {
   const { id } = useParams<{ id: string }>();
   const navegar = useNavigate();
   const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [tipos, setTipos] = useState<TipoRecurso[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [cargando, setCargando] = useState(true);
   const [catalogoCargado, setCatalogoCargado] = useState(false);
@@ -31,13 +32,15 @@ function PaginaServicios({ nuevo = false }: Props): ReactElement {
     const cargar = async (): Promise<void> => {
       setCargando(true);
       try {
-        const [lista, categoriasRecibidas] = await Promise.all([
+        const [lista, categoriasRecibidas, tiposRecibidos] = await Promise.all([
           pedirJson("/api/servicios?incluirInactivos=true", z.array(esquemaServicio), { signal: controlador.signal }),
           pedirJson("/api/categorias", z.array(esquemaCategoria), { signal: controlador.signal }),
+          pedirJson("/api/tipos-recurso?incluirInactivos=true", z.array(esquemaTipoRecurso), { signal: controlador.signal }),
         ]);
         controlador.signal.throwIfAborted();
         setServicios(lista);
         setCategorias(categoriasRecibidas);
+        setTipos(tiposRecibidos);
         setCatalogoCargado(true);
         setErrorLista(null);
       } catch (fallo) {
@@ -63,7 +66,7 @@ function PaginaServicios({ nuevo = false }: Props): ReactElement {
         setDetalle({ id, servicio: null, error: `No se pudo abrir el servicio: ${mensajeDeError(fallo)}` });
       });
     return () => controlador.abort();
-  }, [id]);
+  }, [id, recargas]);
 
   const guardarServicio = async (datos: DatosServicio): Promise<boolean> => {
     if (!puede("servicios:gestionar")) return false;
@@ -80,11 +83,6 @@ function PaginaServicios({ nuevo = false }: Props): ReactElement {
     }
     if (id === undefined) return false;
     await pedir(`/api/servicios/${encodeURIComponent(id)}`, opciones);
-    setDetalle((anterior) => {
-      if (anterior?.id !== id || anterior.servicio === null) return anterior;
-      const categoria = categorias.find((elemento) => elemento.id === datos.categoria_id);
-      return { id, error: null, servicio: { ...anterior.servicio, ...datos, categoria_nombre: categoria?.nombre ?? null } };
-    });
     setRecargas((n) => n + 1);
     return true;
   };
@@ -109,14 +107,14 @@ function PaginaServicios({ nuevo = false }: Props): ReactElement {
 
   let ficha: ReactElement = <p className={styles.ayuda}>Elige un servicio para ver su ficha.</p>;
   if (nuevo && catalogoCargado) {
-    ficha = <FichaServicio key="nuevo" servicio={null} categorias={categorias} onGuardar={guardarServicio} />;
+    ficha = <FichaServicio key="nuevo" servicio={null} categorias={categorias} tipos={tipos} onGuardar={guardarServicio} />;
   } else if (id !== undefined) {
     if (detalle?.id !== id || !catalogoCargado) {
       ficha = <p role="status" className={styles.ayuda}>Cargando servicio…</p>;
     } else if (detalle.error !== null) {
       ficha = <p role="alert" className={styles.error}>{detalle.error}</p>;
     } else if (detalle.servicio !== null) {
-      ficha = <FichaServicio key={id} servicio={detalle.servicio} categorias={categorias} onGuardar={guardarServicio} />;
+      ficha = <FichaServicio key={id} servicio={detalle.servicio} categorias={categorias} tipos={tipos} onGuardar={guardarServicio} />;
     }
   }
 

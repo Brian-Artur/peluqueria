@@ -10,3 +10,4 @@ export * from "./usuario";
 export * from "./permisos";
 export * from "./empleado";
 export * from "./tiempos";
+export * from "./recurso";

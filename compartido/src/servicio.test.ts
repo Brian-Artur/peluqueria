@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { esquemaDatosServicio, esquemaServicio } from "./servicio";
 
-const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
+const datos = { nombre: "Corte", tipo_recurso_id: null, categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
 
 describe("contratos de servicios", () => {
   it("acepta y recorta los datos con o sin categoría", () => {
     expect(esquemaDatosServicio.parse({ ...datos, nombre: "  Corte  ", precio: " 15.00 " })).toEqual(datos);
     expect(esquemaDatosServicio.parse({ ...datos, categoria_id: 2 }).categoria_id).toBe(2);
-    expect(esquemaServicio.parse({ ...datos, id: 1, categoria_nombre: null }).categoria_nombre).toBeNull();
-    expect(esquemaServicio.parse({ ...datos, id: 1, categoria_id: 2, categoria_nombre: "Pelo", activo: false }).activo).toBe(false);
+    expect(esquemaServicio.parse({ ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: null }).categoria_nombre).toBeNull();
+    expect(esquemaServicio.parse({ ...datos, id: 1, categoria_id: 2, tipo_recurso_nombre: null, categoria_nombre: "Pelo", activo: false }).activo).toBe(false);
   });
 
   it.each([5, 45, 600])("acepta la duración %i", (duracion_min) => {
@@ -17,22 +17,22 @@ describe("contratos de servicios", () => {
 
   it.each([0, 5, 60])("acepta el margen %i en entrada y respuesta", (margen_min) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, margen_min }).success).toBe(true);
-    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, margen_min }).success).toBe(true);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: null, margen_min }).success).toBe(true);
   });
 
   it.each([-5, 1, 65, 5.5, "5", null, undefined])("rechaza el margen %j", (margen_min) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, margen_min }).success).toBe(false);
-    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, margen_min }).success).toBe(false);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: null, margen_min }).success).toBe(false);
   });
 
   it.each(["baja", "media", "alta"])("acepta dificultad %s", (dificultad) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, dificultad }).success).toBe(true);
-    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, dificultad }).success).toBe(true);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: null, dificultad }).success).toBe(true);
   });
 
   it.each(["muy alta", "", null, undefined])("rechaza dificultad %j", (dificultad) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, dificultad }).success).toBe(false);
-    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, dificultad }).success).toBe(false);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, tipo_recurso_nombre: null, categoria_nombre: null, dificultad }).success).toBe(false);
   });
 
   it.each([0, 4, 7, 45.5, 605, "30", null])("rechaza la duración %j", (duracion_min) => {
@@ -55,6 +55,15 @@ describe("contratos de servicios", () => {
 
   it.each([0, -1, 1.5, "2", undefined])("rechaza la categoría %j", (categoria_id) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, categoria_id }).success).toBe(false);
+  });
+
+  it("acepta un tipo de recurso o ninguno y devuelve su nombre", () => {
+    expect(esquemaDatosServicio.parse({ ...datos, tipo_recurso_id: 2 }).tipo_recurso_id).toBe(2);
+    expect(esquemaServicio.parse({ ...datos, id: 1, categoria_nombre: null, tipo_recurso_id: 2, tipo_recurso_nombre: "Butaca" }).tipo_recurso_nombre).toBe("Butaca");
+  });
+
+  it.each([0, -1, 1.5, "2", undefined])("rechaza el tipo de recurso %j", (tipo_recurso_id) => {
+    expect(esquemaDatosServicio.safeParse({ ...datos, tipo_recurso_id }).success).toBe(false);
   });
 
   it("valida el nombre y el estado", () => {

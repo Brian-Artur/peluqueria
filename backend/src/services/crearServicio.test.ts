@@ -2,14 +2,29 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ErrorConflicto, ErrorNoEncontrado } from "../errores";
 import { crearServicio } from "./crearServicio";
 
-const dobles = vi.hoisted(() => ({ buscarCategoria: vi.fn(), insertar: vi.fn() }));
+const dobles = vi.hoisted(() => ({ buscarCategoria: vi.fn(), buscarTipo: vi.fn(), insertar: vi.fn() }));
+vi.mock("../repositories/buscarTipoRecurso", () => ({ buscarTipoRecurso: dobles.buscarTipo }));
 vi.mock("../repositories/categoriaRepository", () => ({ buscarCategoriaPorId: dobles.buscarCategoria }));
 vi.mock("../repositories/servicioRepository", () => ({ insertarServicio: dobles.insertar }));
 afterEach(() => vi.resetAllMocks());
 
-const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
+const datos = { nombre: "Corte", tipo_recurso_id: null, categoria_id: 2, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
 
 describe("crear un servicio", () => {
+  it("admite un tipo activo y rechaza uno inactivo o inexistente", async () => {
+    dobles.buscarCategoria.mockResolvedValue({ id: 2, activa: true });
+    dobles.buscarTipo.mockResolvedValue({ id: 3, activo: true });
+    dobles.insertar.mockResolvedValue(5);
+    await expect(crearServicio({ ...datos, tipo_recurso_id: 3 })).resolves.toBe(5);
+    expect(dobles.insertar).toHaveBeenCalledWith({ ...datos, tipo_recurso_id: 3 });
+    dobles.insertar.mockClear();
+    dobles.buscarTipo.mockResolvedValue({ id: 3, activo: false });
+    await expect(crearServicio({ ...datos, tipo_recurso_id: 3 })).rejects.toThrow(ErrorConflicto);
+    dobles.buscarTipo.mockResolvedValue(null);
+    await expect(crearServicio({ ...datos, tipo_recurso_id: 99 })).rejects.toThrow(ErrorNoEncontrado);
+    expect(dobles.insertar).not.toHaveBeenCalled();
+  });
+
   it("admite una categoría activa", async () => {
     dobles.buscarCategoria.mockResolvedValue({ id: 2, nombre: "Pelo", activa: true });
     dobles.insertar.mockResolvedValue(5);

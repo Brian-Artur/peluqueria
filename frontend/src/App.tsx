@@ -10,6 +10,7 @@ import PaginaMiCuenta from "./sesion/PaginaMiCuenta";
 import PaginaUsuarios from "./usuarios/PaginaUsuarios";
 import PaginaServicios from "./servicios/PaginaServicios";
 import PaginaEmpleados from "./empleados/PaginaEmpleados";
+import PaginaLocal from "./local/PaginaLocal";
 import CuadroCompetencias from "./empleados/CuadroCompetencias";
 
 function App(): ReactElement {
@@ -25,6 +26,7 @@ function App(): ReactElement {
               <Route path="/clientes" element={<PaginaClientes />} />
               <Route path="/clientes/nuevo" element={<PaginaClientes nuevo />} />
               <Route path="/clientes/:id" element={<PaginaClientes />} />
+              <Route path="/local" element={<PaginaLocal />} />
               <Route path="/servicios" element={<PaginaServicios />} />
               <Route path="/servicios/nuevo" element={<PaginaServicios nuevo />} />
               <Route path="/servicios/:id" element={<PaginaServicios />} />

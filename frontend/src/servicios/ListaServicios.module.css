@@ -64,3 +64,8 @@
   border-radius: var(--radio);
   padding: var(--espacio-1);
 }
+
+.recurso {
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+}

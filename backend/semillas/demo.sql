@@ -17,12 +17,26 @@ INSERT INTO cliente (nombre, telefono) VALUES
 INSERT INTO categoria_servicio (nombre) VALUES
   ('Pelo'), ('Uñas'), ('Maquillaje'), ('Estética'), ('Depilación'), ('Masaje');
 
-INSERT INTO servicio (nombre, categoria_id, duracion_min, margen_min, dificultad, precio) VALUES
-  ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'), 30, 5, 'media', 15.00),
-  ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'), 45, 5, 'baja', 20.00);
+INSERT INTO tipo_recurso (nombre) VALUES
+  ('Butaca'), ('Lavacabezas'), ('Mesa de uñas'), ('Camilla');
 
-INSERT INTO servicio (nombre, categoria_id, duracion_min, margen_min, dificultad, precio) VALUES
-  ('Depilación láser', (SELECT id FROM categoria_servicio WHERE nombre = 'Depilación'), 45, 10, 'alta', 50.00);
+INSERT INTO recurso (nombre, tipo_recurso_id, fuera_de_servicio, motivo) VALUES
+  ('Butaca 1', (SELECT id FROM tipo_recurso WHERE nombre = 'Butaca'), FALSE, NULL),
+  ('Butaca 2', (SELECT id FROM tipo_recurso WHERE nombre = 'Butaca'), FALSE, NULL),
+  ('Butaca 3', (SELECT id FROM tipo_recurso WHERE nombre = 'Butaca'), FALSE, NULL),
+  ('Butaca 4', (SELECT id FROM tipo_recurso WHERE nombre = 'Butaca'), TRUE, 'En reparación: fallo en el elevador'),
+  ('Lavacabezas 1', (SELECT id FROM tipo_recurso WHERE nombre = 'Lavacabezas'), FALSE, NULL),
+  ('Lavacabezas 2', (SELECT id FROM tipo_recurso WHERE nombre = 'Lavacabezas'), FALSE, NULL),
+  ('Mesa de uñas 1', (SELECT id FROM tipo_recurso WHERE nombre = 'Mesa de uñas'), FALSE, NULL),
+  ('Camilla 1', (SELECT id FROM tipo_recurso WHERE nombre = 'Camilla'), FALSE, NULL);
+
+INSERT INTO servicio (nombre, categoria_id, tipo_recurso_id, duracion_min, margen_min, dificultad, precio) VALUES
+  ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'),
+    (SELECT id FROM tipo_recurso WHERE nombre = 'Butaca'), 30, 5, 'media', 15.00),
+  ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'),
+    (SELECT id FROM tipo_recurso WHERE nombre = 'Mesa de uñas'), 45, 5, 'baja', 20.00),
+  ('Depilación láser', (SELECT id FROM categoria_servicio WHERE nombre = 'Depilación'),
+    (SELECT id FROM tipo_recurso WHERE nombre = 'Camilla'), 45, 10, 'alta', 50.00);
 
 INSERT INTO empleado (nombre, telefono, email, usuario_id, activo) VALUES
   ('Ana Martín', '+34610111222', 'ana@example.com', (SELECT id FROM usuario WHERE nombre_usuario = 'empleado'), TRUE),
