@@ -16,6 +16,7 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v3.0** (13/10/2026, tag `v3.0.0`) — Clientes: navegación con React Router, pantalla lista + ficha con búsqueda, alta rápida desde la cita, email y notas (migraciones 001–002), teléfonos en E.164 con prefijo y formato (migración 003; absorbe la antigua v3.1). Cierra la serie v3.
 - **v4.0** (14/10/2026, tag `v4.0.0`) — Usuarios y roles: sesión con cookie hecha a mano, cuatro roles (admin, encargado, recepción, empleado) con una sola tabla de permisos en `compartido/`, pantallas de entrada, usuarios y mi cuenta.
 - **v4.1** (14/10/2026, tag `v4.1.0`) — Catálogo con categorías editables; empleados (separados de usuarios) con historial de contratos y competencias por nivel; cuadro empleados × servicios con avisos de huecos.
+- **v4.2** (14/10/2026, tag `v4.2.0`) — Duraciones y márgenes por empleado y servicio (margen del servicio + del empleado), dificultad del servicio con aviso para aprendices, historial de cambios; solo admin y encargado.
 
 ## Siguiente
 
