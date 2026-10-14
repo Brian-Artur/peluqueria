@@ -9,3 +9,4 @@ export * from "./telefono";
 export * from "./usuario";
 export * from "./permisos";
 export * from "./empleado";
+export * from "./tiempos";

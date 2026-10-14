@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import {
-  esquemaBaja, esquemaCompetencias, esquemaCrearEmpleado, esquemaDatosEmpleado, esquemaNuevoContrato,
+  esquemaBaja, esquemaCompetencias, esquemaCrearEmpleado, esquemaDatosEmpleado, esquemaNuevoContrato, esquemaDatosTiempo,
 } from "@peluqueria/compartido";
 import { requierePermiso } from "../middleware/requierePermiso";
 import { listarEmpleados } from "../services/listarEmpleados";
@@ -13,6 +13,9 @@ import { darBajaEmpleado } from "../services/darBajaEmpleado";
 import { reemplazarCompetencias } from "../services/reemplazarCompetencias";
 import { listarCompetencias } from "../services/listarCompetencias";
 import { parsearId } from "./parsearId";
+import { listarTiemposEmpleado } from "../services/listarTiemposEmpleado";
+import { listarHistorialTiempo } from "../services/listarHistorialTiempo";
+import { editarTiempoEmpleado } from "../services/editarTiempoEmpleado";
 
 export const empleadosRouter = Router();
 
@@ -90,4 +93,28 @@ empleadosRouter.put("/empleados/:id/competencias", requierePermiso("empleados:ge
 
 empleadosRouter.get("/competencias", requierePermiso("empleados:ver"), async (_req, res) => {
   res.json(await listarCompetencias());
+});
+
+empleadosRouter.get("/empleados/:id/tiempos", requierePermiso("rendimiento:ver"), async (req, res) => {
+  const id = parsearId(req.params.id);
+  if (!id) return res.status(400).json({ error: "Id inválido" });
+  res.json(await listarTiemposEmpleado(id));
+});
+
+empleadosRouter.get("/empleados/:id/tiempos/historial", requierePermiso("rendimiento:ver"), async (req, res) => {
+  const id = parsearId(req.params.id);
+  if (!id) return res.status(400).json({ error: "Id inválido" });
+  res.json(await listarHistorialTiempo(id));
+});
+
+empleadosRouter.put("/empleados/:id/tiempos/:servicioId", requierePermiso("rendimiento:gestionar"), async (req, res) => {
+  const id = parsearId(req.params.id);
+  const servicioId = parsearId(req.params.servicioId);
+  if (!id || !servicioId) return res.status(400).json({ error: "Id inválido" });
+  const resultado = esquemaDatosTiempo.safeParse(req.body);
+  if (!resultado.success) {
+    return res.status(400).json({ error: "Datos inválidos", detalles: resultado.error.issues });
+  }
+  await editarTiempoEmpleado(id, servicioId, resultado.data, res.locals.usuario!.id);
+  res.status(204).send();
 });

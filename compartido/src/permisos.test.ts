@@ -5,12 +5,12 @@ import { esquemaPermiso, rolesPorPermiso, puede } from "./permisos";
 describe("la tabla completa de roles y permisos", () => {
   // Orden: ver citas, gestionar citas, completar citas, ver clientes,
   // gestionar clientes, gestionar servicios, gestionar usuarios, cambiar la propia contraseña,
-  // ver empleados y gestionar empleados.
+  // ver empleados, gestionar empleados, ver rendimiento y gestionar rendimiento.
   const esperados: Record<Rol, boolean[]> = {
-    admin: [true, true, true, true, true, true, true, true, true, true],
-    encargado: [true, true, true, true, true, true, false, true, true, true],
-    recepcion: [true, true, true, true, true, false, false, true, true, false],
-    empleado: [true, false, true, true, false, false, false, true, false, false],
+    admin: [true, true, true, true, true, true, true, true, true, true, true, true],
+    encargado: [true, true, true, true, true, true, false, true, true, true, true, true],
+    recepcion: [true, true, true, true, true, false, false, true, true, false, false, false],
+    empleado: [true, false, true, true, false, false, false, true, false, false, false, false],
   };
 
   it("incluye exactamente los permisos definidos", () => {

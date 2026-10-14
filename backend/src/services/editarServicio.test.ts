@@ -9,8 +9,8 @@ vi.mock("../repositories/servicioRepository", () => ({
 }));
 afterEach(() => vi.resetAllMocks());
 
-const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 45, precio: "20.00", activo: true };
-const anterior = { ...datos, id: 1, categoria_nombre: "Pelo", duracion_min: 30, precio: "15.00" };
+const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 45, margen_min: 10, dificultad: "alta" as const, precio: "20.00", activo: true };
+const anterior = { ...datos, id: 1, categoria_nombre: "Pelo", duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00" };
 
 describe("editar un servicio", () => {
   it("rechaza un servicio inexistente con 404", async () => {

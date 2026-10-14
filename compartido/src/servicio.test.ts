@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { esquemaDatosServicio, esquemaServicio } from "./servicio";
 
-const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, precio: "15.00", activo: true };
+const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
 
 describe("contratos de servicios", () => {
   it("acepta y recorta los datos con o sin categoría", () => {
@@ -13,6 +13,26 @@ describe("contratos de servicios", () => {
 
   it.each([5, 45, 600])("acepta la duración %i", (duracion_min) => {
     expect(esquemaDatosServicio.safeParse({ ...datos, duracion_min }).success).toBe(true);
+  });
+
+  it.each([0, 5, 60])("acepta el margen %i en entrada y respuesta", (margen_min) => {
+    expect(esquemaDatosServicio.safeParse({ ...datos, margen_min }).success).toBe(true);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, margen_min }).success).toBe(true);
+  });
+
+  it.each([-5, 1, 65, 5.5, "5", null, undefined])("rechaza el margen %j", (margen_min) => {
+    expect(esquemaDatosServicio.safeParse({ ...datos, margen_min }).success).toBe(false);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, margen_min }).success).toBe(false);
+  });
+
+  it.each(["baja", "media", "alta"])("acepta dificultad %s", (dificultad) => {
+    expect(esquemaDatosServicio.safeParse({ ...datos, dificultad }).success).toBe(true);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, dificultad }).success).toBe(true);
+  });
+
+  it.each(["muy alta", "", null, undefined])("rechaza dificultad %j", (dificultad) => {
+    expect(esquemaDatosServicio.safeParse({ ...datos, dificultad }).success).toBe(false);
+    expect(esquemaServicio.safeParse({ ...datos, id: 1, categoria_nombre: null, dificultad }).success).toBe(false);
   });
 
   it.each([0, 4, 7, 45.5, 605, "30", null])("rechaza la duración %j", (duracion_min) => {

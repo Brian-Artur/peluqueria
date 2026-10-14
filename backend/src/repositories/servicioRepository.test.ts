@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { esquemaServicio } from "@peluqueria/compartido";
-import { actualizarServicio, findAllServicios, findServicioById } from "./servicioRepository";
+import { actualizarServicio, findAllServicios, findServicioById, insertarServicio } from "./servicioRepository";
 
 const { consultar } = vi.hoisted(() => ({ consultar: vi.fn() }));
 vi.mock("../db", () => ({ pool: { query: consultar } }));
 afterEach(() => vi.resetAllMocks());
 
 describe("repositorio de servicios sin BD", () => {
-  const fila = { id: 1, nombre: "Corte", categoria_id: 2, categoria_nombre: "Pelo", activo: 1, duracion_min: 30, precio: "15.00" };
+  const fila = { id: 1, nombre: "Corte", categoria_id: 2, categoria_nombre: "Pelo", activo: 1, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00" };
 
   it("traduce la categoría y el estado al contrato y pide solo activos por defecto", async () => {
     consultar.mockResolvedValue([[{ ...fila, interno: "privado" }], []]);
@@ -37,12 +37,22 @@ describe("repositorio de servicios sin BD", () => {
 
   it("editar duración y precio actualiza solo servicio y nunca las citas", async () => {
     consultar.mockResolvedValue([{}, []]);
-    const datos = { nombre: "Corte", categoria_id: null, activo: false, duracion_min: 45, precio: "20.00" };
+    const datos = { nombre: "Corte", categoria_id: null, activo: false, duracion_min: 45, margen_min: 10, dificultad: "alta" as const, precio: "20.00" };
     await actualizarServicio(1, datos);
     expect(consultar).toHaveBeenCalledTimes(1);
     expect(consultar).toHaveBeenCalledWith(
-      "UPDATE servicio SET nombre = ?, categoria_id = ?, duracion_min = ?, precio = ?, activo = ? WHERE id = ?",
-      ["Corte", null, 45, "20.00", false, 1]
+      "UPDATE servicio SET nombre = ?, categoria_id = ?, duracion_min = ?, margen_min = ?, dificultad = ?, precio = ?, activo = ? WHERE id = ?",
+      ["Corte", null, 45, 10, "alta", "20.00", false, 1]
+    );
+  });
+
+  it("inserta margen y dificultad con parámetros", async () => {
+    consultar.mockResolvedValue([{ insertId: 7 }, []]);
+    const datos = { nombre: "Corte", categoria_id: null, activo: true, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00" };
+    await expect(insertarServicio(datos)).resolves.toBe(7);
+    expect(consultar).toHaveBeenCalledExactlyOnceWith(
+      "INSERT INTO servicio (nombre, categoria_id, duracion_min, margen_min, dificultad, precio, activo) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      ["Corte", null, 30, 5, "media", "15.00", true]
     );
   });
 });

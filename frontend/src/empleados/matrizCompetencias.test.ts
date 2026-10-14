@@ -7,10 +7,10 @@ const empleados: EmpleadoResumen[] = [
   { id: 2, nombre: "Eva", activo: false, telefono: null, email: null, contrato_vigente: null, num_competencias: 1 },
 ];
 const servicios: Servicio[] = [
-  { id: 1, nombre: "Corte", activo: true, categoria_id: 1, categoria_nombre: "Pelo", duracion_min: 30, precio: "10" },
-  { id: 2, nombre: "Color", activo: true, categoria_id: 1, categoria_nombre: "Pelo", duracion_min: 30, precio: "10" },
-  { id: 3, nombre: "Uñas", activo: true, categoria_id: null, categoria_nombre: null, duracion_min: 30, precio: "10" },
-  { id: 4, nombre: "Antiguo", activo: false, categoria_id: null, categoria_nombre: null, duracion_min: 30, precio: "10" },
+  { id: 1, nombre: "Corte", activo: true, categoria_id: 1, categoria_nombre: "Pelo", duracion_min: 30, margen_min: 0, dificultad: "media", precio: "10" },
+  { id: 2, nombre: "Color", activo: true, categoria_id: 1, categoria_nombre: "Pelo", duracion_min: 30, margen_min: 0, dificultad: "media", precio: "10" },
+  { id: 3, nombre: "Uñas", activo: true, categoria_id: null, categoria_nombre: null, duracion_min: 30, margen_min: 0, dificultad: "media", precio: "10" },
+  { id: 4, nombre: "Antiguo", activo: false, categoria_id: null, categoria_nombre: null, duracion_min: 30, margen_min: 0, dificultad: "media", precio: "10" },
 ];
 
 describe("cuadro de competencias y huecos", () => {

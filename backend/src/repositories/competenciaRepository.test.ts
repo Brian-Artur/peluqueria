@@ -15,7 +15,7 @@ describe("repositorio de competencias sin BD", () => {
   });
 
   it("la ficha puede consultar competencias de cualquier empleado", async () => {
-    dobles.pool.mockResolvedValue([[{ empleado_id: 1, servicio_id: 2, nivel: "experto" }], []]);
+    dobles.pool.mockResolvedValue([[{ empleado_id: 1, servicio_id: 2, nivel: "experto", duracion_min: 45, margen_min: 10 }], []]);
     await expect(consultarCompetenciasEmpleado(1)).resolves.toEqual([{ servicio_id: 2, nivel: "experto" }]);
     expect(dobles.pool).toHaveBeenCalledWith(expect.stringContaining("WHERE empleado_id = ?"), [1]);
   });
@@ -29,14 +29,26 @@ describe("repositorio de competencias sin BD", () => {
     expect(dobles.conexion.mock.calls[0][0]).not.toContain("activo");
   });
 
-  it("borra solo las competencias del empleado y repone la lista en la conexión recibida", async () => {
+  it("conserva duración y margen de los mantenidos: borra solo los quitados y actualiza solo el nivel", async () => {
     dobles.conexion.mockResolvedValue([{}, []]);
     await sustituirCompetencias(1, [{ servicio_id: 2, nivel: "autonomo" }, { servicio_id: 3, nivel: "experto" }], conexion);
-    expect(dobles.conexion.mock.calls).toEqual([
-      ["DELETE FROM competencia WHERE empleado_id = ?", [1]],
-      ["INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES (?, ?, ?)", [1, 2, "autonomo"]],
-      ["INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES (?, ?, ?)", [1, 3, "experto"]],
+    expect(dobles.conexion.mock.calls[0]).toEqual([
+      "DELETE FROM competencia WHERE empleado_id = ? AND servicio_id NOT IN (?, ?)", [1, 2, 3],
     ]);
+    expect(dobles.conexion).toHaveBeenNthCalledWith(2, expect.stringContaining("ON DUPLICATE KEY UPDATE nivel = VALUES(nivel)"), [1, 2, "autonomo"]);
+    expect(dobles.conexion).toHaveBeenNthCalledWith(3, expect.stringContaining("ON DUPLICATE KEY UPDATE nivel = VALUES(nivel)"), [1, 3, "experto"]);
+    expect(dobles.conexion).toHaveBeenCalledTimes(3);
+    for (const [sql] of dobles.conexion.mock.calls.slice(1)) {
+      expect(sql.split("ON DUPLICATE KEY UPDATE ")[1]).toBe("nivel = VALUES(nivel)");
+      expect(sql).not.toContain("duracion_min");
+      expect(sql).not.toContain("margen_min");
+    }
     expect(dobles.pool).not.toHaveBeenCalled();
+  });
+
+  it("admite vaciar sin generar NOT IN vacío", async () => {
+    dobles.conexion.mockResolvedValue([{}, []]);
+    await sustituirCompetencias(1, [], conexion);
+    expect(dobles.conexion).toHaveBeenCalledExactlyOnceWith("DELETE FROM competencia WHERE empleado_id = ?", [1]);
   });
 });

@@ -1,0 +1,1 @@
+ALTER TABLE servicio ADD COLUMN margen_min INT NOT NULL DEFAULT 0;

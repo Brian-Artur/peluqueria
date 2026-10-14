@@ -7,7 +7,7 @@ vi.mock("../repositories/categoriaRepository", () => ({ buscarCategoriaPorId: do
 vi.mock("../repositories/servicioRepository", () => ({ insertarServicio: dobles.insertar }));
 afterEach(() => vi.resetAllMocks());
 
-const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 30, precio: "15.00", activo: true };
+const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
 
 describe("crear un servicio", () => {
   it("admite una categoría activa", async () => {

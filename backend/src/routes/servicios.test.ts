@@ -33,7 +33,7 @@ function solicitar(metodo: string, url: string, cuerpo?: unknown, rol?: Rol): Pr
   });
 }
 
-const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, precio: "15.00", activo: true };
+const datos = { nombre: "Corte", categoria_id: null, duracion_min: 30, margen_min: 5, dificultad: "media" as const, precio: "15.00", activo: true };
 const servicio = { ...datos, id: 2, categoria_nombre: null };
 const rutas: [string, string, unknown][] = [
   ["GET", "/servicios", undefined], ["GET", "/servicios/2", undefined],
@@ -93,7 +93,8 @@ describe("validación y respuestas de servicios", () => {
     expect(dobles.editar).not.toHaveBeenCalled();
   });
 
-  it.each([{ duracion_min: 31 }, { precio: "-1" }, { activo: 1 }, { nombre: " " }])(
+  it.each([{ duracion_min: 31 }, { precio: "-1" }, { activo: 1 }, { nombre: " " },
+    { margen_min: 1 }, { margen_min: 65 }, { dificultad: "muy alta" }])(
     "rechaza los datos %j antes del service", async (cambio) => {
       expect((await solicitar("POST", "/servicios", { ...datos, ...cambio }, "admin")).codigo).toBe(400);
       expect((await solicitar("PATCH", "/servicios/2", { ...datos, ...cambio }, "admin")).codigo).toBe(400);

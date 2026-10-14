@@ -7,6 +7,7 @@ import { ErrorConflicto, ErrorNoEncontrado } from "../errores";
 
 const dobles = vi.hoisted(() => ({
   listar: vi.fn(), obtener: vi.fn(), crear: vi.fn(), editar: vi.fn(), contrato: vi.fn(), baja: vi.fn(), competencias: vi.fn(), resumen: vi.fn(),
+  tiempos: vi.fn(), editarTiempo: vi.fn(), historialTiempo: vi.fn(),
 }));
 vi.mock("../services/listarEmpleados", () => ({ listarEmpleados: dobles.listar }));
 vi.mock("../services/obtenerEmpleado", () => ({ obtenerEmpleado: dobles.obtener }));
@@ -16,6 +17,9 @@ vi.mock("../services/nuevoContratoEmpleado", () => ({ nuevoContratoEmpleado: dob
 vi.mock("../services/darBajaEmpleado", () => ({ darBajaEmpleado: dobles.baja }));
 vi.mock("../services/reemplazarCompetencias", () => ({ reemplazarCompetencias: dobles.competencias }));
 vi.mock("../services/listarCompetencias", () => ({ listarCompetencias: dobles.resumen }));
+vi.mock("../services/listarTiemposEmpleado", () => ({ listarTiemposEmpleado: dobles.tiempos }));
+vi.mock("../services/editarTiempoEmpleado", () => ({ editarTiempoEmpleado: dobles.editarTiempo }));
+vi.mock("../services/listarHistorialTiempo", () => ({ listarHistorialTiempo: dobles.historialTiempo }));
 afterEach(() => vi.resetAllMocks());
 
 type Respuesta = { codigo: number; cuerpo: unknown };
@@ -51,7 +55,13 @@ const escrituras: [string, string, unknown][] = [
   ["POST", "/empleados/1/contratos", contrato], ["POST", "/empleados/1/baja", { fecha: "2026-10-14" }],
   ["PUT", "/empleados/1/competencias", competencias],
 ];
-const rutas = [...lecturas, ...escrituras];
+const datosTiempo = { duracion_min: 45, margen_min: 10 };
+const rutasTiempo: [string, string, unknown][] = [
+  ["GET", "/empleados/1/tiempos", undefined],
+  ["GET", "/empleados/1/tiempos/historial", undefined],
+  ["PUT", "/empleados/1/tiempos/2", datosTiempo],
+];
+const rutas = [...lecturas, ...escrituras, ...rutasTiempo];
 
 describe("permisos de todas las rutas de empleados y competencias", () => {
   it.each(rutas)("sin sesión: %s %s da 401", async (metodo, url, cuerpo) => {
@@ -88,6 +98,64 @@ describe("permisos de todas las rutas de empleados y competencias", () => {
     expect(dobles.contrato).toHaveBeenCalledWith(1, contrato);
     expect(dobles.baja).toHaveBeenCalledWith(1, { fecha: "2026-10-14" });
     expect(dobles.competencias).toHaveBeenCalledWith(1, competencias);
+  });
+});
+
+describe("rutas de tiempos e historial", () => {
+  it.each(rutasTiempo)("recepción: %s %s da 403", async (metodo, url, cuerpo) => {
+    expect((await solicitar(metodo, url, cuerpo, "recepcion")).codigo).toBe(403);
+    expect(dobles.tiempos).not.toHaveBeenCalled();
+    expect(dobles.editarTiempo).not.toHaveBeenCalled();
+    expect(dobles.historialTiempo).not.toHaveBeenCalled();
+  });
+
+  it.each(["admin", "encargado"] as const)("%s consulta con 200 y edita con 204, pasando su usuario", async (rol) => {
+    const tiempos = [{ servicio_id: 2, duracion_agendada: 60 }];
+    const historial = [{ campo: "duracion", valor_anterior: null, valor_nuevo: 45 }];
+    dobles.tiempos.mockResolvedValue(tiempos);
+    dobles.historialTiempo.mockResolvedValue(historial);
+    expect(await solicitar("GET", "/empleados/1/tiempos", undefined, rol)).toEqual({ codigo: 200, cuerpo: tiempos });
+    expect(await solicitar("GET", "/empleados/1/tiempos/historial", undefined, rol)).toEqual({ codigo: 200, cuerpo: historial });
+    expect(await solicitar("PUT", "/empleados/1/tiempos/2", { ...datosTiempo, usuario_id: 99 }, rol)).toEqual({ codigo: 204, cuerpo: undefined });
+    expect(dobles.tiempos).toHaveBeenCalledWith(1);
+    expect(dobles.historialTiempo).toHaveBeenCalledWith(1);
+    expect(dobles.editarTiempo).toHaveBeenCalledWith(1, 2, datosTiempo, 7);
+  });
+
+  it("admite volver a la duración heredada", async () => {
+    const datos = { duracion_min: null, margen_min: 0 };
+    expect((await solicitar("PUT", "/empleados/1/tiempos/2", datos, "admin")).codigo).toBe(204);
+    expect(dobles.editarTiempo).toHaveBeenCalledWith(1, 2, datos, 7);
+  });
+
+  it.each(["0", "-1", "1.5", "abc"])("rechaza id o servicioId %s con 400", async (id) => {
+    for (const [metodo, url, cuerpo] of rutasTiempo) {
+      expect((await solicitar(metodo, url.replace("/1", `/${id}`), cuerpo, "admin")).codigo).toBe(400);
+    }
+    expect((await solicitar("PUT", `/empleados/1/tiempos/${id}`, datosTiempo, "admin")).codigo).toBe(400);
+    expect(dobles.tiempos).not.toHaveBeenCalled();
+    expect(dobles.historialTiempo).not.toHaveBeenCalled();
+    expect(dobles.editarTiempo).not.toHaveBeenCalled();
+  });
+
+  it.each([null, {}, { duracion_min: 0, margen_min: 0 }, { duracion_min: 31, margen_min: 0 },
+    { duracion_min: 605, margen_min: 0 }, { duracion_min: null, margen_min: 1 },
+    { duracion_min: null, margen_min: 65 }, { duracion_min: "45", margen_min: 0 },
+  ])("rechaza datos %j antes del servicio", async (datos) => {
+    expect((await solicitar("PUT", "/empleados/1/tiempos/2", datos, "admin")).codigo).toBe(400);
+    expect(dobles.editarTiempo).not.toHaveBeenCalled();
+  });
+
+  it.each(rutasTiempo)("propaga 404: %s %s", async (metodo, url, cuerpo) => {
+    for (const doble of [dobles.tiempos, dobles.historialTiempo, dobles.editarTiempo]) {
+      doble.mockRejectedValue(new ErrorNoEncontrado("Empleado no encontrado"));
+    }
+    expect(await solicitar(metodo, url, cuerpo, "admin")).toEqual({ codigo: 404, cuerpo: { error: "Empleado no encontrado" } });
+  });
+
+  it("devuelve 404 si no existe la competencia", async () => {
+    dobles.editarTiempo.mockRejectedValue(new ErrorNoEncontrado("Competencia no encontrada"));
+    expect(await solicitar("PUT", "/empleados/1/tiempos/2", datosTiempo, "admin")).toEqual({ codigo: 404, cuerpo: { error: "Competencia no encontrada" } });
   });
 });
 

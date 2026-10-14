@@ -17,12 +17,12 @@ INSERT INTO cliente (nombre, telefono) VALUES
 INSERT INTO categoria_servicio (nombre) VALUES
   ('Pelo'), ('Uñas'), ('Maquillaje'), ('Estética'), ('Depilación'), ('Masaje');
 
-INSERT INTO servicio (nombre, categoria_id, duracion_min, precio) VALUES
-  ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'), 30, 15.00),
-  ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'), 45, 20.00);
+INSERT INTO servicio (nombre, categoria_id, duracion_min, margen_min, dificultad, precio) VALUES
+  ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'), 30, 5, 'media', 15.00),
+  ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'), 45, 5, 'baja', 20.00);
 
-INSERT INTO servicio (nombre, categoria_id, duracion_min, precio) VALUES
-  ('Depilación láser', (SELECT id FROM categoria_servicio WHERE nombre = 'Depilación'), 45, 50.00);
+INSERT INTO servicio (nombre, categoria_id, duracion_min, margen_min, dificultad, precio) VALUES
+  ('Depilación láser', (SELECT id FROM categoria_servicio WHERE nombre = 'Depilación'), 45, 10, 'alta', 50.00);
 
 INSERT INTO empleado (nombre, telefono, email, usuario_id, activo) VALUES
   ('Ana Martín', '+34610111222', 'ana@example.com', (SELECT id FROM usuario WHERE nombre_usuario = 'empleado'), TRUE),
@@ -49,15 +49,15 @@ SET @corte = (SELECT id FROM servicio WHERE nombre = 'Corte de pelo');
 SET @manicura = (SELECT id FROM servicio WHERE nombre = 'Manicura');
 SET @laser = (SELECT id FROM servicio WHERE nombre = 'Depilación láser');
 
-INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES
-  (@ana, @corte, 'experto'),
-  (@ana, @manicura, 'autonomo'),
-  (@beatriz, @corte, 'autonomo'),
-  (@beatriz, @manicura, 'experto'),
-  (@clara, @corte, 'aprendiz'),
-  (@clara, @manicura, 'aprendiz'),
-  (@diego, @laser, 'experto'),
-  (@elena, @manicura, 'autonomo');
+INSERT INTO competencia (empleado_id, servicio_id, nivel, duracion_min, margen_min) VALUES
+  (@ana, @corte, 'experto', 25, 0),
+  (@ana, @manicura, 'autonomo', NULL, 5),
+  (@beatriz, @corte, 'autonomo', NULL, 0),
+  (@beatriz, @manicura, 'experto', 35, 0),
+  (@clara, @corte, 'aprendiz', 50, 10),
+  (@clara, @manicura, 'aprendiz', 60, 10),
+  (@diego, @laser, 'experto', NULL, 0),
+  (@elena, @manicura, 'autonomo', NULL, 0);
 
 -- Citas repartidas en una semana. inicio + fin coherentes con la duración
 -- del servicio, pero congelados en la propia cita (patrón snapshot).

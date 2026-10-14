@@ -33,9 +33,20 @@ export async function consultarServiciosExistentes(ids: number[], conexion: Conn
 }
 
 export async function sustituirCompetencias(empleadoId: number, competencias: Competencias, conexion: Connection): Promise<void> {
-  await conexion.query("DELETE FROM competencia WHERE empleado_id = ?", [empleadoId]);
+  if (competencias.length === 0) {
+    await conexion.query("DELETE FROM competencia WHERE empleado_id = ?", [empleadoId]);
+    return;
+  }
+  const ids = competencias.map((competencia) => competencia.servicio_id);
+  const marcadores = ids.map(() => "?").join(", ");
+  await conexion.query(
+    `DELETE FROM competencia WHERE empleado_id = ? AND servicio_id NOT IN (${marcadores})`,
+    [empleadoId, ...ids]
+  );
   for (const competencia of competencias) {
-    await conexion.query("INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES (?, ?, ?)",
+    // El duplicado solo cambia el nivel: conserva la duración y el margen propios.
+    await conexion.query(`INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE nivel = VALUES(nivel)`,
       [empleadoId, competencia.servicio_id, competencia.nivel]);
   }
 }
