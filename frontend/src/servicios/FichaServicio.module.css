@@ -38,6 +38,13 @@
   margin-bottom: var(--espacio-2);
 }
 
+.ayuda {
+  margin: 0 0 var(--espacio-2);
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 .principal {
   align-self: start;
   padding: var(--espacio-2) var(--espacio-3);

@@ -5,6 +5,7 @@ import { esAbortada, mensajeDeError } from "../peticion";
 import { useSesion } from "../sesion/useSesion";
 import { textosNivel } from "./textos";
 import { cambiarCompetencia } from "./cambiarCompetencia";
+import { necesitaAvisoAprendiz } from "./avisoAprendiz";
 import styles from "./CompetenciasEmpleado.module.css";
 
 type Props = { empleado: Empleado; servicios: Servicio[]; ocupado: boolean; onGuardar: (datos: Competencias) => Promise<void> };
@@ -49,15 +50,22 @@ export default function CompetenciasEmpleado({ empleado, servicios, ocupado, onG
       <fieldset className={styles.campos} disabled={!puedeGestionar || ocupado || guardando}>
         {grupos.map((grupo) => <div key={grupo.categoriaId ?? "sin-categoria"}>
           <h3 className={styles.subtitulo}>{grupo.nombre}</h3>
-          {grupo.servicios.map((servicio) => <div className={styles.fila} key={servicio.id}>
-            <label htmlFor={`${prefijo}-${servicio.id}`}>{servicio.nombre}</label>
-            <select id={`${prefijo}-${servicio.id}`} className={styles.campo}
-              value={competencias.find((competencia) => competencia.servicio_id === servicio.id)?.nivel ?? ""}
-              onChange={(evento) => cambiar(servicio.id, evento.target.value)}>
-              <option value="">—</option>
-              {esquemaNivel.options.map((nivel) => <option key={nivel} value={nivel}>{textosNivel[nivel]}</option>)}
-            </select>
-          </div>)}
+          {grupo.servicios.map((servicio) => {
+            const nivel = competencias.find((competencia) => competencia.servicio_id === servicio.id)?.nivel ?? null;
+            const mostrarAviso = necesitaAvisoAprendiz(nivel, servicio.dificultad);
+            return <div className={styles.fila} key={servicio.id}>
+              <label htmlFor={`${prefijo}-${servicio.id}`}>{servicio.nombre}</label>
+              <select id={`${prefijo}-${servicio.id}`} className={styles.campo}
+                value={nivel ?? ""}
+                aria-describedby={mostrarAviso ? `${prefijo}-aviso-${servicio.id}` : undefined}
+                onChange={(evento) => cambiar(servicio.id, evento.target.value)}>
+                <option value="">—</option>
+                {esquemaNivel.options.map((nivel) => <option key={nivel} value={nivel}>{textosNivel[nivel]}</option>)}
+              </select>
+              {mostrarAviso &&
+                <span id={`${prefijo}-aviso-${servicio.id}`} className={styles.aviso}>Dificultad alta para un aprendiz</span>}
+            </div>;
+          })}
         </div>)}
         {grupos.length === 0 && <p className={styles.ayuda}>No hay servicios activos.</p>}
         {puedeGestionar && <button type="submit" className={styles.principal}>{guardando ? "Guardando…" : "Guardar competencias"}</button>}

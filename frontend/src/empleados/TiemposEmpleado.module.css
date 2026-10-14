@@ -1,0 +1,65 @@
+.seccion {
+  min-width: 0;
+  padding: var(--espacio-4);
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+}
+
+.titulo {
+  margin: 0 0 var(--espacio-4);
+  font-size: 1.125rem;
+}
+
+.ayuda {
+  color: var(--color-texto-suave);
+  line-height: 1.5;
+}
+
+.desplazamiento {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+}
+
+.desplazamiento:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: var(--espacio-1);
+}
+
+.tabla {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.tabla caption {
+  padding: var(--espacio-3);
+  text-align: left;
+  color: var(--color-texto-suave);
+}
+
+.tabla th, .tabla td {
+  padding: var(--espacio-2);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-linea);
+}
+
+.historial {
+  margin-top: var(--espacio-4);
+}
+
+.historial summary {
+  cursor: pointer;
+}
+
+.historial ul {
+  padding-left: var(--espacio-4);
+  color: var(--color-texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.historial li {
+  padding: var(--espacio-2) 0;
+  border-bottom: 1px solid var(--color-linea);
+}

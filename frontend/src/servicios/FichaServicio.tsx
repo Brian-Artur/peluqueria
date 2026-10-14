@@ -1,7 +1,9 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
-import { esquemaDatosServicio, type Categoria, type DatosServicio, type Servicio } from "@peluqueria/compartido";
+import { esquemaDatosServicio, esquemaDificultad, type Categoria, type DatosServicio, type Dificultad, type Servicio } from "@peluqueria/compartido";
+import { opcionesMinutos } from "../catalogo/opcionesMinutos";
 import { mensajeDeError } from "../peticion";
 import { useSesion } from "../sesion/useSesion";
+import { textosDificultad } from "./textosDificultad";
 import styles from "./FichaServicio.module.css";
 
 type Props = {
@@ -17,6 +19,8 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
   const [nombre, setNombre] = useState(servicio?.nombre ?? "");
   const [categoriaId, setCategoriaId] = useState<number | null>(servicio?.categoria_id ?? null);
   const [duracion, setDuracion] = useState(String(servicio?.duracion_min ?? 30));
+  const [margen, setMargen] = useState(servicio?.margen_min ?? 0);
+  const [dificultad, setDificultad] = useState<Dificultad>(servicio?.dificultad ?? "media");
   const [precio, setPrecio] = useState(servicio?.precio ?? "0.00");
   const [activo, setActivo] = useState(servicio?.activo ?? true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +36,7 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
     setError(null);
     const resultado = esquemaDatosServicio.safeParse({
       nombre, categoria_id: categoriaId, duracion_min: Number(duracion),
-      precio: precio.replace(",", "."), activo,
+      precio: precio.replace(",", "."), activo, margen_min: margen, dificultad,
     });
     if (!resultado.success) {
       setError(resultado.error.issues.map((problema) => problema.message).join(". "));
@@ -74,6 +78,19 @@ function FichaServicio({ servicio, categorias, onGuardar }: Props): ReactElement
         <label htmlFor={`${prefijo}-duracion`}>Duración (minutos)</label>
         <input id={`${prefijo}-duracion`} className={styles.campo} type="number" min={5} max={600} step={5}
           value={duracion} onChange={(evento) => setDuracion(evento.target.value)} required />
+
+        <label htmlFor={`${prefijo}-margen`}>Margen (minutos)</label>
+        <select id={`${prefijo}-margen`} className={styles.campo} value={margen}
+          aria-describedby={`${prefijo}-nota-margen`} onChange={(evento) => setMargen(Number(evento.target.value))}>
+          {opcionesMinutos(0, 60).map((minutos) => <option key={minutos} value={minutos}>{minutos}</option>)}
+        </select>
+        <p id={`${prefijo}-nota-margen`} className={styles.ayuda}>preparación y limpieza; se suma al tiempo de cualquier empleado</p>
+
+        <label htmlFor={`${prefijo}-dificultad`}>Dificultad</label>
+        <select id={`${prefijo}-dificultad`} className={styles.campo} value={dificultad}
+          onChange={(evento) => setDificultad(esquemaDificultad.parse(evento.target.value))}>
+          {esquemaDificultad.options.map((valor) => <option key={valor} value={valor}>{textosDificultad[valor]}</option>)}
+        </select>
 
         <label htmlFor={`${prefijo}-precio`}>Precio (€)</label>
         <input id={`${prefijo}-precio`} className={styles.campo} inputMode="decimal" value={precio}

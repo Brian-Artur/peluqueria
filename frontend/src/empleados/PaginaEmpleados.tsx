@@ -3,25 +3,42 @@ import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { z } from "zod";
 import {
   esquemaEmpleado, esquemaEmpleadoResumen, esquemaServicio, esquemaCategoria, esquemaUsuario,
+  esquemaTiempoEmpleado, esquemaCambioTiempo,
   type Baja, type Competencias, type CrearEmpleado, type DatosEmpleado as Datos,
   type Empleado, type EmpleadoResumen, type NuevoContrato, type Servicio, type Usuario,
+  type CambioTiempo, type DatosTiempo, type TiempoEmpleado,
 } from "@peluqueria/compartido";
 import { esAbortada, mensajeDeError, pedir, pedirJson } from "../peticion";
 import { useSesion } from "../sesion/useSesion";
 import DatosEmpleado from "./DatosEmpleado";
 import ContratosEmpleado from "./ContratosEmpleado";
 import CompetenciasEmpleado from "./CompetenciasEmpleado";
+import TiemposEmpleado from "./TiemposEmpleado";
 import ListaEmpleados from "./ListaEmpleados";
 import styles from "./PaginaEmpleados.module.css";
 
 type Props = { nuevo?: boolean };
 type Detalle = { id: string; empleado: Empleado | null; error: string | null; revision: number };
+type DatosTiempos = { tiempos: TiempoEmpleado[]; historial: CambioTiempo[] };
+type DetalleTiempos = DatosTiempos & { id: string; error: string | null; revision: number };
+
+async function cargarTiempos(id: string, signal: AbortSignal): Promise<DatosTiempos> {
+  const url = `/api/empleados/${encodeURIComponent(id)}/tiempos`;
+  const [tiempos, historial] = await Promise.all([
+    pedirJson(url, z.array(esquemaTiempoEmpleado), { signal }),
+    pedirJson(`${url}/historial`, z.array(esquemaCambioTiempo), { signal }),
+  ]);
+  signal.throwIfAborted();
+  return { tiempos, historial };
+}
 
 export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement {
   const { puede } = useSesion();
   const puedeVer = puede("empleados:ver");
   const puedeGestionar = puede("empleados:gestionar");
   const puedeEnlazar = puede("usuarios:gestionar");
+  const puedeVerTiempos = puede("rendimiento:ver");
+  const puedeGestionarTiempos = puede("rendimiento:gestionar");
   const { id } = useParams<{ id: string }>();
   const navegar = useNavigate();
   const [empleados, setEmpleados] = useState<EmpleadoResumen[]>([]);
@@ -33,17 +50,19 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
   const [usuarios, setUsuarios] = useState<Usuario[] | null>(null);
   const [errorUsuarios, setErrorUsuarios] = useState<string | null>(null);
   const [detalle, setDetalle] = useState<Detalle | null>(null);
+  const [detalleTiempos, setDetalleTiempos] = useState<DetalleTiempos | null>(null);
   const [recargas, setRecargas] = useState(0);
   const [ocupado, setOcupado] = useState(false);
   const [confirmacion, setConfirmacion] = useState<{ id: string; mensaje: string } | null>(null);
   const mutaciones = useRef<AbortController | null>(null);
+  const cargaTiempos = useRef<AbortController | null>(null);
   const escribiendo = useRef(false);
 
   useEffect(() => {
     const controlador = new AbortController();
     mutaciones.current = controlador;
     return () => controlador.abort();
-  }, [id, nuevo]);
+  }, [id, nuevo, puedeGestionar, puedeVerTiempos, puedeGestionarTiempos]);
 
   useEffect(() => {
     if (!puedeVer) return;
@@ -121,6 +140,39 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
     return () => controlador.abort();
   }, [id, nuevo, puedeVer]);
 
+  useEffect(() => {
+    if (!puedeVer || !puedeVerTiempos || id === undefined || nuevo) return;
+    const controlador = new AbortController();
+    cargaTiempos.current = controlador;
+    const { signal } = controlador;
+    cargarTiempos(id, signal)
+      .then((datos) => {
+        if (!signal.aborted) setDetalleTiempos({ id, ...datos, error: null, revision: 0 });
+      })
+      .catch((fallo: unknown) => {
+        if (!signal.aborted && !esAbortada(fallo)) {
+          setDetalleTiempos({ id, tiempos: [], historial: [], error: mensajeDeError(fallo), revision: 0 });
+        }
+      });
+    return () => controlador.abort();
+  }, [id, nuevo, puedeVer, puedeVerTiempos]);
+
+  const refrescarTiempos = async (empleadoId: string, signal: AbortSignal): Promise<void> => {
+    // La carga inicial no debe sobrescribir los tiempos que acabamos de guardar.
+    cargaTiempos.current?.abort();
+    try {
+      const datos = await cargarTiempos(empleadoId, signal);
+      setDetalleTiempos((anterior) => ({
+        id: empleadoId, ...datos, error: null, revision: (anterior?.revision ?? 0) + 1,
+      }));
+    } catch (fallo) {
+      if (signal.aborted || esAbortada(fallo)) throw fallo;
+      const mensaje = `Los cambios se guardaron, pero no se pudieron refrescar los tiempos: ${mensajeDeError(fallo)}. Recarga la ficha.`;
+      setDetalleTiempos({ id: empleadoId, tiempos: [], historial: [], error: mensaje, revision: 0 });
+      throw new Error(mensaje, { cause: fallo });
+    }
+  };
+
   const crear = async (datos: CrearEmpleado): Promise<void> => {
     if (!puedeGestionar || !nuevo || escribiendo.current) return;
     const signal = mutaciones.current?.signal;
@@ -154,6 +206,9 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
       setRecargas((n) => n + 1);
       const actualizado = await pedirJson(url, esquemaEmpleado, { signal });
       signal?.throwIfAborted();
+      if (sufijo === "/competencias" && puedeVerTiempos && signal !== undefined) {
+        await refrescarTiempos(id, signal);
+      }
       setDetalle((anterior) => ({ id, empleado: actualizado, error: null, revision: (anterior?.revision ?? 0) + 1 }));
       setConfirmacion({ id, mensaje: "Cambios guardados." });
     } finally {
@@ -165,6 +220,25 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
   const nuevoContrato = (datos: NuevoContrato): Promise<void> => escribir("/contratos", "POST", datos);
   const darDeBaja = (datos: Baja): Promise<void> => escribir("/baja", "POST", datos);
   const guardarCompetencias = (datos: Competencias): Promise<void> => escribir("/competencias", "PUT", datos);
+
+  const guardarTiempo = async (servicioId: number, datos: DatosTiempo): Promise<void> => {
+    const signal = mutaciones.current?.signal;
+    if (!puedeGestionarTiempos || id === undefined || signal === undefined || escribiendo.current) return;
+    escribiendo.current = true;
+    setOcupado(true);
+    setConfirmacion(null);
+    try {
+      await pedir(`/api/empleados/${encodeURIComponent(id)}/tiempos/${servicioId}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos), signal,
+      });
+      signal.throwIfAborted();
+      await refrescarTiempos(id, signal);
+      setConfirmacion({ id, mensaje: "Tiempos guardados." });
+    } finally {
+      escribiendo.current = false;
+      setOcupado(false);
+    }
+  };
 
   if (!puedeVer) return <Navigate to="/agenda" replace />;
   if (nuevo && !puedeGestionar) return <Navigate to="/empleados" replace />;
@@ -181,6 +255,17 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
     } else if (detalle.empleado !== null) {
       const empleado = detalle.empleado;
       const bloqueado = ocupado || cargando || errorLista !== null;
+      let seccionTiempos: ReactElement | null = null;
+      if (puedeVerTiempos) {
+        if (detalleTiempos?.id !== id) {
+          seccionTiempos = <p role="status" className={styles.ayuda}>Cargando tiempos…</p>;
+        } else if (detalleTiempos.error !== null) {
+          seccionTiempos = <p role="alert" className={styles.error}>No se pudieron cargar los tiempos: {detalleTiempos.error}</p>;
+        } else {
+          seccionTiempos = <TiemposEmpleado tiempos={detalleTiempos.tiempos} historial={detalleTiempos.historial}
+            revision={detalleTiempos.revision} ocupado={bloqueado} onGuardar={guardarTiempo} />;
+        }
+      }
       // Reiniciar los formularios con la ficha recibida evita conservar valores anteriores al guardado.
       ficha = <div key={`${id}-${detalle.revision}`} className={styles.ficha}>
         <DatosEmpleado empleado={empleado} empleados={empleados} usuarios={usuarios} errorUsuarios={errorUsuarios}
@@ -188,6 +273,7 @@ export default function PaginaEmpleados({ nuevo = false }: Props): ReactElement 
         <ContratosEmpleado empleado={empleado} empleados={empleados} ocupado={bloqueado} onContrato={nuevoContrato} onBaja={darDeBaja} />
         {servicios === null ? <p className={styles.ayuda}>Las competencias necesitan el catálogo de servicios.</p> :
           <CompetenciasEmpleado empleado={empleado} servicios={servicios} ocupado={bloqueado} onGuardar={guardarCompetencias} />}
+        {seccionTiempos}
       </div>;
     }
   }

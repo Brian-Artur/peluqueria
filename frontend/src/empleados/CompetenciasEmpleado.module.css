@@ -63,3 +63,9 @@ button:disabled, .campos:disabled button {
   gap: var(--espacio-2);
   margin-bottom: var(--espacio-2);
 }
+
+.aviso {
+  grid-column: 1 / -1;
+  color: var(--color-acento);
+  font-size: 0.875rem;
+}
