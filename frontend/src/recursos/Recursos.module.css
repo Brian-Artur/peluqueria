@@ -1,3 +1,10 @@
+.recursos {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .herramientas {
   display: flex;
   flex-wrap: wrap;
@@ -8,9 +15,15 @@
 
 .distribucion {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: var(--espacio-5);
   align-items: start;
+  flex: 1;
+  min-height: 0;
+}
+
+.lista {
+  min-width: 0;
 }
 
 .ficha {
@@ -37,7 +50,7 @@
   color: var(--color-error);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .distribucion {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -105,19 +105,22 @@ export default function Horario(): ReactElement {
     await ejecutarEscritura(() => pedir(`/api/excepciones/${id}`, { method: "DELETE" }));
   };
 
-  return <section className={styles.seccion} aria-labelledby="titulo-horario">
-    <h2 id="titulo-horario">Horario</h2>
+  return <div className={styles.horario}>
     {error && <p role="alert" className={styles.error}>{error}</p>}
     {error && <button type="button" disabled={cargando} onClick={() => setIntento((anterior) => anterior + 1)}>Recargar horario</button>}
     {cargando && <p role="status">Cargando horario…</p>}
     {guardado && <p role="status" className={styles.confirmacion}>Cambios guardados.</p>}
     {datos && <fieldset className={styles.contenido} disabled={cargando}>
-      <DatosSalon key={`local-${revision}`} local={datos.local} onGuardar={guardarLocal} />
-      <HorarioGeneral key={`general-${revision}`} general={datos.horario.general} onGuardar={guardarGeneral} />
-      <Temporadas temporadas={datos.horario.temporadas} revision={revision}
-        onGuardarDatos={guardarTemporada} onGuardarHorario={guardarSemanaTemporada} />
-      <Excepciones excepciones={datos.horario.excepciones} revision={revision}
-        onGuardar={guardarExcepcion} onEliminar={eliminarExcepcion} />
+      <div className={styles.columna}>
+        <DatosSalon key={`local-${revision}`} local={datos.local} onGuardar={guardarLocal} />
+        <HorarioGeneral key={`general-${revision}`} general={datos.horario.general} onGuardar={guardarGeneral} />
+      </div>
+      <div className={styles.columna}>
+        <Temporadas temporadas={datos.horario.temporadas} revision={revision}
+          onGuardarDatos={guardarTemporada} onGuardarHorario={guardarSemanaTemporada} />
+        <Excepciones excepciones={datos.horario.excepciones} revision={revision}
+          onGuardar={guardarExcepcion} onEliminar={eliminarExcepcion} />
+      </div>
     </fieldset>}
-  </section>;
+  </div>;
 }

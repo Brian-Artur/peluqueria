@@ -82,24 +82,25 @@ function Recursos(): ReactElement {
   }
 
   return (
-    <section aria-labelledby="titulo-recursos">
-      <h2 id="titulo-recursos">Recursos</h2>
+    <div className={styles.recursos}>
       {error !== null && <p role="alert" className={styles.error}>{error}</p>}
       {cargando && <p role="status" className={styles.ayuda}>Cargando recursos…</p>}
       {cargado && <>
         <GestionTipos tipos={tipos} onGuardar={guardarTipo} />
-        <div className={styles.herramientas}>
-          <label><input type="checkbox" checked={mostrarBajas}
-            onChange={(evento) => setMostrarBajas(evento.target.checked)} /> Mostrar dados de baja</label>
-          {puede("local:gestionar") && <button type="button" className={styles.principal}
-            onClick={() => setSeleccion("nuevo")}>Nuevo recurso</button>}
-        </div>
         <div className={styles.distribucion}>
-          <ListaRecursos recursos={recursos} mostrarBajas={mostrarBajas} seleccion={seleccion} onSeleccionar={setSeleccion} />
+          <div className={styles.lista}>
+            <div className={styles.herramientas}>
+              <label><input type="checkbox" checked={mostrarBajas}
+                onChange={(evento) => setMostrarBajas(evento.target.checked)} /> Mostrar dados de baja</label>
+              {puede("local:gestionar") && <button type="button" className={styles.principal}
+                onClick={() => setSeleccion("nuevo")}>Nuevo recurso</button>}
+            </div>
+            <ListaRecursos recursos={recursos} mostrarBajas={mostrarBajas} seleccion={seleccion} onSeleccionar={setSeleccion} />
+          </div>
           <aside className={styles.ficha} aria-label="Ficha del recurso">{ficha}</aside>
         </div>
       </>}
-    </section>
+    </div>
   );
 }
 

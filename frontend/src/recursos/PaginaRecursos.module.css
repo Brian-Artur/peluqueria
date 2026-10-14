@@ -1,0 +1,11 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.titulo {
+  margin: 0 0 var(--espacio-5);
+  font-size: 1.75rem;
+}
