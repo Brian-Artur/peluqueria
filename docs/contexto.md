@@ -6,9 +6,9 @@ Actualizado: **14/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v4.2.0` (14/10/2026): duraciones y márgenes por empleado, dificultad del servicio, historial de cambios. |
-| **En curso** | **v4.3** (recursos) y **v4.4** (horario del local) completas; pendientes de tag. Siguiente: v4.5 turnos y ausencias. |
-| **Siguiente** | v4.4 horario del local · v4.5 turnos y ausencias · v4.6 bloqueos. Después, v5. |
+| **Última versión cerrada** | `v4.4.0` (14/10/2026): horario del local (temporadas, excepciones); antes `v4.3.0`, recursos físicos. |
+| **En curso** | **v4.4.1**: Horario y Recursos en dos pantallas a pantalla completa. |
+| **Siguiente** | v4.5 turnos · v4.6 ausencias · v4.7 bloqueos · v4.8 plano del local · v4.9 incidencias de clientes. Detalle en el roadmap. |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
 ## Para retomar
