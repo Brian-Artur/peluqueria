@@ -66,9 +66,7 @@ Se deciden de una en una, cuando toque.
 | Decisión | Cuándo |
 |---|---|
 | Dónde y cómo desplegar (máquina virtual del portátil u otro ordenador; si se usa `dev.artesaniaartur.es`, por ruta o por subdominio) | Despliegue |
-| Autenticación: sesión con cookie o token; cuántos roles | v4.0 |
 | ¿El cliente puede elegir empleado o solo expresar preferencia? | v4 |
 | ¿Alguien en prácticas puede hacer algún servicio sin tutor? | v4 |
-| ¿Qué cubre el margen de un servicio (retraso, limpieza, cambio de cliente)? | v4 |
 | Arrastrar citas: confirmar dnd-kit | v6 |
 | Plano: SVG a mano + dnd-kit, o React Flow | v10 |
