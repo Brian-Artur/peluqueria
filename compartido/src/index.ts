@@ -8,3 +8,4 @@ export * from "./inicioEnFranja";
 export * from "./telefono";
 export * from "./usuario";
 export * from "./permisos";
+export * from "./empleado";

@@ -21,6 +21,44 @@ INSERT INTO servicio (nombre, categoria_id, duracion_min, precio) VALUES
   ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'), 30, 15.00),
   ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'), 45, 20.00);
 
+INSERT INTO servicio (nombre, categoria_id, duracion_min, precio) VALUES
+  ('Depilación láser', (SELECT id FROM categoria_servicio WHERE nombre = 'Depilación'), 45, 50.00);
+
+INSERT INTO empleado (nombre, telefono, email, usuario_id, activo) VALUES
+  ('Ana Martín', '+34610111222', 'ana@example.com', (SELECT id FROM usuario WHERE nombre_usuario = 'empleado'), TRUE),
+  ('Beatriz Soto', '+34610333444', 'beatriz@example.com', NULL, TRUE),
+  ('Clara Gil', NULL, 'clara@example.com', NULL, TRUE),
+  ('Diego Vega', '+34610555666', 'diego@example.com', NULL, TRUE),
+  ('Elena Ruiz', NULL, NULL, NULL, FALSE);
+
+SET @ana = (SELECT id FROM empleado WHERE nombre = 'Ana Martín');
+SET @beatriz = (SELECT id FROM empleado WHERE nombre = 'Beatriz Soto');
+SET @clara = (SELECT id FROM empleado WHERE nombre = 'Clara Gil');
+SET @diego = (SELECT id FROM empleado WHERE nombre = 'Diego Vega');
+SET @elena = (SELECT id FROM empleado WHERE nombre = 'Elena Ruiz');
+
+INSERT INTO contrato_empleado (empleado_id, tipo, desde, hasta, tutor_id, empresa) VALUES
+  (@ana, 'plantilla', '2025-01-01', NULL, NULL, NULL),
+  (@beatriz, 'prueba', '2026-01-01', '2026-03-31', NULL, NULL),
+  (@beatriz, 'plantilla', '2026-04-01', NULL, NULL, NULL),
+  (@clara, 'practicas', '2026-09-01', NULL, @ana, NULL),
+  (@diego, 'externo', '2026-02-01', NULL, NULL, 'Láser Demo'),
+  (@elena, 'plantilla', '2025-02-01', '2026-08-31', NULL, NULL);
+
+SET @corte = (SELECT id FROM servicio WHERE nombre = 'Corte de pelo');
+SET @manicura = (SELECT id FROM servicio WHERE nombre = 'Manicura');
+SET @laser = (SELECT id FROM servicio WHERE nombre = 'Depilación láser');
+
+INSERT INTO competencia (empleado_id, servicio_id, nivel) VALUES
+  (@ana, @corte, 'experto'),
+  (@ana, @manicura, 'autonomo'),
+  (@beatriz, @corte, 'autonomo'),
+  (@beatriz, @manicura, 'experto'),
+  (@clara, @corte, 'aprendiz'),
+  (@clara, @manicura, 'aprendiz'),
+  (@diego, @laser, 'experto'),
+  (@elena, @manicura, 'autonomo');
+
 -- Citas repartidas en una semana. inicio + fin coherentes con la duración
 -- del servicio, pero congelados en la propia cita (patrón snapshot).
 -- Los DATETIME están en UTC; en julio, la hora de España peninsular es UTC +2 h.

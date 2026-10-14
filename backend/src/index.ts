@@ -9,6 +9,7 @@ import { manejadorErrores } from "./middleware/errores";
 import { requiereSesion } from "./middleware/requiereSesion";
 import { inicioSesionRouter, sesionRouter } from "./routes/sesion";
 import { usuariosRouter } from "./routes/usuarios";
+import { empleadosRouter } from "./routes/empleados";
 
 const app = express();
 // 3100 y no 3000: el 3000 lo usa bot_trading en la misma máquina
@@ -21,6 +22,7 @@ app.use("/api", inicioSesionRouter);
 app.use("/api", requiereSesion);
 app.use("/api", sesionRouter);
 app.use("/api", usuariosRouter);
+app.use("/api", empleadosRouter);
 app.use("/api", serviciosRouter);
 app.use("/api", categoriasRouter);
 app.use("/api", clientesRouter);
