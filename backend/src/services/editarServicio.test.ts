@@ -1,0 +1,49 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { ErrorConflicto, ErrorNoEncontrado } from "../errores";
+import { editarServicio } from "./editarServicio";
+
+const dobles = vi.hoisted(() => ({ buscarServicio: vi.fn(), buscarCategoria: vi.fn(), actualizar: vi.fn() }));
+vi.mock("../repositories/categoriaRepository", () => ({ buscarCategoriaPorId: dobles.buscarCategoria }));
+vi.mock("../repositories/servicioRepository", () => ({
+  findServicioById: dobles.buscarServicio, actualizarServicio: dobles.actualizar,
+}));
+afterEach(() => vi.resetAllMocks());
+
+const datos = { nombre: "Corte", categoria_id: 2, duracion_min: 45, precio: "20.00", activo: true };
+const anterior = { ...datos, id: 1, categoria_nombre: "Pelo", duracion_min: 30, precio: "15.00" };
+
+describe("editar un servicio", () => {
+  it("rechaza un servicio inexistente con 404", async () => {
+    dobles.buscarServicio.mockResolvedValue(null);
+    await expect(editarServicio(99, datos)).rejects.toThrow(ErrorNoEncontrado);
+    expect(dobles.actualizar).not.toHaveBeenCalled();
+  });
+
+  it("conserva la categoría anterior aunque se haya desactivado", async () => {
+    dobles.buscarServicio.mockResolvedValue(anterior);
+    await editarServicio(1, datos);
+    expect(dobles.buscarCategoria).not.toHaveBeenCalled();
+    expect(dobles.actualizar).toHaveBeenCalledWith(1, datos);
+  });
+
+  it("permite cambiar a una categoría activa", async () => {
+    dobles.buscarServicio.mockResolvedValue(anterior);
+    dobles.buscarCategoria.mockResolvedValue({ id: 3, nombre: "Estética", activa: true });
+    await editarServicio(1, { ...datos, categoria_id: 3 });
+    expect(dobles.actualizar).toHaveBeenCalledWith(1, { ...datos, categoria_id: 3 });
+  });
+
+  it("impide cambiar a una categoría inactiva", async () => {
+    dobles.buscarServicio.mockResolvedValue(anterior);
+    dobles.buscarCategoria.mockResolvedValue({ id: 3, nombre: "Estética", activa: false });
+    await expect(editarServicio(1, { ...datos, categoria_id: 3 })).rejects.toThrow(ErrorConflicto);
+    expect(dobles.actualizar).not.toHaveBeenCalled();
+  });
+
+  it("permite quitar la categoría y desactivar sin borrar", async () => {
+    dobles.buscarServicio.mockResolvedValue(anterior);
+    await editarServicio(1, { ...datos, categoria_id: null, activo: false });
+    expect(dobles.actualizar).toHaveBeenCalledWith(1, { ...datos, categoria_id: null, activo: false });
+    expect(dobles.buscarCategoria).not.toHaveBeenCalled();
+  });
+});

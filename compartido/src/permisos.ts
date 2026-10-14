@@ -7,6 +7,7 @@ export const esquemaPermiso = z.enum([
   "citas:completar",
   "clientes:ver",
   "clientes:gestionar",
+  "servicios:gestionar",
   "usuarios:gestionar",
   "sesion:contrasena",
 ]);
@@ -21,6 +22,7 @@ export const rolesPorPermiso: Record<Permiso, Rol[]> = {
   "citas:completar": ["admin", "encargado", "recepcion", "empleado"],
   "clientes:ver": ["admin", "encargado", "recepcion", "empleado"],
   "clientes:gestionar": ["admin", "encargado", "recepcion"],
+  "servicios:gestionar": ["admin", "encargado"],
   "usuarios:gestionar": ["admin"],
   "sesion:contrasena": ["admin", "encargado", "recepcion", "empleado"],
 };

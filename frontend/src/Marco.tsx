@@ -30,6 +30,7 @@ function Marco(): ReactElement {
         <nav className={styles.navegacion} aria-label="Navegación principal">
           {puede("citas:ver") && <NavLink to="/agenda" className={styles.enlace}>Agenda</NavLink>}
           {puede("clientes:ver") && <NavLink to="/clientes" className={styles.enlace}>Clientes</NavLink>}
+          {puede("citas:ver") && <NavLink to="/servicios" className={styles.enlace}>Servicios</NavLink>}
           {puede("usuarios:gestionar") && <NavLink to="/usuarios" className={styles.enlace}>Usuarios</NavLink>}
         </nav>
         {usuario !== null && (

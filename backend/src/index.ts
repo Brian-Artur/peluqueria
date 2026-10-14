@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { healthRouter } from "./routes/health";
 import { serviciosRouter } from "./routes/servicios";
+import { categoriasRouter } from "./routes/categorias";
 import { clientesRouter } from "./routes/clientes";
 import { citasRouter } from "./routes/citas";
 import { manejadorErrores } from "./middleware/errores";
@@ -21,6 +22,7 @@ app.use("/api", requiereSesion);
 app.use("/api", sesionRouter);
 app.use("/api", usuariosRouter);
 app.use("/api", serviciosRouter);
+app.use("/api", categoriasRouter);
 app.use("/api", clientesRouter);
 app.use("/api", citasRouter);
 

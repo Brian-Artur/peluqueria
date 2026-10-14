@@ -8,6 +8,7 @@ import RutasProtegidas from "./sesion/RutasProtegidas";
 import PaginaEntrar from "./sesion/PaginaEntrar";
 import PaginaMiCuenta from "./sesion/PaginaMiCuenta";
 import PaginaUsuarios from "./usuarios/PaginaUsuarios";
+import PaginaServicios from "./servicios/PaginaServicios";
 
 function App(): ReactElement {
   return (
@@ -22,6 +23,9 @@ function App(): ReactElement {
               <Route path="/clientes" element={<PaginaClientes />} />
               <Route path="/clientes/nuevo" element={<PaginaClientes nuevo />} />
               <Route path="/clientes/:id" element={<PaginaClientes />} />
+              <Route path="/servicios" element={<PaginaServicios />} />
+              <Route path="/servicios/nuevo" element={<PaginaServicios nuevo />} />
+              <Route path="/servicios/:id" element={<PaginaServicios />} />
               <Route path="/usuarios" element={<PaginaUsuarios />} />
               <Route path="/usuarios/nuevo" element={<PaginaUsuarios nuevo />} />
               <Route path="/usuarios/:id" element={<PaginaUsuarios />} />

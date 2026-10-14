@@ -2,6 +2,7 @@
 export * from "./cita";
 export * from "./cliente";
 export * from "./servicio";
+export * from "./categoria";
 export * from "./error";
 export * from "./inicioEnFranja";
 export * from "./telefono";

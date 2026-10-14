@@ -14,9 +14,12 @@ INSERT INTO cliente (nombre, telefono) VALUES
   ('Lucía Fernández',  '+34600555666'),
   ('Javier Moreno',    NULL);
 
-INSERT INTO servicio (nombre, duracion_min, precio) VALUES
-  ('Corte de pelo', 30, 15.00),
-  ('Manicura',      45, 20.00);
+INSERT INTO categoria_servicio (nombre) VALUES
+  ('Pelo'), ('Uñas'), ('Maquillaje'), ('Estética'), ('Depilación'), ('Masaje');
+
+INSERT INTO servicio (nombre, categoria_id, duracion_min, precio) VALUES
+  ('Corte de pelo', (SELECT id FROM categoria_servicio WHERE nombre = 'Pelo'), 30, 15.00),
+  ('Manicura', (SELECT id FROM categoria_servicio WHERE nombre = 'Uñas'), 45, 20.00);
 
 -- Citas repartidas en una semana. inicio + fin coherentes con la duración
 -- del servicio, pero congelados en la propia cita (patrón snapshot).
