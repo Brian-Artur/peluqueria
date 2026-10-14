@@ -11,3 +11,4 @@ export * from "./permisos";
 export * from "./empleado";
 export * from "./tiempos";
 export * from "./recurso";
+export * from "./horario";

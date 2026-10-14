@@ -13,6 +13,17 @@ import { empleadosRouter } from "./routes/empleados";
 
 import { tiposRecursoRouter } from "./routes/tiposRecurso";
 import { recursosRouter } from "./routes/recursos";
+import { obtenerLocalRouter } from "./routes/obtenerLocal";
+import { editarLocalRouter } from "./routes/editarLocal";
+import { obtenerHorarioRouter } from "./routes/obtenerHorario";
+import { obtenerSemanaHorarioRouter } from "./routes/obtenerSemanaHorario";
+import { reemplazarHorarioGeneralRouter } from "./routes/reemplazarHorarioGeneral";
+import { crearTemporadaRouter } from "./routes/crearTemporada";
+import { editarTemporadaRouter } from "./routes/editarTemporada";
+import { reemplazarHorarioTemporadaRouter } from "./routes/reemplazarHorarioTemporada";
+import { crearExcepcionRouter } from "./routes/crearExcepcion";
+import { editarExcepcionRouter } from "./routes/editarExcepcion";
+import { eliminarExcepcionRouter } from "./routes/eliminarExcepcion";
 
 const app = express();
 // 3100 y no 3000: el 3000 lo usa bot_trading en la misma máquina
@@ -30,6 +41,17 @@ app.use("/api", serviciosRouter);
 app.use("/api", categoriasRouter);
 app.use("/api", tiposRecursoRouter);
 app.use("/api", recursosRouter);
+app.use("/api", obtenerLocalRouter);
+app.use("/api", editarLocalRouter);
+app.use("/api", obtenerHorarioRouter);
+app.use("/api", obtenerSemanaHorarioRouter);
+app.use("/api", reemplazarHorarioGeneralRouter);
+app.use("/api", crearTemporadaRouter);
+app.use("/api", editarTemporadaRouter);
+app.use("/api", reemplazarHorarioTemporadaRouter);
+app.use("/api", crearExcepcionRouter);
+app.use("/api", editarExcepcionRouter);
+app.use("/api", eliminarExcepcionRouter);
 app.use("/api", clientesRouter);
 app.use("/api", citasRouter);
 

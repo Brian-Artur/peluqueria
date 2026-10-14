@@ -1,5 +1,24 @@
 -- Semilla v1: datos de demostración inventados
 
+-- El horario general ya viene de las migraciones; el resto sigue el año de las citas demo.
+INSERT INTO temporada (nombre, desde, hasta, activa)
+VALUES ('Verano', '2026-07-01', '2026-08-31', TRUE);
+SET @verano = LAST_INSERT_ID();
+INSERT INTO horario_tramo (temporada_id, dia_semana, abre, cierra) VALUES
+  (@verano, 2, '08:00:00', '15:00:00'),
+  (@verano, 3, '08:00:00', '15:00:00'),
+  (@verano, 4, '08:00:00', '15:00:00'),
+  (@verano, 5, '08:00:00', '15:00:00'),
+  (@verano, 6, '08:00:00', '15:00:00');
+
+INSERT INTO excepcion_horario (fecha, cerrado, motivo)
+VALUES ('2026-08-15', TRUE, 'Festivo: Asunción');
+INSERT INTO excepcion_horario (fecha, cerrado, motivo)
+VALUES ('2026-07-12', FALSE, 'Bodas');
+SET @bodas = LAST_INSERT_ID();
+INSERT INTO excepcion_tramo (excepcion_id, abre, cierra)
+VALUES (@bodas, '09:00:00', '14:00:00');
+
 -- Solo para desarrollo: un usuario por rol, todos con contraseña demo1234.
 -- Hashes generados con cifrarContrasena; cada contraseña tiene su propia sal.
 INSERT INTO usuario (nombre_usuario, nombre, hash_contrasena, rol) VALUES

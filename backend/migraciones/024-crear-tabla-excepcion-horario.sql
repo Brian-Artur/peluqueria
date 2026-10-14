@@ -1,0 +1,6 @@
+CREATE TABLE excepcion_horario (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  fecha DATE NOT NULL UNIQUE,
+  cerrado BOOLEAN NOT NULL,
+  motivo VARCHAR(200) NULL
+);
