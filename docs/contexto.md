@@ -7,7 +7,7 @@ Actualizado: **14/10/2026**
 | | |
 |---|---|
 | **Última versión cerrada** | `v4.0.0` (14/10/2026): usuarios y roles — sesiones con cookie, permisos por rol, pantallas de entrada, usuarios y mi cuenta. |
-| **En curso** | **v4.1a: catálogo** (categorías editables y servicios). Después v4.1b: empleados y competencias. |
+| **En curso** | **v4.1** completa (catálogo con categorías, empleados con historial de contratos y competencias, cuadro resumen); pendiente de revisión y del tag `v4.1.0`. |
 | **Siguiente** | v4.2 duraciones por empleado; después recursos, horarios, turnos, ausencias y bloqueos. |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 

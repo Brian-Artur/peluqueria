@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v3.0)
+# Arquitectura — cómo está construido hoy (v4.1)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -21,7 +21,12 @@ MariaDB 12 en Docker, puerto `127.0.0.1:3305` (solo loopback). Docker solo crea 
 | Tabla | Columnas | Notas |
 |---|---|---|
 | `cliente` | id, nombre, telefono, email, notas | Todo opcional salvo el nombre. Teléfono como **texto** en E.164 (`+34612345678`). |
-| `servicio` | id, nombre, duracion_min, precio | Catálogo. `precio` aún no se usa. |
+| `usuario`, `sesion` | quien entra en la app y sus sesiones | Rol (admin, encargado, recepción, empleado). La sesión guarda el SHA-256 del token. |
+| `categoria_servicio` | id, nombre, activa | Editable; se desactiva, no se borra. |
+| `empleado` | id, nombre, telefono, email, usuario_id, activo | Quien trabaja en el salón; enlace opcional a un usuario. |
+| `contrato_empleado` | tipo, desde, hasta, tutor_id, empresa | Historial; el vigente no tiene `hasta`. |
+| `competencia` | empleado_id, servicio_id, nivel | aprendiz / autonomo / experto. |
+| `servicio` | id, nombre, categoria_id, duracion_min, precio, activo | Catálogo. Cambiarlo no altera citas ya creadas. |
 | `cita` | id, cliente_id, servicio_id, inicio, fin, estado | FK a cliente y servicio. |
 
 - `estado` es un ENUM `reservada` / `cancelada` / `completada`: **máquina de estados** y soft-delete (cancelar no borra).
@@ -68,6 +73,9 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 | `App.tsx`, `Marco.tsx` | Rutas con React Router (`/agenda`, `/clientes`, `/clientes/nuevo`, `/clientes/:id`) y barra de navegación. |
 | `clientes/PaginaClientes.tsx` | Pantalla de clientes: dueña de la lista y la búsqueda (espera 300 ms; cada búsqueda cancela la anterior con `AbortController`); el cliente abierto sale de la URL. |
 | `clientes/ListaClientes.tsx`, `FichaCliente.tsx`, `CampoTelefono.tsx` | Filas compactas con notas desplegables; formulario validado con el contrato; prefijo + número. |
+| `sesion/`, `usuarios/` | Entrada, rutas protegidas, gestión de usuarios (admin) y mi cuenta. |
+| `servicios/` | Catálogo agrupado por categoría y gestión de categorías (admin y encargado). |
+| `empleados/` | Ficha del empleado (datos, historial de contratos, competencias) y cuadro empleados × servicios con avisos de huecos. |
 | `Calendario.tsx` | Dueño del estado (`citas`, `clientes`, `servicios`, `lunesVisible`, `seleccion`) y de los fetch. |
 | `calendario/CabeceraDias.tsx` | Semana ISO, días con su número y flechas de semana anterior / siguiente. |
 | `calendario/Rejilla.tsx`, `FilaHora.tsx`, `CeldaHora.tsx` | Horas y celdas de una hora. Al pulsar, la franja de 5 min bajo el ratón (resaltada al pasar por encima); marcan la franja seleccionada. |
