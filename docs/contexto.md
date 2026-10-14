@@ -2,12 +2,12 @@
 
 > **Este archivo se reescribe, no se amplía.** Solo el estado de ahora. Lo que deja de ser cierto se borra; la historia vive en los tags y commits de Git. Lo estable está en los demás documentos de `docs/`.
 
-Actualizado: **13/10/2026**
+Actualizado: **14/10/2026**
 
 | | |
 |---|---|
 | **Última versión cerrada** | `v4.0.0` (14/10/2026): usuarios y roles — sesiones con cookie, permisos por rol, pantallas de entrada, usuarios y mi cuenta. |
-| **En curso** | **v4.1: empleados y competencias** — primeras decisiones de modelo. |
+| **En curso** | **v4.1a: catálogo** (categorías editables y servicios). Después v4.1b: empleados y competencias. |
 | **Siguiente** | v4.2 duraciones por empleado; después recursos, horarios, turnos, ausencias y bloqueos. |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
