@@ -1,0 +1,79 @@
+.pagina {
+  min-width: 0;
+}
+.enlace, .nombre a {
+  color: var(--color-acento);
+}
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+  margin: var(--espacio-4) 0;
+}
+.leyenda span {
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: var(--radio);
+}
+.aprendiz {
+  background: var(--color-nivel-aprendiz);
+}
+.autonomo {
+  background: var(--color-nivel-autonomo);
+}
+.experto {
+  background: var(--color-nivel-experto);
+  color: var(--color-sobre-nivel-experto);
+}
+.ayuda {
+  color: var(--color-texto-suave);
+}
+.error {
+  color: var(--color-error);
+}
+.desplazamiento {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--color-linea);
+  border-radius: var(--radio);
+}
+.desplazamiento:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: var(--espacio-1);
+}
+.tabla {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 100%;
+}
+.tabla caption {
+  text-align: left;
+  padding: var(--espacio-3);
+  color: var(--color-texto-suave);
+}
+.tabla th, .tabla td {
+  padding: var(--espacio-3);
+  border-right: 1px solid var(--color-linea);
+  border-bottom: 1px solid var(--color-linea);
+  text-align: center;
+  min-width: 115px;
+}
+.tabla thead th, .tabla tfoot th {
+  background: var(--color-superficie);
+}
+.tabla .nombre {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 180px;
+  text-align: left;
+  background: var(--color-superficie);
+}
+.tabla thead .nombre {
+  z-index: 2;
+}
+.aviso {
+  color: var(--color-acento);
+  background: var(--color-acento-tinte);
+  font-weight: 600;
+  white-space: nowrap;
+}

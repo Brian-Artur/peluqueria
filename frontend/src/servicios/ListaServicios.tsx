@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router";
 import type { Servicio } from "@peluqueria/compartido";
-import { agruparServicios } from "./agruparServicios";
+import { agruparServicios } from "../catalogo/agruparServicios";
 import { formatearPrecio } from "./formatearPrecio";
 import styles from "./ListaServicios.module.css";
 

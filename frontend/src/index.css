@@ -10,6 +10,10 @@
   --color-acento-tinte: #F1E7F2;
   --color-ok: #2F7A72;
   --color-ok-tinte: #E1F1EE;
+  --color-nivel-aprendiz: var(--color-acento-tinte);
+  --color-nivel-autonomo: var(--color-ok-tinte);
+  --color-nivel-experto: var(--color-ok);
+  --color-sobre-nivel-experto: var(--color-sobre-acento);
   --color-error: #B00020;
   --color-sobre-error: #FFFFFF;
   --espacio-1: 4px;
