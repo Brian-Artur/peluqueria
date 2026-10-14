@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { columnaDeFecha, filaDeHora, franjaEnPosicion } from "./posicion";
+import { columnaDeFecha, filaDeHora, filasDeCita, franjaEnPosicion } from "./posicion";
 
 describe("columnaDeFecha", () => {
   it.each([
@@ -23,7 +23,28 @@ describe("filaDeHora", () => {
     { hora: 9, minuto: 5, fila: 3 },
     { hora: 19, minuto: 55, fila: 133 },
   ])("devuelve la fila $fila a las $hora horas y $minuto minutos", ({ hora, minuto, fila }) => {
-    expect(filaDeHora(new Date(2026, 9, 12, hora, minuto))).toBe(fila);
+    expect(filaDeHora(new Date(2026, 9, 12, hora, minuto), 9)).toBe(fila);
+  });
+});
+
+describe("filaDeHora con otro rango", () => {
+  it("sitúa las 8:00 en la primera franja y las 14:55 en la última del rango 8–15", () => {
+    expect(filaDeHora(new Date(2026, 9, 12, 8), 8)).toBe(2);
+    expect(filaDeHora(new Date(2026, 9, 12, 14, 55), 8)).toBe(85);
+  });
+});
+
+describe("filasDeCita", () => {
+  it("no crea filas implícitas para citas anteriores o posteriores al rango 8–15", () => {
+    expect(filasDeCita(new Date(2026, 9, 12, 7), new Date(2026, 9, 12, 8), 8, 84)).toBeNull();
+    expect(filasDeCita(new Date(2026, 9, 12, 15), new Date(2026, 9, 12, 16), 8, 84)).toBeNull();
+  });
+  it("recorta únicamente la parte que se sale del rango", () => {
+    expect(filasDeCita(new Date(2026, 9, 12, 7, 30), new Date(2026, 9, 12, 8, 30), 8, 84)).toEqual({ inicio: 2, fin: 8 });
+    expect(filasDeCita(new Date(2026, 9, 12, 14, 30), new Date(2026, 9, 12, 15, 30), 8, 84)).toEqual({ inicio: 80, fin: 86 });
+  });
+  it("calcula el final de una cita que cruza medianoche", () => {
+    expect(filasDeCita(new Date(2026, 9, 12, 23, 30), new Date(2026, 9, 13, 0, 30), 0, 288)).toEqual({ inicio: 284, fin: 290 });
   });
 });
 

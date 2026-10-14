@@ -1,16 +1,18 @@
 import { useState, type ReactElement } from "react";
-import { DIAS_APERTURA } from "./constantes";
+import type { DiaResuelto } from "@peluqueria/compartido";
+import { fechaDeDia } from "./horario";
 import { diasDelMes, mismoDia } from "./fechas";
 import styles from "./MiniCalendario.module.css";
 
 type Props = {
   valor: Date;
+  horario: DiaResuelto[];
   onCambiar: (fecha: Date) => void;
 };
 
 const INICIALES_DIA = ["L", "M", "X", "J", "V", "S", "D"];
 
-function MiniCalendario({ valor, onCambiar }: Props): ReactElement {
+function MiniCalendario({ valor, horario, onCambiar }: Props): ReactElement {
   const [mesVisible, setMesVisible] = useState(
     () => new Date(valor.getFullYear(), valor.getMonth(), 1)
   );
@@ -68,7 +70,9 @@ function MiniCalendario({ valor, onCambiar }: Props): ReactElement {
 
           const elegido = mismoDia(dia, valor);
           const esHoy = mismoDia(dia, hoy);
-          const cerrado = !DIAS_APERTURA.includes(dia.getDay());
+          // Solo se atenúan fechas cuyo horario se ha consultado; el resto todavía es desconocido.
+          const resuelto = horario.find((elemento) => elemento.fecha === fechaDeDia(dia));
+          const cerrado = resuelto?.tramos.length === 0;
           const clases = [styles.dia];
           if (cerrado) clases.push(styles.cerrado);
           if (esHoy) clases.push(styles.hoy);

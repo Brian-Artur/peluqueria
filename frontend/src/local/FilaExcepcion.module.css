@@ -1,0 +1,5 @@
+.fila { padding-block: var(--espacio-2); border-bottom: 1px solid var(--color-linea); }
+.resumen, .confirmacion { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espacio-2); margin-bottom: var(--espacio-2); }
+.resumen button, .confirmacion button { padding: var(--espacio-2); border: 1px solid var(--color-linea); border-radius: var(--radio); background: var(--color-fondo); color: var(--color-texto); cursor: pointer; }
+.accion { margin-left: var(--espacio-3); color: var(--color-acento); }
+.error { color: var(--color-error); }

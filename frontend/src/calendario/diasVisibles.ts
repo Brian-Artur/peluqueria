@@ -1,15 +1,16 @@
 import type { Cita } from "../tipos";
-import { DIAS_APERTURA } from "./constantes";
+import type { DiaResuelto } from "@peluqueria/compartido";
+import { fechaDeDia } from "./horario";
 import { diasDeLaSemana, mismoDia } from "./fechas";
 
-export function diasVisibles(lunes: Date, citas: Cita[], mostrarCerrados: boolean): Date[] {
+export function diasVisibles(lunes: Date, citas: Cita[], mostrarCerrados: boolean, horario: DiaResuelto[]): Date[] {
   const dias = diasDeLaSemana(lunes);
   if (mostrarCerrados) {
     return dias;
   }
 
   return dias.filter((dia) => {
-    if (DIAS_APERTURA.includes(dia.getDay())) {
+    if (horario.some((resuelto) => resuelto.fecha === fechaDeDia(dia) && resuelto.tramos.length > 0)) {
       return true;
     }
 

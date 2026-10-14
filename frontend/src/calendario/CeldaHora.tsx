@@ -1,5 +1,7 @@
 import { useState, type MouseEvent, type ReactElement } from "react";
 import { FRANJAS_POR_HORA, MINUTOS_FRANJA } from "./constantes";
+import type { Tramo } from "@peluqueria/compartido";
+import { intervaloEnTramos } from "./horario";
 import { mismoDia } from "./fechas";
 import { franjaEnPosicion } from "./posicion";
 import { useSesion } from "../sesion/useSesion";
@@ -7,6 +9,7 @@ import styles from "./CeldaHora.module.css";
 
 type Props = {
   dia: Date;
+  tramos: Tramo[];
   hora: number;
   columna: number;
   filaInicio: number;
@@ -23,6 +26,7 @@ function franjaDelEvento(evento: MouseEvent<HTMLDivElement>): number {
 
 function CeldaHora({
   dia,
+  tramos,
   hora,
   columna,
   filaInicio,
@@ -59,6 +63,12 @@ function CeldaHora({
       onMouseLeave={() => setFranjaBajoRaton(null)}
       onClick={seleccionarFranja}
     >
+      {Array.from({ length: FRANJAS_POR_HORA }, (_, franja) => {
+        if (intervaloEnTramos(hora * 60 + franja * MINUTOS_FRANJA, MINUTOS_FRANJA, tramos)) return null;
+        return <div key={franja} className={styles.fueraHorario} style={{
+          top: `${franja / FRANJAS_POR_HORA * 100}%`, height: `${100 / FRANJAS_POR_HORA}%`,
+        }} />;
+      })}
       {puedeGestionar && franjaBajoRaton !== null && (
         <div
           className={styles.banda}

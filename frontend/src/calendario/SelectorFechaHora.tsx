@@ -1,19 +1,23 @@
 import type { ReactElement } from "react";
-import { HORAS, MINUTOS_FRANJA } from "./constantes";
+import type { DiaResuelto } from "@peluqueria/compartido";
+import { MINUTOS_FRANJA } from "./constantes";
 import MiniCalendario from "./MiniCalendario";
 import styles from "./SelectorFechaHora.module.css";
 
 type Props = {
   valor: Date;
+  horario: DiaResuelto[];
   onCambiar: (fecha: Date) => void;
 };
+
+const HORAS = Array.from({ length: 24 }, (_, hora) => hora);
 
 const MINUTOS = Array.from(
   { length: 60 / MINUTOS_FRANJA },
   (_, indice) => indice * MINUTOS_FRANJA
 );
 
-function SelectorFechaHora({ valor, onCambiar }: Props): ReactElement {
+function SelectorFechaHora({ valor, horario, onCambiar }: Props): ReactElement {
   const minutosVisibles = Math.floor(valor.getMinutes() / MINUTOS_FRANJA) * MINUTOS_FRANJA;
 
   function cambiarHora(hora: number, minutos: number): void {
@@ -24,7 +28,7 @@ function SelectorFechaHora({ valor, onCambiar }: Props): ReactElement {
 
   return (
     <div className={styles.selector}>
-      <MiniCalendario valor={valor} onCambiar={onCambiar} />
+      <MiniCalendario valor={valor} horario={horario} onCambiar={onCambiar} />
       <div className={styles.hora}>
         <label className={styles.campo}>
           Hora

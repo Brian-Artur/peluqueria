@@ -41,7 +41,6 @@
 .calendario {
   flex: 1;
   display: grid;
-  grid-template-rows: 48px repeat(132, minmax(4px, 1fr));
   border: 1px solid var(--color-linea);
   font-size: 13px;
 }
@@ -68,3 +67,9 @@
   margin: 0;
   color: var(--color-error);
 }
+
+.aviso { color: var(--color-texto-suave); margin: 0 0 var(--espacio-3); }
+
+.fueraRango { display: flex; flex-direction: column; gap: var(--espacio-2); margin-top: var(--espacio-3); }
+.fueraRango p { margin: 0; color: var(--color-texto-suave); }
+.fueraRango button { text-align: left; padding: var(--espacio-2); color: var(--color-texto); background: var(--color-superficie); border: 1px solid var(--color-linea); border-radius: var(--radio); cursor: pointer; }

@@ -1,14 +1,19 @@
 import { useId, useState, type FormEvent, type ReactElement } from "react";
-import { esquemaDatosCliente, normalizarTelefono, type CountryCode, type DatosCliente } from "@peluqueria/compartido";
+import { esquemaDatosCliente, normalizarTelefono, type CountryCode, type DatosCliente, type DiaResuelto } from "@peluqueria/compartido";
 import type { Seleccion, Cliente, Servicio, Cita } from "../tipos";
 import { erroresDeCliente, type ErroresCliente, type FormularioCliente } from "../clientes/erroresCliente";
 import CampoTelefono from "../clientes/CampoTelefono";
+import { duracionParaAviso } from "./duracionParaAviso";
+import { citaDentroDeHorario } from "./horario";
+import { useHorarioDelPanel } from "./useHorarioDelPanel";
 import SelectorFechaHora from "./SelectorFechaHora";
 import { useSesion } from "../sesion/useSesion";
 import styles from "./Panel.module.css";
 
 type Props = {
   seleccion: Seleccion;
+  semanaHorario: { desde: string; dias: DiaResuelto[] } | null;
+  consultarSemana: (desde: string, signal: AbortSignal) => Promise<DiaResuelto[]>;
   clientes: Cliente[];
   servicios: Servicio[];
   citaSeleccionada: Cita | null;
@@ -23,6 +28,8 @@ type Props = {
 
 function Panel({
   seleccion,
+  semanaHorario,
+  consultarSemana,
   clientes,
   servicios,
   citaSeleccionada,
@@ -50,6 +57,14 @@ function Panel({
   const [nuevoInicio, setNuevoInicio] = useState<Date>(
     () => new Date(citaSeleccionada?.inicio ?? Date.now())
   );
+
+  const inicioPropuesto = seleccion.tipo === "hueco" ? inicio : nuevoInicio;
+  const horario = useHorarioDelPanel(inicioPropuesto, semanaHorario, consultarSemana);
+  const idServicioPropuesto = seleccion.tipo === "hueco" ? servicioId : citaSeleccionada?.servicio_id;
+  const servicio = servicios.find((elemento) => elemento.id === idServicioPropuesto) ?? null;
+  const duracion = duracionParaAviso(servicio, citaSeleccionada);
+  const serviciosActivos = servicios.filter((elemento) => elemento.activo);
+  const fueraHorario = horario.dias !== null && !citaDentroDeHorario(inicioPropuesto, duracion, horario.dias);
 
   const crearCliente = async (evento: FormEvent<HTMLFormElement>): Promise<void> => {
     evento.preventDefault();
@@ -83,7 +98,7 @@ function Panel({
       {seleccion.tipo === "hueco" && puede("citas:gestionar") && (
         <div>
           <p className={styles.titulo}>Nueva cita</p>
-          <SelectorFechaHora valor={inicio} onCambiar={setInicio} />
+          <SelectorFechaHora valor={inicio} horario={horario.dias ?? []} onCambiar={setInicio} />
 
           <select
             className={styles.campo}
@@ -163,20 +178,24 @@ function Panel({
             onChange={(e) => setServicioId(Number(e.target.value) || null)}
           >
             <option value="">— Servicio —</option>
-            {servicios.map((s) => (
+            {serviciosActivos.map((s) => (
               <option key={s.id} value={s.id}>{s.nombre}</option>
             ))}
           </select>
 
+          {fueraHorario && <p role="status" className={styles.aviso}>El local está cerrado a esa hora</p>}
+          {horario.error && <><p role="alert" className={styles.error}>{horario.error}</p>
+            <button type="button" className={styles.secundario} onClick={horario.reintentar}>Volver a comprobar horario</button></>}
+          {horario.dias === null && !horario.error && <p role="status">Comprobando horario…</p>}
           <button
             className={styles.principal}
-            disabled={clienteId === null || servicioId === null || altaRapida || creandoCliente}
+            disabled={horario.dias === null || clienteId === null || servicioId === null || altaRapida || creandoCliente}
             onClick={() => {
               if (clienteId === null || servicioId === null) return;
               onCrear(clienteId, servicioId, inicio);
             }}
           >
-            Crear cita
+            {fueraHorario ? "Crear de todos modos" : "Crear cita"}
           </button>
         </div>
       )}
@@ -190,7 +209,7 @@ function Panel({
 
           {citaSeleccionada.estado === "reservada" && (
             <>
-              {puede("citas:gestionar") && <SelectorFechaHora valor={nuevoInicio} onCambiar={setNuevoInicio} />}
+              {puede("citas:gestionar") && <SelectorFechaHora valor={nuevoInicio} horario={horario.dias ?? []} onCambiar={setNuevoInicio} />}
               {puede("citas:completar") && (
                 <button className={styles.secundario} onClick={() => onCompletar(citaSeleccionada.id)}>
                   Completar cita
@@ -198,8 +217,13 @@ function Panel({
               )}
               {puede("citas:gestionar") && (
                 <>
+                  {fueraHorario && <p role="status" className={styles.aviso}>El local está cerrado a esa hora</p>}
+                  {horario.error && <><p role="alert" className={styles.error}>{horario.error}</p>
+            <button type="button" className={styles.secundario} onClick={horario.reintentar}>Volver a comprobar horario</button></>}
+                  {horario.dias === null && !horario.error && <p role="status">Comprobando horario…</p>}
                   <button
                     className={styles.principal}
+                    disabled={horario.dias === null}
                     onClick={() =>
                       onMover(
                         citaSeleccionada.id,
@@ -207,7 +231,7 @@ function Panel({
                       )
                     }
                   >
-                    Mover cita
+                    {fueraHorario ? "Mover de todos modos" : "Mover cita"}
                   </button>
 
                   <button className={styles.secundario} onClick={() => onCancelar(citaSeleccionada.id)}>

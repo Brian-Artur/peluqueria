@@ -20,3 +20,11 @@
   outline: 2px solid var(--color-acento);
   outline-offset: -2px;
 }
+
+.fueraHorario {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--color-fuera-horario);
+  pointer-events: none;
+}

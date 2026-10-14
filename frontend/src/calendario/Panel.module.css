@@ -116,3 +116,5 @@
 .campo[aria-invalid="true"] {
   border-color: var(--color-error);
 }
+
+.aviso { color: var(--color-acento); }

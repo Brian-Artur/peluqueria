@@ -65,3 +65,5 @@
 .siguiente {
   right: var(--espacio-1);
 }
+
+.marca { color: var(--color-acento); }

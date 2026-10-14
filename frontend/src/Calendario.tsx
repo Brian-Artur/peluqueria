@@ -1,14 +1,15 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { z } from "zod";
-import { esquemaCita, esquemaCliente, esquemaServicio, type DatosCliente } from "@peluqueria/compartido";
+import { esquemaCita, esquemaCliente, esquemaServicio, type DatosCliente, esquemaLocal, esquemaDiaResuelto, type Local, type DiaResuelto } from "@peluqueria/compartido";
 import type { Cita, Cliente, Servicio, Seleccion } from "./tipos";
 import { esAbortada, mensajeDeError, pedir, pedirJson } from "./peticion";
 import CabeceraDias from "./calendario/CabeceraDias";
 import Rejilla from "./calendario/Rejilla";
 import TarjetaCita from "./calendario/TarjetaCita";
 import { lunesDeEstaSemana, sumarDias } from "./calendario/fechas";
+import { fechaDeDia, rangoDeHorario } from "./calendario/horario";
 import { diasVisibles } from "./calendario/diasVisibles";
-import { columnaDeFecha } from "./calendario/posicion";
+import { columnaDeFecha, filasDeCita } from "./calendario/posicion";
 import styles from "./Calendario.module.css";
 import Panel from "./calendario/Panel";
 import { useSesion } from "./sesion/useSesion";
@@ -17,6 +18,12 @@ import { useSesion } from "./sesion/useSesion";
 function Calendario(): ReactElement {
   const { puede } = useSesion();
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [local, setLocal] = useState<Local | null>(null);
+  const [semanaHorario, setSemanaHorario] = useState<{ desde: string; dias: DiaResuelto[] } | null>(null);
+  const [errorHorario, setErrorHorario] = useState<string | null>(null);
+  const zonaDispositivo = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const consultarSemana = useCallback((desde: string, signal: AbortSignal): Promise<DiaResuelto[]> =>
+    pedirJson(`/api/horario/semana?desde=${desde}`, z.array(esquemaDiaResuelto).length(7), { signal }), []);
   const [mostrarCerrados, setMostrarCerrados] = useState(false);
   const [lunesVisible, setLunesVisible] = useState(() =>
     lunesDeEstaSemana(new Date())
@@ -65,7 +72,7 @@ function Calendario(): ReactElement {
     setSeleccion({ tipo: "hueco", inicio });
   };
 
-  const seleccionarCita = (id: number) => {
+  const seleccionarCita = (id: number): void => {
     setError(null);
     setSeleccion({ tipo: "cita", id });
   };
@@ -150,7 +157,7 @@ function Calendario(): ReactElement {
 
   useEffect(() => {
     const controlador = new AbortController();
-    pedirJson("/api/servicios", z.array(esquemaServicio), { signal: controlador.signal })
+    pedirJson("/api/servicios?incluirInactivos=true", z.array(esquemaServicio), { signal: controlador.signal })
       .then((lista) => {
         if (!controlador.signal.aborted) setServicios(lista);
       })
@@ -180,17 +187,55 @@ function Calendario(): ReactElement {
       "No se pudo mover la cita"
     );
 
+  useEffect(() => {
+    const controlador = new AbortController();
+    pedirJson("/api/local", esquemaLocal, { signal: controlador.signal })
+      .then((datos) => { if (!controlador.signal.aborted) setLocal(datos); })
+      .catch((fallo) => {
+        if (controlador.signal.aborted || esAbortada(fallo)) return;
+        setError(`No se pudieron cargar los datos del salón: ${mensajeDeError(fallo)}`);
+      });
+    return () => controlador.abort();
+  }, []);
+
+  useEffect(() => {
+    const controlador = new AbortController();
+    const desde = fechaDeDia(lunesVisible);
+    consultarSemana(desde, controlador.signal)
+      .then((dias) => {
+        if (controlador.signal.aborted) return;
+        setSemanaHorario({ desde, dias });
+        setErrorHorario(null);
+      })
+      .catch((fallo) => {
+        if (controlador.signal.aborted || esAbortada(fallo)) return;
+        setErrorHorario(`No se pudo cargar el horario: ${mensajeDeError(fallo)}`);
+      });
+    return () => controlador.abort();
+  }, [lunesVisible, consultarSemana]);
+
+  const horario = semanaHorario?.desde === fechaDeDia(lunesVisible) ? semanaHorario.dias : [];
+  const rango = rangoDeHorario(horario);
   const domingoSiguiente = sumarDias(lunesVisible, 7);
 
   const citasDeLaSemana = citas.filter((cita) => {
     const inicio = new Date(cita.inicio);
     return inicio >= lunesVisible && inicio < domingoSiguiente;
   });
-  const dias = diasVisibles(lunesVisible, citasDeLaSemana, mostrarCerrados);
+  const dias = diasVisibles(lunesVisible, citasDeLaSemana, mostrarCerrados, horario);
+  const citasFueraRango = citasDeLaSemana.filter((cita) =>
+    filasDeCita(new Date(cita.inicio), new Date(cita.fin), rango.horaInicio, rango.franjas) === null);
+  const columnas = dias.length === 0 ? "60px" : `60px repeat(${dias.length}, minmax(0, 1fr))`;
 
   return (
     <section className={styles.pagina}>
       <h1 className={styles.titulo}>Agenda</h1>
+      {local && zonaDispositivo !== local.zona_horaria && <p className={styles.aviso} role="status">
+        Este dispositivo está en otra zona horaria ({zonaDispositivo}). Las horas se muestran en la hora del dispositivo, no en la del salón ({local.zona_horaria}).
+      </p>}
+      {errorHorario && <p role="alert" className={styles.error}>{errorHorario}</p>}
+      {horario.length === 0 && !errorHorario && <p role="status">Cargando horario…</p>}
+      {horario.length > 0 && dias.length === 0 && <p className={styles.aviso}>Esta semana el local está cerrado. Activa «Mostrar días cerrados» para ver sus días.</p>}
       <div className={styles.distribucion}>
         <div className={styles.agenda}>
           <div className={styles.opciones}>
@@ -209,11 +254,13 @@ function Calendario(): ReactElement {
 
           <div
             className={styles.calendario}
-            style={{ gridTemplateColumns: `60px repeat(${dias.length}, minmax(0, 1fr))` }}
+            style={{ gridTemplateRows: `48px repeat(${rango.franjas}, minmax(4px, 1fr))`, gridTemplateColumns: columnas }}
           >
-            <CabeceraDias dias={dias} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
+            <CabeceraDias dias={dias} lunes={lunesVisible} horario={horario} onAnterior={semanaAnterior} onSiguiente={semanaSiguiente} />
             <Rejilla
               dias={dias}
+              horario={horario}
+              rango={rango}
               huecoSeleccionado={seleccion?.tipo === "hueco" ? seleccion.inicio : null}
               onSeleccionarHueco={seleccionarHueco}
             />
@@ -228,12 +275,20 @@ function Calendario(): ReactElement {
                   key={cita.id}
                   cita={cita}
                   columna={columna}
+                  horaInicio={rango.horaInicio}
+                  franjas={rango.franjas}
                   seleccionada={seleccion?.tipo === "cita" && seleccion.id === cita.id}
                   onSeleccionarCita={seleccionarCita}
                 />
               );
             })}
           </div>
+          {citasFueraRango.length > 0 && <div className={styles.fueraRango}>
+            <p>Citas fuera del rango de la rejilla</p>
+            {citasFueraRango.map((cita) => <button key={cita.id} type="button" onClick={() => seleccionarCita(cita.id)}>
+              {new Date(cita.inicio).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })} · {cita.cliente_nombre} · {cita.servicio_nombre} · {cita.estado}
+            </button>)}
+          </div>}
         </div>
 
         <div className={styles.columnaPanel}>
@@ -252,6 +307,8 @@ function Calendario(): ReactElement {
                   : `hueco-${seleccion.inicio.toISOString()}`
               }
               seleccion={seleccion}
+              semanaHorario={semanaHorario}
+              consultarSemana={consultarSemana}
               clientes={clientes}
               servicios={servicios}
               citaSeleccionada={citaSeleccionada}
