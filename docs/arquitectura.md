@@ -1,4 +1,4 @@
-# Arquitectura — cómo está construido hoy (v4.3)
+# Arquitectura — cómo está construido hoy (v4.4)
 
 Lo que existe en el código. Lo que vendrá está en [dominio.md](dominio.md); el porqué de cada elección, en [decisiones.md](decisiones.md).
 
@@ -28,6 +28,8 @@ MariaDB 12 en Docker, puerto `127.0.0.1:3305` (solo loopback). Docker solo crea 
 | `competencia` | empleado_id, servicio_id, nivel, duracion_min, margen_min | Nivel aprendiz / autonomo / experto; duración y margen propios del empleado en ese servicio. |
 | `historial_tiempo` | empleado, servicio, campo, antes, después, usuario, cuándo | Cada cambio de duración o margen. |
 | `tipo_recurso`, `recurso` | tipo editable; recurso con nombre, fuera de servicio + motivo, activo | Butaca 1, Lavacabezas 2… Cada servicio ocupa un tipo (`servicio.tipo_recurso_id`). |
+| `local` | nombre, zona_horaria | Fila única con los datos del salón. |
+| `horario_tramo`, `temporada`, `excepcion_horario`, `excepcion_tramo` | tramos por día (general o de temporada), temporadas con fechas, excepciones por fecha | Se resuelve: excepción → temporada activa → general (`GET /api/horario/semana`). |
 | `servicio` | id, nombre, categoria_id, duracion_min, margen_min, dificultad, precio, activo | Catálogo. Cambiarlo no altera citas ya creadas. |
 | `cita` | id, cliente_id, servicio_id, inicio, fin, estado | FK a cliente y servicio. |
 
@@ -77,7 +79,7 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 | `clientes/ListaClientes.tsx`, `FichaCliente.tsx`, `CampoTelefono.tsx` | Filas compactas con notas desplegables; formulario validado con el contrato; prefijo + número. |
 | `sesion/`, `usuarios/` | Entrada, rutas protegidas, gestión de usuarios (admin) y mi cuenta. |
 | `servicios/` | Catálogo agrupado por categoría y gestión de categorías (admin y encargado). |
-| `local/` | Pantalla del salón: tipos de recurso y recursos (fuera de servicio, bajas). |
+| `local/` | Pantalla del salón: horario (general, temporadas, excepciones), datos del salón y recursos. |
 | `empleados/` | Ficha del empleado (datos, historial de contratos, competencias, tiempos e historial de cambios) y cuadro empleados × servicios con avisos de huecos. |
 | `Calendario.tsx` | Dueño del estado (`citas`, `clientes`, `servicios`, `lunesVisible`, `seleccion`) y de los fetch. |
 | `calendario/CabeceraDias.tsx` | Semana ISO, días con su número y flechas de semana anterior / siguiente. |
