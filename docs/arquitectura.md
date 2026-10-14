@@ -79,7 +79,7 @@ Calendario semanal en **CSS Grid escrito a mano**. Estilos con **CSS Modules**: 
 | `clientes/ListaClientes.tsx`, `FichaCliente.tsx`, `CampoTelefono.tsx` | Filas compactas con notas desplegables; formulario validado con el contrato; prefijo + número. |
 | `sesion/`, `usuarios/` | Entrada, rutas protegidas, gestión de usuarios (admin) y mi cuenta. |
 | `servicios/` | Catálogo agrupado por categoría y gestión de categorías (admin y encargado). |
-| `local/` | Pantalla del salón: horario (general, temporadas, excepciones), datos del salón y recursos. |
+| `horario/`, `recursos/` | Pantallas del salón: horario (general, temporadas, excepciones) y datos del salón; tipos de recurso y recursos. |
 | `empleados/` | Ficha del empleado (datos, historial de contratos, competencias, tiempos e historial de cambios) y cuadro empleados × servicios con avisos de huecos. |
 | `Calendario.tsx` | Dueño del estado (`citas`, `clientes`, `servicios`, `lunesVisible`, `seleccion`) y de los fetch. |
 | `calendario/CabeceraDias.tsx` | Semana ISO, días con su número y flechas de semana anterior / siguiente. |

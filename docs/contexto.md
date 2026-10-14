@@ -6,8 +6,8 @@ Actualizado: **14/10/2026**
 
 | | |
 |---|---|
-| **Última versión cerrada** | `v4.4.0` (14/10/2026): horario del local (temporadas, excepciones); antes `v4.3.0`, recursos físicos. |
-| **En curso** | **v4.4.1**: Horario y Recursos en dos pantallas a pantalla completa. |
+| **Última versión cerrada** | `v4.4.1` (14/10/2026): Horario y Recursos separados a pantalla completa. Antes `v4.4.0` horario del local y `v4.3.0` recursos. |
+| **En curso** | **v4.5: turnos** — primeras decisiones. |
 | **Siguiente** | v4.5 turnos · v4.6 ausencias · v4.7 bloqueos · v4.8 plano del local · v4.9 incidencias de clientes. Detalle en el roadmap. |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 

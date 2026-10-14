@@ -17,6 +17,8 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 - **v4.0** (14/10/2026, tag `v4.0.0`) — Usuarios y roles: sesión con cookie hecha a mano, cuatro roles (admin, encargado, recepción, empleado) con una sola tabla de permisos en `compartido/`, pantallas de entrada, usuarios y mi cuenta.
 - **v4.1** (14/10/2026, tag `v4.1.0`) — Catálogo con categorías editables; empleados (separados de usuarios) con historial de contratos y competencias por nivel; cuadro empleados × servicios con avisos de huecos.
 - **v4.2** (14/10/2026, tag `v4.2.0`) — Duraciones y márgenes por empleado y servicio (margen del servicio + del empleado), dificultad del servicio con aviso para aprendices, historial de cambios; solo admin y encargado.
+- **v4.3** (14/10/2026, tag `v4.3.0`) — Recursos físicos: tipos editables, recursos uno a uno (fuera de servicio, bajas) y el tipo que ocupa cada servicio.
+- **v4.4** (14/10/2026, tags `v4.4.0`, `v4.4.1`) — Horario del local con varios tramos por día, temporadas y excepciones; la agenda sigue el horario (avisa fuera de horario); aviso de zona horaria. En `v4.4.1`, Horario y Recursos pasan a pantallas separadas a pantalla completa.
 
 ## Cómo se numera
 
@@ -28,7 +30,6 @@ Orden pensado para que cada paso se apoye en el anterior. **No se adelanta traba
 
 | Subversión | Contenido |
 |---|---|
-| **v4.4.1** | Horario y Recursos en dos pantallas separadas, a pantalla completa. |
 | **v4.5** | **Turnos**: qué días y horas trabaja cada empleado (varios tramos por día, como el horario del local). |
 | **v4.6** | **Ausencias**: vacaciones, bajas, formación… por rangos de fechas. |
 | **v4.7** | **Bloqueos por eventos** (bodas…): una franja que inutiliza empleados y/o recursos concretos, con motivo. Avisa de las citas que chocan; no las borra. |
