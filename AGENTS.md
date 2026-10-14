@@ -85,6 +85,7 @@ frontend/src/
   usuarios/             pantalla /usuarios (admin) y /mi-cuenta
   servicios/            pantalla /servicios: catálogo y categorías
   empleados/            pantalla /empleados: ficha, contratos, competencias y /empleados/cuadro
+  local/                pantalla /local: recursos físicos (y el horario del salón en v4.4)
   catalogo/             utilidades compartidas del catálogo (agrupar servicios por categoría)
   tipos.ts              reexporta los tipos de compartido + Seleccion (solo de la interfaz)
   peticion.ts           fetch que lanza el mensaje de error del backend y valida la respuesta con su esquema
