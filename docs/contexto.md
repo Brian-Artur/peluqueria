@@ -7,7 +7,7 @@ Actualizado: **14/10/2026**
 | | |
 |---|---|
 | **Última versión cerrada** | `v4.1.0` (14/10/2026): catálogo con categorías editables, empleados con historial de contratos y competencias, cuadro resumen. |
-| **En curso** | **v4.2: duraciones por empleado** — primeras decisiones. |
+| **En curso** | **v4.2** completa (duraciones y márgenes por empleado, dificultad, historial); pendiente de revisión y del tag `v4.2.0`. |
 | **Siguiente** | Recursos físicos, horarios del local, turnos, ausencias y bloqueos (resto de v4). |
 | **Pendiente de mí** | Usuarios demo para desarrollo: `admin`, `encargado`, `recepcion`, `empleado` (contraseña `demo1234`). Crear el usuario real con `npm run crear-usuario`. El despliegue queda aparcado (el Windows de bot_trading va justo). |
 
